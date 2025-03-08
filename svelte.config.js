@@ -17,10 +17,12 @@ const config = {
 		alias: {
 			$routes: '.svelte-kit/types/src/routes',
 			$components: 'src/lib/components',
+			$ui: 'src/lib/components/ui',
 			$utils: 'src/lib/utils',
+			$boid: 'src/lib/boid',
+			$config: 'src/lib/config',
 			$game: 'src/lib/game',
 			$scenes: 'src/lib/game/scenes',
-			$boid: 'src/lib/game/boid',
 			$assets: 'src/assets'
 		}
 	}
