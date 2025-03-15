@@ -157,7 +157,7 @@
 {#snippet debugToggle()}
 	<div class="flex items-center gap-2">
 		<Label for="debug-mode" class="cursor-pointer text-sm font-medium">Debug</Label>
-		<Switch id="debug-mode" checked={debugMode} onchange={toggleDebugMode}></Switch>
+		<Switch id="debug-mode" checked={debugMode} onCheckedChange={toggleDebugMode} ></Switch>
 	</div>
 {/snippet}
 

@@ -2,7 +2,12 @@ import { EventBus } from '$game/event-bus';
 import { Scene, Input, GameObjects } from 'phaser';
 import { Flock } from '$boid/flock';
 import { Boid, BoidVariant } from '$boid';
-import type { BoidConfig, SimulationConfig } from '$config/index.svelte';
+import {
+	getBoidConfig,
+	getSimulationConfig,
+	type BoidConfig,
+	type SimulationConfig
+} from '$config/simulation-signals.svelte';
 
 export class Game extends Scene {
 	private boids: Boid[] = [];
@@ -13,12 +18,8 @@ export class Game extends Scene {
 	private obstacleGroup!: Phaser.GameObjects.Group;
 
 	// Configuration parameters
-	private boidConfig: Partial<BoidConfig> = {};
-	private simulationConfig: Partial<SimulationConfig> = {
-		initialPreyCount: 100,
-		initialPredatorCount: 0,
-		obstacleCount: 0
-	};
+	private boidConfig: Partial<BoidConfig> = getBoidConfig();
+	private simulationConfig: Partial<SimulationConfig> = getSimulationConfig();
 
 	// Debug settings
 	private debugMode = false;
@@ -144,7 +145,7 @@ export class Game extends Scene {
 
 	private createBoids() {
 		// Create prey boids
-		const preyCount = this.simulationConfig.initialPreyCount || 100;
+		const preyCount = this.simulationConfig.initialPreyCount || 0;
 		for (let i = 0; i < preyCount; i++) {
 			this.createBoid(BoidVariant.PREY);
 		}
@@ -267,6 +268,7 @@ export class Game extends Scene {
 	}
 
 	private drawDebugVisuals() {
+		console.debug('making debug visuals');
 		this.debugGraphics.clear();
 
 		// Draw perception radius and direction for each boid
@@ -274,9 +276,9 @@ export class Game extends Scene {
 			// Draw perception radius
 			const perceptionRadius = boid.getPerceptionRadius();
 			this.debugGraphics.lineStyle(
-				1,
+				2,
 				boid.getVariant() === BoidVariant.PREDATOR ? 0xff0000 : 0x00ff00,
-				0.3
+				0.5
 			);
 			this.debugGraphics.strokeCircle(boid.x, boid.y, perceptionRadius);
 

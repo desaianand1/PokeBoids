@@ -70,8 +70,8 @@ export class Boid extends Physics.Arcade.Sprite {
 		variant: BoidVariant = BoidVariant.PREY,
 		config: Partial<BoidConfig> = {}
 	) {
-		// Use different texture based on type
-		const texture = variant === BoidVariant.PREDATOR ? 'predator' : 'boid';
+		// Use different texture based on variant
+		const texture = variant === BoidVariant.PREDATOR ? 'predator' : 'prey';
 		super(scene, x, y, texture);
 
 		scene.physics.add.existing(this);
@@ -93,13 +93,13 @@ export class Boid extends Physics.Arcade.Sprite {
 
 		this.acceleration = new PhaserMath.Vector2();
 
-		// Initialize stats based on type
+		// Initialize stats based on variant
 		this.initStats();
 
 		// Listen for config changes
 		this.setupEventListeners();
 
-		// Set display properties based on type
+		// Set display properties based on variant
 		this.setupDisplay();
 	}
 
@@ -117,7 +117,7 @@ export class Boid extends Physics.Arcade.Sprite {
 		};
 
 		// Predator-specific stats
-		if (this.type === BoidVariant.PREDATOR) {
+		if (this.variant === BoidVariant.PREDATOR) {
 			this.stats.attack = 10;
 		}
 	}
@@ -157,14 +157,13 @@ export class Boid extends Physics.Arcade.Sprite {
 
 	private setupDisplay() {
 		// Set scale and origin
-		this.setScale(this.type === BoidVariant.PREDATOR ? 0.75 : 0.5);
+		this.setScale(this.variant === BoidVariant.PREDATOR ? 0.75 : 0.5);
 		this.setOrigin(0.5, 0.5);
-
-		// Set tint based on type
-		if (this.type === BoidVariant.PREDATOR) {
-			this.setTint(0xff3333); // Red for predators
+		// Set tint based on variant
+		if (this.variant === BoidVariant.PREDATOR) {
+			this.setTint(0xff8c00); // Orange for predators
 		} else {
-			this.setTint(0x33ff33); // Green for prey
+			this.setTint(0x00ff7f); // Green for prey
 		}
 	}
 
@@ -245,7 +244,7 @@ export class Boid extends Physics.Arcade.Sprite {
 	}
 
 	increaseReproduction(amount: number) {
-		if (this.reproductionCount >= (this.type === BoidVariant.PREDATOR ? 5 : 3)) {
+		if (this.reproductionCount >= (this.variant === BoidVariant.PREDATOR ? 5 : 3)) {
 			return false; // Already reached reproduction limit
 		}
 
@@ -268,7 +267,7 @@ export class Boid extends Physics.Arcade.Sprite {
 		this.stats.health += PhaserMath.Between(5, 10);
 		this.stats.speed += PhaserMath.FloatBetween(1, 3);
 
-		if (this.type === BoidVariant.PREDATOR && this.stats.attack) {
+		if (this.variant === BoidVariant.PREDATOR && this.stats.attack) {
 			this.stats.attack += PhaserMath.FloatBetween(0.5, 1.5);
 		}
 

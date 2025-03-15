@@ -44,20 +44,20 @@ const DEFAULT_BOID_CONFIG: BoidConfig = {
 	alignmentWeight: 1.0,
 	cohesionWeight: 1.0,
 	separationWeight: 1.5,
-	perceptionRadius: 50,
-	separationRadius: 30,
-	boundaryMargin: 100,
-	boundaryForceMultiplier: 3.0,
+	perceptionRadius: 100,
+	separationRadius: 50,
+	boundaryMargin: 150,
+	boundaryForceMultiplier: 5.0,
 	boundaryForceRamp: 2.5,
 	obstaclePerceptionRadius: 150,
 	obstacleForceMultiplier: 4.0,
 	maxSpeed: 100,
-	maxForce: 1.0
+	maxForce: 5.0
 };
 
 const DEFAULT_SIMULATION_CONFIG: SimulationConfig = {
-	initialPreyCount: 100,
-	initialPredatorCount: 0,
+	initialPreyCount: 50,
+	initialPredatorCount: 10,
 	obstacleCount: 0,
 	trackStats: true
 };

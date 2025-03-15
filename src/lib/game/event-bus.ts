@@ -101,7 +101,6 @@ export interface EventMap {
 
 	// Debug events
 	'debug-toggle': { enabled: boolean };
-	'debug-visuals-toggle': { enabled: boolean };
 
 	// Unit-Testing
 	'test-event': { value: number };

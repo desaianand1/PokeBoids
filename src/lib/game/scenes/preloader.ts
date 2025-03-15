@@ -31,7 +31,9 @@ export class Preloader extends Scene {
 
 		this.load.image('day-sky', 'day-sky.jpg');
 		this.load.image('night-sky', 'night-sky.jpg');
-		this.load.image('boid', 'chevron.png');
+		this.load.image('prey', 'prey.png');
+		this.load.image('predator', 'predator.png');
+		// this.load.image('obstacle', 'obstacle.png');
 	}
 
 	create() {
