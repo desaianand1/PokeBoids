@@ -1,6 +1,6 @@
 import { Events } from 'phaser';
 import type { Boid } from '$lib/boid';
-import type { BoidConfig, SimulationConfig } from '$config/index.svelte';
+import type { BoidConfig, SimulationConfig } from '$config/simulation-signals.svelte';
 
 /**
  * Core event types for Phaser-Svelte communication
@@ -102,6 +102,11 @@ export interface EventMap {
 	// Debug events
 	'debug-toggle': { enabled: boolean };
 	'debug-visuals-toggle': { enabled: boolean };
+
+	// Unit-Testing
+	'test-event': { value: number };
+	'test-event-1': { value?: number, type?: unknown };
+	'test-event-2': { value?: number, type?: unknown };
 }
 
 /**

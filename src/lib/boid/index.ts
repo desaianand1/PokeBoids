@@ -1,7 +1,7 @@
 import { Physics, Scene, Math as PhaserMath } from 'phaser';
 import { v4 as UUIDv4 } from 'uuid';
 import { EventBus } from '$game/event-bus';
-import type { BoidConfig } from '$config/index.svelte';
+import type { BoidConfig } from '$config/simulation-signals.svelte';
 
 export enum BoidVariant {
 	PREY = 'prey',

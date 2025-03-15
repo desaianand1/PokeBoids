@@ -36,6 +36,9 @@ export interface SimulationConfig {
 	trackStats: boolean;
 }
 
+const simulationSpeeds = [0.2, 0.5, 1.0, 1.5, 2.0, 3.0] as const;
+export type SimulationSpeed = (typeof simulationSpeeds)[number];
+
 // Default configuration
 const DEFAULT_BOID_CONFIG: BoidConfig = {
 	alignmentWeight: 1.0,
@@ -63,21 +66,13 @@ const DEFAULT_SIMULATION_CONFIG: SimulationConfig = {
 let boidConfig = $state<BoidConfig>({ ...DEFAULT_BOID_CONFIG });
 let simulationConfig = $state<SimulationConfig>({ ...DEFAULT_SIMULATION_CONFIG });
 
-export function getBoidConfig() {
-	return boidConfig;
-}
-export function getSimulationConfig() {
-	return simulationConfig;
-}
+// Simulation state
+let isPlaying = $state(true);
+let simulationSpeed = $state<SimulationSpeed>(1.0);
+let debugMode = $state(false);
 
-// Reset to defaults function
-export function resetToDefaults() {
-	boidConfig = { ...DEFAULT_BOID_CONFIG };
-	simulationConfig = { ...DEFAULT_SIMULATION_CONFIG };
-}
-
-// Set up effects to emit events when config changes
 $effect.root(() => {
+	// Set up effects to emit events when config changes
 	$effect(() => {
 		const config = boidConfig;
 
@@ -111,16 +106,105 @@ $effect.root(() => {
 		// Also emit a composite event
 		EventBus.emit('simulation-config-changed', { config });
 	});
+
+	$effect(() => {
+		if (isPlaying) {
+			EventBus.emit('simulation-started', undefined);
+		} else {
+			EventBus.emit('simulation-paused', undefined);
+		}
+	});
+
+	$effect(() => {
+		EventBus.emit('simulation-speed-changed', { value: simulationSpeed });
+	});
+
+	$effect(() => {
+		EventBus.emit('debug-toggle', { enabled: debugMode });
+	});
 });
 
-// Update a single parameter
-export function updateBoidConfig<K extends keyof BoidConfig>(key: K, value: BoidConfig[K]) {
+// Functions to update configuration
+function updateBoidConfig<K extends keyof BoidConfig>(key: K, value: BoidConfig[K]) {
 	boidConfig = { ...boidConfig, [key]: value };
 }
 
-export function updateSimulationConfig<K extends keyof SimulationConfig>(
+function getBoidConfig(): BoidConfig {
+	return boidConfig;
+}
+
+function updateSimulationConfig<K extends keyof SimulationConfig>(
 	key: K,
 	value: SimulationConfig[K]
 ) {
 	simulationConfig = { ...simulationConfig, [key]: value };
 }
+
+function getSimulationConfig(): SimulationConfig {
+	return simulationConfig;
+}
+
+function resetToDefaults() {
+	boidConfig = { ...DEFAULT_BOID_CONFIG };
+	simulationConfig = { ...DEFAULT_SIMULATION_CONFIG };
+}
+
+function togglePlayPause() {
+	isPlaying = !isPlaying;
+}
+
+function isSimulationPlaying(): boolean {
+	return isPlaying;
+}
+
+function advanceSimulationSpeed(): void {
+	const currentIndex = simulationSpeeds.indexOf(simulationSpeed);
+	if (currentIndex < simulationSpeeds.length - 1) {
+		simulationSpeed = simulationSpeeds[currentIndex + 1];
+	}
+}
+
+function slowSimulationSpeed(): void {
+	const currentIndex = simulationSpeeds.indexOf(simulationSpeed);
+	if (currentIndex > 0) {
+		simulationSpeed = simulationSpeeds[currentIndex - 1];
+	}
+}
+
+function getCurrentSimulationSpeed(): SimulationSpeed {
+	return simulationSpeed;
+}
+
+function getSimulationSpeedRange(): { min: number; max: number } {
+	return { min: simulationSpeeds[0], max: simulationSpeeds[simulationSpeeds.length - 1] };
+}
+
+function toggleDebugMode() {
+	debugMode = !debugMode;
+}
+
+function getDebugMode(): boolean {
+	return debugMode;
+}
+
+function resetSimulation() {
+	EventBus.emit('simulation-reset', undefined);
+}
+
+// Export everything
+export {
+	isSimulationPlaying,
+	getCurrentSimulationSpeed,
+	getDebugMode,
+	updateBoidConfig,
+	getBoidConfig,
+	updateSimulationConfig,
+	getSimulationConfig,
+	resetToDefaults,
+	togglePlayPause,
+	advanceSimulationSpeed,
+	slowSimulationSpeed,
+	getSimulationSpeedRange,
+	toggleDebugMode,
+	resetSimulation
+};
