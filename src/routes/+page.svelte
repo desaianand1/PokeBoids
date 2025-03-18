@@ -26,6 +26,7 @@
 		Info,
 		ChevronDown
 	} from '@lucide/svelte';
+	import { gameVersion } from '$utils/version';
 
 	// UI State
 	let sidebarVisible = $state(true);
@@ -156,13 +157,13 @@
 		</div>
 	</Tabs>
 
-	<div class="flex items-center justify-between border-t px-4 py-2 text-xs text-muted-foreground">
+	<footer class="flex items-center justify-between border-t px-4 py-2 text-xs text-muted-foreground">
 		<span class="flex items-center justify-center gap-4 p-2">
 			<ThemeSwitcher variant="outline" size="icon" />
 			<Badge variant="outline" class="py-2 font-mono text-xs">Boids Simulation</Badge>
 		</span>
-		<span class="text-secondary">v1.0.0</span>
-	</div>
+		<span class="text-secondary">v{gameVersion}</span>
+	</footer>
 {/snippet}
 
 {#snippet tabsSection(defaultTab: string)}
