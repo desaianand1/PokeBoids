@@ -6,13 +6,18 @@ export default defineConfig({
 	plugins: [sveltekit()],
 	test: {
 		environment: 'jsdom',
-		include: ['src/**/*.{test,spec}.{js,ts}'],
+		include: ['src/**/*.{test,spec}.{js,ts}', 'tests/**/*.{test,spec}.{js,ts}'],
 		globals: true,
-		setupFiles: ['./setup-tests.ts'],
 		coverage: {
 			provider: 'v8',
 			reporter: ['text', 'json', 'html'],
-			exclude: ['**/*.svelte', '**/*.d.ts', 'node_modules/**', 'src/lib/components/ui/**']
+			exclude: [
+				'**/*.svelte',
+				'**/*.d.ts',
+				'node_modules/**',
+				'src/lib/components/ui/**',
+				'tests/**'
+			]
 		},
 		deps: {
 			inline: [/phaser/]

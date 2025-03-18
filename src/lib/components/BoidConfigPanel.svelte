@@ -1,4 +1,3 @@
-<!-- src/lib/components/BoidConfigPanel.svelte -->
 <script lang="ts">
 	import { Card, CardContent, CardHeader, CardTitle } from '$ui/card';
 	import { Button } from '$ui/button';

@@ -1,329 +1,171 @@
-import { EventBus } from '$game/event-bus';
-import { Scene, Input, GameObjects } from 'phaser';
-import { Flock } from '$boid/flock';
-import { Boid, BoidVariant } from '$boid';
+import { Scene } from 'phaser';
+import { PhaserFlock } from '$lib/boid/phaser-flock';
+import { BoidFactory } from '$lib/boid/boid-factory';
+import { type IGameEventBus } from '$lib/adapters/phaser-events';
+import { BackgroundManager } from '$lib/game/background-manager';
+import { ObstacleManager } from '$lib/game/obstacle-manager';
+import { DebugManager } from '$lib/game/debug-manager';
+import { EffectsManager } from '$lib/game/effects-manager';
 import {
 	getBoidConfig,
 	getSimulationConfig,
 	type BoidConfig,
 	type SimulationConfig
 } from '$config/simulation-signals.svelte';
+import { createCompleteDependencies } from '$lib/adapters';
 
+/**
+ * Main game scene that coordinates all game components
+ */
 export class Game extends Scene {
-	private boids: Boid[] = [];
-	private flock!: Flock;
-	private background!: Phaser.GameObjects.Image;
-	private simulationActive = true;
-	private simulationSpeed = 1;
-	private obstacleGroup!: Phaser.GameObjects.Group;
+	// Core components
+	private eventEmitter!: IGameEventBus;
+	private boidFactory!: BoidFactory;
+	private flock!: PhaserFlock;
 
-	// Configuration parameters
+	// Managers
+	private backgroundManager!: BackgroundManager;
+	private obstacleManager!: ObstacleManager;
+	private debugManager!: DebugManager;
+	private effectsManager!: EffectsManager;
+
+	// Configuration and state
 	private boidConfig: Partial<BoidConfig> = getBoidConfig();
 	private simulationConfig: Partial<SimulationConfig> = getSimulationConfig();
-
-	// Debug settings
-	private debugMode = false;
-	private debugGraphics!: Phaser.GameObjects.Graphics;
+	private simulationActive = true;
+	private simulationSpeed = 1;
 
 	constructor() {
 		super('Game');
 	}
 
-	create() {
-		// Create background
-		this.background = this.add.image(0, 0, 'day-sky').setOrigin(0.5, 0.5);
-		this.scale.on('resize', this.resizeBackground, this);
-		this.resizeBackground();
-
-		// Create obstacle group
-		this.obstacleGroup = this.add.group();
-
-		// Create debug graphics layer (hidden by default)
-		this.debugGraphics = this.add.graphics();
-
-		// Create flock with initial config
-		this.flock = new Flock(this, this.boidConfig);
-
-		// Setup event listeners
+	create(): void {
+		this.initializeComponents();
 		this.setupEventListeners();
-
-		// Initialize simulation
-		this.initializeSimulation();
-
-		// Notify that scene is ready
-		EventBus.emit('scene-ready', { scene: this });
+		this.startSimulation();
 	}
 
-	private setupEventListeners() {
-		// Listen for UI control events from Svelte
-		EventBus.on(
-			'simulation-paused',
-			() => {
-				this.simulationActive = false;
-				EventBus.emit('game-paused', undefined);
-			},
-			this
-		);
+	private initializeComponents(): void {
+		const dependencies = createCompleteDependencies(this);
+		this.eventEmitter = dependencies.eventEmitter;
 
-		EventBus.on(
-			'simulation-started',
-			() => {
-				this.simulationActive = true;
-				EventBus.emit('game-resumed', undefined);
-			},
-			this
-		);
+		// Create managers
+		this.backgroundManager = new BackgroundManager(this);
+		this.obstacleManager = new ObstacleManager(this);
+		this.debugManager = new DebugManager(this);
+		this.effectsManager = new EffectsManager(this);
 
-		EventBus.on(
-			'simulation-reset',
-			() => {
-				this.resetSimulation();
-			},
-			this
-		);
+		// Create boid factory
+		const vectorFactory = dependencies.vectorFactory;
+		this.boidFactory = new BoidFactory(this, {
+			vectorFactory,
+			eventEmitter: this.eventEmitter,
+			random: dependencies.random,
+			time: dependencies.time,
+			physics: dependencies.physics,
+			config: this.boidConfig
+		});
 
-		EventBus.on(
-			'simulation-speed-changed',
-			({ value }) => {
-				this.simulationSpeed = value;
-			},
-			this
-		);
-
-		// Listen for configuration changes
-		EventBus.on(
-			'boid-config-changed',
-			({ config }) => {
-				this.boidConfig = config;
-			},
-			this
-		);
-
-		EventBus.on(
-			'simulation-config-changed',
-			({ config }) => {
-				this.simulationConfig = config;
-			},
-			this
-		);
-
-		// Listen for debug mode toggle
-		EventBus.on(
-			'debug-toggle',
-			({ enabled }) => {
-				this.debugMode = enabled;
-				this.debugGraphics.clear();
-			},
-			this
-		);
-
-		// Listen for obstacle count changes
-		EventBus.on(
-			'obstacle-count-changed',
-			({ value }) => {
-				this.updateObstacles(value);
-			},
-			this
-		);
+		// Create flock
+		this.flock = new PhaserFlock(this, this.eventEmitter, {
+			alignmentWeight: this.boidConfig.alignmentWeight ?? 1.0,
+			cohesionWeight: this.boidConfig.cohesionWeight ?? 1.0,
+			separationWeight: this.boidConfig.separationWeight ?? 1.5,
+			perceptionRadius: this.boidConfig.perceptionRadius ?? 150,
+			separationRadius: this.boidConfig.separationRadius ?? 50
+		});
 	}
 
-	private initializeSimulation() {
+	private setupEventListeners(): void {
+		// Simulation control events
+		this.eventEmitter.on('simulation-paused', () => {
+			this.simulationActive = false;
+			this.scene.pause();
+		});
+		this.eventEmitter.on('simulation-resumed', () => {
+			this.simulationActive = true;
+			this.scene.resume();
+		});
+		this.eventEmitter.on('simulation-reset', () => this.resetSimulation());
+		this.eventEmitter.on('simulation-speed-changed', ({ value }) => (this.simulationSpeed = value));
+
+		// Configuration events
+		this.eventEmitter.on('boid-config-changed', ({ config }) => (this.boidConfig = config));
+		this.eventEmitter.on('simulation-config-changed', ({ config }) => {
+			this.simulationConfig = config;
+			this.obstacleManager.updateObstacles(config.obstacleCount ?? 0);
+		});
+
+		// Debug events
+		this.eventEmitter.on('debug-toggle', ({ enabled }) => this.debugManager.setEnabled(enabled));
+
+		// Collision events
+		this.eventEmitter.on('boundary-collision', ({ boid, boundary }) => {
+			this.effectsManager.createCollisionEffect(boid, boundary);
+		});
+	}
+
+	private startSimulation(): void {
+		const margin = 50;
+		const bounds = {
+			minX: margin,
+			maxX: this.scale.width - margin,
+			minY: margin,
+			maxY: this.scale.height - margin
+		};
+
 		// Create initial boids
-		this.createBoids();
+		const prey = this.boidFactory.createPreys(this.simulationConfig.initialPreyCount ?? 0, bounds);
+		const predators = this.boidFactory.createPredators(
+			this.simulationConfig.initialPredatorCount ?? 0,
+			bounds
+		);
+
+		// Add boids to flock
+		[...prey, ...predators].forEach((boid) => this.flock.addBoid(boid));
 
 		// Create obstacles
-		if (this.simulationConfig.obstacleCount) {
-			this.createObstacles(this.simulationConfig.obstacleCount);
-		}
+		this.obstacleManager.updateObstacles(this.simulationConfig.obstacleCount ?? 0);
 
-		// Emit game started event
-		EventBus.emit('game-started', undefined);
-
-		// Emit flock data for UI
-		EventBus.emit('flock-updated', { count: this.boids.length });
+		// Notify scene is ready
+		this.eventEmitter.emit('scene-ready', { scene: this });
+		this.eventEmitter.emit('game-started', undefined);
 	}
 
-	private createBoids() {
-		// Create prey boids
-		const preyCount = this.simulationConfig.initialPreyCount || 0;
-		for (let i = 0; i < preyCount; i++) {
-			this.createBoid(BoidVariant.PREY);
-		}
-
-		// Create predator boids if specified
-		const predatorCount = this.simulationConfig.initialPredatorCount || 0;
-		for (let i = 0; i < predatorCount; i++) {
-			this.createBoid(BoidVariant.PREDATOR);
-		}
-	}
-
-	private createBoid(variant: BoidVariant) {
-		// Random position within the screen bounds
-		const margin = 50;
-		const x = Phaser.Math.Between(margin, this.scale.width - margin);
-		const y = Phaser.Math.Between(margin, this.scale.height - margin);
-
-		// Create the boid with current config
-		const boid = new Boid(this, x, y, variant, this.boidConfig);
-		this.add.existing(boid);
-
-		// Add to tracking arrays
-		this.boids.push(boid);
-		this.flock.addBoid(boid);
-	}
-
-	private createObstacles(count: number) {
-		// Clear existing obstacles
-		this.obstacleGroup.clear(true, true);
-		this.flock.clearAllObstacles();
-
-		// Create new obstacles
-		for (let i = 0; i < count; i++) {
-			const margin = 100;
-			const x = Phaser.Math.Between(margin, this.scale.width - margin);
-			const y = Phaser.Math.Between(margin, this.scale.height - margin);
-			const radius = Phaser.Math.Between(20, 60);
-
-			// Create circle obstacle
-			const obstacle = this.add.circle(x, y, radius, 0x555555, 0.7);
-			this.obstacleGroup.add(obstacle);
-
-			// Make it draggable
-			obstacle.setInteractive();
-			this.input.setDraggable(obstacle);
-
-			// Add to flock's obstacles
-			this.flock.addObstacle(obstacle);
-		}
-
-		// Set up drag events for all obstacles
-		this.input.on(
-			'drag',
-			(
-				pointer: Input.Pointer,
-				gameObject: GameObjects.GameObject,
-				dragX: number,
-				dragY: number
-			) => {
-				if (gameObject.body) {
-					gameObject.body.position.x = dragX;
-					gameObject.body.position.y = dragY;
-				}
-			}
-		);
-	}
-
-	private updateObstacles(count: number) {
-		// Only update if count changed
-		if (count !== this.obstacleGroup.getLength()) {
-			this.createObstacles(count);
-		}
-	}
-
-	private resetSimulation() {
-		// Clear existing boids
-		for (const boid of this.boids) {
-			boid.destroy();
-		}
-		this.boids = [];
-
-		// Recreate flock
+	private resetSimulation(): void {
+		// Clean up existing simulation
 		this.flock.destroy();
-		this.flock = new Flock(this, this.boidConfig);
 
-		// Initialize boids
-		this.createBoids();
+		// Create new flock
+		this.flock = new PhaserFlock(this, this.eventEmitter, {
+			alignmentWeight: this.boidConfig.alignmentWeight ?? 1.0,
+			cohesionWeight: this.boidConfig.cohesionWeight ?? 1.0,
+			separationWeight: this.boidConfig.separationWeight ?? 1.5,
+			perceptionRadius: this.boidConfig.perceptionRadius ?? 150,
+			separationRadius: this.boidConfig.separationRadius ?? 50
+		});
 
-		// Update obstacles
-		if (this.simulationConfig.obstacleCount) {
-			this.createObstacles(this.simulationConfig.obstacleCount);
-		}
-
-		// Emit reset event
-		EventBus.emit('game-reset', undefined);
-
-		// Emit flock data for UI
-		EventBus.emit('flock-updated', { count: this.boids.length });
+		// Start new simulation
+		this.startSimulation();
+		this.eventEmitter.emit('game-reset', undefined);
 	}
 
 	update(time: number, delta: number): void {
-		// Only update if simulation is active
 		if (this.simulationActive) {
-			// Apply simulation speed (adjust delta)
-			const adjustedDelta = delta * this.simulationSpeed;
+			// Update flock with adjusted delta time
+			this.flock.update(delta * this.simulationSpeed);
 
-			// Update boids
-			for (const boid of this.boids) {
-				boid.preUpdate(time, adjustedDelta);
-			}
-
-			// Let the flock compute and apply forces
-			this.flock.run();
-
-			// Draw debug visualizations if enabled
-			if (this.debugMode) {
-				this.drawDebugVisuals();
-			}
+			// Update debug visualization
+			this.debugManager.update(this.flock.getBoids());
 		}
 	}
 
-	private drawDebugVisuals() {
-		console.debug('making debug visuals');
-		this.debugGraphics.clear();
-
-		// Draw perception radius and direction for each boid
-		for (const boid of this.boids) {
-			// Draw perception radius
-			const perceptionRadius = boid.getPerceptionRadius();
-			this.debugGraphics.lineStyle(
-				2,
-				boid.getVariant() === BoidVariant.PREDATOR ? 0xff0000 : 0x00ff00,
-				0.5
-			);
-			this.debugGraphics.strokeCircle(boid.x, boid.y, perceptionRadius);
-
-			// Draw velocity vector
-			const velocity = boid.getVelocity();
-			const lineLength = velocity.length() * 0.5;
-			this.debugGraphics.lineStyle(2, 0xffffff, 0.5);
-			this.debugGraphics.lineBetween(
-				boid.x,
-				boid.y,
-				boid.x + velocity.x * lineLength,
-				boid.y + velocity.y * lineLength
-			);
-		}
-	}
-
-	private resizeBackground = () => {
-		const width = this.scale.width;
-		const height = this.scale.height;
-
-		if (!this.background) return;
-
-		const scaleX = width / this.background.width;
-		const scaleY = height / this.background.height;
-		const scale = Math.max(scaleX, scaleY);
-
-		this.background.setScale(scale);
-		this.background.setPosition(width / 2, height / 2);
-	};
-
-	shutdown() {
-		// Clean up event listeners
-		EventBus.off('simulation-paused', undefined, this);
-		EventBus.off('simulation-started', undefined, this);
-		EventBus.off('simulation-reset', undefined, this);
-		EventBus.off('simulation-speed-changed', undefined, this);
-		EventBus.off('boid-config-changed', undefined, this);
-		EventBus.off('simulation-config-changed', undefined, this);
-		EventBus.off('debug-toggle', undefined, this);
-		EventBus.off('obstacle-count-changed', undefined, this);
-
-		this.scale.off('resize', this.resizeBackground, this);
-		this.input.off('drag');
-
-		// Clean up the flock
+	shutdown(): void {
+		// Clean up all components
+		this.eventEmitter.destroy();
+		this.backgroundManager.destroy();
+		this.obstacleManager.destroy();
+		this.debugManager.destroy();
 		this.flock.destroy();
 	}
 }

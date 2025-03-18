@@ -70,7 +70,6 @@
 
 		// Set up event listeners
 		EventBus.on('scene-ready', handleSceneReady);
-		EventBus.on('game-started', handleGameStart);
 		EventBus.on('game-reset', handleGameReset);
 	}
 
@@ -78,7 +77,6 @@
 	function cleanupResources() {
 		// Remove event listeners
 		EventBus.off('scene-ready', handleSceneReady);
-		EventBus.off('game-started', handleGameStart);
 		EventBus.off('game-reset', handleGameReset);
 
 		// Destroy game
