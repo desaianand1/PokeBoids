@@ -1,9 +1,9 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest';
-import { FlockLogic } from './flock-logic';
-import { TestVectorFactory } from '../../../tests/implementations/vector';
-import { TestEventBus } from '../../../tests/implementations/events';
-import { BoidVariant } from './types';
-import { createMockBoid } from '../../../tests/utils/mock-boid';
+import { FlockLogic } from '$boid/flock-logic';
+import { TestVectorFactory } from '$tests/implementations/vector';
+import { TestEventBus } from '$tests/implementations/events';
+import { BoidVariant } from '$boid/types';
+import { createMockBoid } from '$tests/utils/mock-boid';
 
 describe('FlockLogic', () => {
   let vectorFactory: TestVectorFactory;

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { PhaserVector, PhaserVectorFactory } from './phaser-vector';
+import { PhaserVector, PhaserVectorFactory } from '$adapters/phaser-vector';
 
 describe('PhaserVector', () => {
   let vector: PhaserVector;

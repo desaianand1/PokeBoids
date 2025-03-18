@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach } from 'vitest';
-import { TestEventBus } from './events';
+import { TestEventBus } from '$tests/implementations/events';
 
 describe('TestEventBus', () => {
   let eventBus: TestEventBus;

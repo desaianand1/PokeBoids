@@ -4,8 +4,8 @@ import type {
 	IDebugRenderer,
 	ITimeProvider,
 	IRandomGenerator
-} from '$lib/interfaces/system';
-import type { IVector2 } from '$lib/interfaces/vector';
+} from '$interfaces/system';
+import type { IVector2 } from '$interfaces/vector';
 
 /**
  * Phaser-specific physics implementation

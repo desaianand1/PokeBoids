@@ -1,6 +1,6 @@
 import type { Scene } from 'phaser';
-import type { IEventSystem, EventHandler } from '$lib/interfaces/events';
-import type { IBoid } from '$lib/interfaces/boid';
+import type { IEventSystem, EventHandler } from '$interfaces/events';
+import type { IBoid } from '$interfaces/boid';
 import type { BoidConfig, SimulationConfig } from '$config/simulation-signals.svelte';
 
 /**

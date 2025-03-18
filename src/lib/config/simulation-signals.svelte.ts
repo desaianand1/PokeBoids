@@ -1,4 +1,4 @@
-import type { GameEvents } from '$lib/adapters/phaser-events';
+import type { GameEvents } from '$adapters/phaser-events';
 
 export interface BoidConfig {
   // Core flocking behavior

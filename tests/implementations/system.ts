@@ -1,5 +1,5 @@
-import type { IRandomGenerator, ITimeProvider, IPhysics, IDebugRenderer } from '$lib/interfaces';
-import type { IVector2 } from '$lib/interfaces';
+import type { IRandomGenerator, ITimeProvider, IPhysics, IDebugRenderer } from '$interfaces';
+import type { IVector2 } from '$interfaces';
 
 /**
  * Deterministic random number generator for testing

@@ -1,4 +1,4 @@
-import type { IGameEventBus } from '$lib/adapters/phaser-events';
+import type { IGameEventBus } from '$adapters/phaser-events';
 
 /**
  * Test implementation of event bus

@@ -1,15 +1,15 @@
-import { testVectorFactory } from './vector';
-import { TestTypedEventEmitter } from './events';
-import { testRandom, testTime, testPhysics, testDebug } from './system';
-import type { AllDependencies } from '$lib/interfaces';
-import type { BoidEvents } from '$lib/boid/types';
+import { TestVectorFactory } from '$tests/implementations/vector';
+import { TestTypedEventEmitter } from '$adapters/phaser-events';
+import { TestRandomGenerator, TestTimeProvider, TestPhysics, TestDebugRenderer } from '$tests/implementations/system';
+import type { AllDependencies } from '$interfaces';
+import type {  } from '$boid/types';
 
 /**
  * Default test dependencies for unit testing
  */
 export const defaultTestDependencies: AllDependencies = {
-  vectorFactory: testVectorFactory,
-  eventEmitter: new TestTypedEventEmitter<BoidEvents>(),
+  vectorFactory: TestVectorFactory,
+  eventEmitter: new TestTypedEventEmitter<GameEvents>(),
   random: testRandom,
   time: testTime,
   physics: testPhysics,
@@ -48,4 +48,5 @@ export * from './system';
 
 // Import types for createFreshTestDependencies
 import { TestVectorFactory } from './vector';
-import { TestRandomGenerator, TestTimeProvider, TestPhysics, TestDebugRenderer } from './system';
+import { TestRandomGenerator, TestTimeProvider, TestPhysics, TestDebugRenderer } from './system';import type { GameEvents } from '$adapters';
+

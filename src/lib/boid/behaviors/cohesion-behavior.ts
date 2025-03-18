@@ -1,6 +1,6 @@
-import type { IFlockingBehavior } from '$lib/interfaces/flocking';
-import type { IBoid } from '$lib/interfaces/boid';
-import type { IVector2, IVectorFactory } from '$lib/interfaces/vector';
+import type { IFlockingBehavior } from '$interfaces/flocking';
+import type { IBoid } from '$interfaces/boid';
+import type { IVector2, IVectorFactory } from '$interfaces/vector';
 
 /**
  * Implements cohesion behavior - boids steer towards the average position of neighbors

@@ -1,5 +1,5 @@
 import { Math as PhaserMath } from 'phaser';
-import type { IVector2, IVectorFactory, IDistanceCalculator } from '$lib/interfaces/vector';
+import type { IVector2, IVectorFactory, IDistanceCalculator } from '$interfaces/vector';
 
 /**
  * Phaser-specific vector implementation

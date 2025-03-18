@@ -1,4 +1,4 @@
-import type { IVector2 } from '$lib/interfaces';
+import type { IVector2 } from '$interfaces';
 import { expect, type MockInstance } from 'vitest';
 
 /**

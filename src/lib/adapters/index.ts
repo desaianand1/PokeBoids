@@ -1,5 +1,5 @@
-import { PhaserVectorFactory } from '$lib/adapters/phaser-vector';
-import { PhaserEventAdapter, type IGameEventBus } from '$lib/adapters/phaser-events';
+import { PhaserVectorFactory } from '$adapters/phaser-vector';
+import { PhaserEventAdapter, type IGameEventBus } from '$adapters/phaser-events';
 import {
 	PhaserRandomGenerator,
 	PhaserPhysics,

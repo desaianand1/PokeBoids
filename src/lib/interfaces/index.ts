@@ -1,7 +1,7 @@
-import type { IVector2, IVectorFactory, IDistanceCalculator } from './vector';
-import type { IEventEmitter, IEventSubscriber, IEventDispatcher, IEventSystem, EventHandler } from './events';
-import type { IRandomGenerator, ITimeProvider, IPhysics, IDebugRenderer } from './system';
-import type { IGameEventBus } from '$lib/adapters/phaser-events';
+import type { IVector2, IVectorFactory, IDistanceCalculator } from '$interfaces/vector';
+import type { IEventEmitter, IEventSubscriber, IEventDispatcher, IEventSystem, EventHandler } from '$interfaces/events';
+import type { IRandomGenerator, ITimeProvider, IPhysics, IDebugRenderer } from '$interfaces/system';
+import type { IGameEventBus } from '$adapters/phaser-events';
 
 // Re-export all interfaces
 export type {

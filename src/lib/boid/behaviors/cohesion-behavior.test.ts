@@ -1,8 +1,8 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest';
-import { CohesionBehavior } from './cohesion-behavior';
-import { TestVectorFactory } from '../../../../tests/implementations/vector';
-import { BoidVariant } from '$lib/boid/types';
-import { createMockBoid } from '../../../../tests/utils/mock-boid';
+import { CohesionBehavior } from '$boid/behaviors/cohesion-behavior';
+import { TestVectorFactory } from '$tests/implementations/vector';
+import { BoidVariant } from '$boid/types';
+import { createMockBoid } from '$tests/utils/mock-boid';
 
 describe('CohesionBehavior', () => {
   let vectorFactory: TestVectorFactory;

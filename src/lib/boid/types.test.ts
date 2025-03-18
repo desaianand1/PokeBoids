@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { BoidVariant, isPredator } from './types';
-import type { BoidStats, PreyStats, PredatorStats } from './types';
-import type { IBoid } from '$lib/interfaces/boid';
-import type { GameEvents } from '$lib/adapters/phaser-events';
-import { TestVector } from '../../../tests/implementations/vector';
+import { BoidVariant, isPredator } from '$boid/types';
+import type { BoidStats, PreyStats, PredatorStats } from '$boid/types';
+import type { IBoid } from '$interfaces/boid';
+import type { GameEvents } from '$adapters/phaser-events';
+import { TestVector } from '$tests/implementations/vector';
 
 // Create mock boid factory
 const createMockBoid = (variant: BoidVariant, stats: BoidStats): IBoid => ({

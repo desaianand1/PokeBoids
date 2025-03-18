@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { BoidFactory } from './boid-factory';
-import { BoidVariant } from './types';
-import { defaultTestDependencies } from '../../../tests/implementations';
+import { BoidFactory } from '$boid/boid-factory';
+import { BoidVariant } from '$boid/types';
+import { defaultTestDependencies } from '$tests/implementations';
 import type { Scene } from 'phaser';
 
 describe('BoidFactory', () => {

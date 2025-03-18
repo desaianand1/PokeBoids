@@ -1,6 +1,6 @@
 import type { Scene } from 'phaser';
-import { BoidVariant } from '$lib/boid/types';
-import type { IBoid } from '$lib/interfaces/boid';
+import { BoidVariant } from '$boid/types';
+import type { IBoid } from '$interfaces/boid';
 
 /**
  * Manages visual effects in the game

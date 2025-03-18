@@ -1,7 +1,7 @@
-import type { IBoid } from '$lib/interfaces/boid';
-import type { BoidVariant, BoidStats } from '$lib/boid/types';
-import type { IVector2 } from '$lib/interfaces/vector';
-import { TestVectorFactory } from '../implementations/vector';
+import type { IBoid } from '$interfaces/boid';
+import type { BoidVariant, BoidStats } from '$boid/types';
+import type { IVector2 } from '$interfaces/vector';
+import { TestVectorFactory } from '$tests/implementations/vector';
 import { vi } from 'vitest';
 
 /**

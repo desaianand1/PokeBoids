@@ -1,4 +1,4 @@
-import type { IVector2, IVectorFactory } from '$lib/interfaces/vector';
+import type { IVector2, IVectorFactory } from '$interfaces/vector';
 
 /**
  * Test implementation of IVector2 for testing boid behaviors

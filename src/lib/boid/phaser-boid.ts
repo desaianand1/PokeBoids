@@ -1,9 +1,9 @@
 import { Physics } from 'phaser';
-import { BoidBehavior } from './boid-behavior';
-import type { IBoid, IBoidDependencies } from '$lib/interfaces/boid';
-import type { IVector2 } from '$lib/interfaces/vector';
-import { BoidVariant } from './types';
-import type { BoidStats } from './types';
+import { BoidBehavior } from '$boid/boid-behavior';
+import type { IBoid, IBoidDependencies } from '$interfaces/boid';
+import type { IVector2 } from '$interfaces/vector';
+import { BoidVariant } from '$boid/types';
+import type { BoidStats } from '$boid/types';
 
 /**
  * Phaser-specific boid implementation using composition

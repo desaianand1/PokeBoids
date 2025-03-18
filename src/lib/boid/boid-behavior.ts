@@ -1,9 +1,8 @@
 import { v4 as UUIDv4 } from 'uuid';
-import type { IVector2 } from '$lib/interfaces/vector';
-import type { BoidStats, BoidVariant } from './types';
-import type { IBoidDependencies } from '$lib/interfaces/boid';
-import { isPredator } from './types';
-import type { GameEvents } from '$lib/adapters/phaser-events';
+import type { IVector2 } from '$interfaces/vector';
+import { isPredator,type BoidStats,type BoidVariant } from '$boid/types';
+import type { IBoidDependencies } from '$interfaces/boid';
+import type { GameEvents } from '$adapters/phaser-events';
 
 /**
  * Core boid behavior implementation independent of rendering framework

@@ -1,6 +1,6 @@
-import type { IVector2 } from './vector';
+import type { IVector2 } from '$interfaces/vector';
 import type { BoidVariant, BoidStats, PreyStats, PredatorStats } from '$boid/types';
-import type { IGameEventBus } from '$lib/adapters/phaser-events';
+import type { IGameEventBus } from '$adapters/phaser-events';
 
 /**
  * Core boid behavior interface independent of rendering/physics framework

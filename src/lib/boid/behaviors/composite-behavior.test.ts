@@ -1,10 +1,10 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest';
-import { CompositeBehavior } from './composite-behavior';
-import { TestVectorFactory } from '../../../../tests/implementations/vector';
-import { BoidVariant } from '$lib/boid/types';
-import { createMockBoid } from '../../../../tests/utils/mock-boid';
-import type { IFlockingBehavior } from '$lib/interfaces/flocking';
-import type { IVector2 } from '$lib/interfaces/vector';
+import { CompositeBehavior } from '$boid/behaviors/composite-behavior';
+import { TestVectorFactory } from '$tests/implementations/vector';
+import { BoidVariant } from '$boid/types';
+import { createMockBoid } from '$tests/utils/mock-boid';
+import type { IFlockingBehavior } from '$interfaces/flocking';
+import type { IVector2 } from '$interfaces/vector';
 
 describe('CompositeBehavior', () => {
   let vectorFactory: TestVectorFactory;

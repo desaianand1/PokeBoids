@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
-import { defaultTestDependencies, resetTestDependencies } from '../implementations';
-import type { AllDependencies } from '$lib/interfaces';
+import { defaultTestDependencies, resetTestDependencies } from '$tests/implementations';
+import type { AllDependencies } from '$interfaces';
 
 /**
  * Reset all test dependencies and mocks before each test

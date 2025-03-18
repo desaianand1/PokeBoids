@@ -22,8 +22,11 @@ const config = {
 			$boid: 'src/lib/boid',
 			$config: 'src/lib/config',
 			$game: 'src/lib/game',
+			$adapters: 'src/lib/adapters',
+			$interfaces: 'src/lib/interfaces',
 			$scenes: 'src/lib/game/scenes',
-			$assets: 'src/assets'
+			$assets: 'src/assets',
+			$tests: 'tests'
 		}
 	}
 };

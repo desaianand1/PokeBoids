@@ -1,7 +1,7 @@
 import type { Scene } from 'phaser';
-import { PhaserBoid } from './phaser-boid';
-import type { IBoidDependencies, IBoidConfig } from '$lib/interfaces/boid';
-import { BoidVariant } from './types';
+import { PhaserBoid } from '$boid/phaser-boid';
+import type { IBoidDependencies, IBoidConfig } from '$interfaces/boid';
+import { BoidVariant } from '$boid/types';
 
 /**
  * Factory for creating boids with consistent configuration

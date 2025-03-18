@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { PhaserPhysics, PhaserDebugRenderer, PhaserTimeProvider } from './phaser-system';
+import { PhaserPhysics, PhaserDebugRenderer, PhaserTimeProvider } from '$adapters/phaser-system';
 import type { Scene } from 'phaser';
-import type { IVector2 } from '$lib/interfaces/vector';
+import type { IVector2 } from '$interfaces/vector';
 
 // Mock types for Phaser graphics
 interface MockGraphics {

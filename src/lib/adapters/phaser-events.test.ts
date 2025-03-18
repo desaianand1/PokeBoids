@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest';
-import { PhaserEventAdapter, type IGameEventBus } from './phaser-events';
+import { PhaserEventAdapter, type IGameEventBus } from '$adapters/phaser-events';
 import type { Scene } from 'phaser';
 
 describe('PhaserEventAdapter', () => {

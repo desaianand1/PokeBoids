@@ -1,8 +1,8 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest';
-import { AlignmentBehavior } from './alignment-behavior';
-import { TestVectorFactory } from '../../../../tests/implementations/vector';
-import { BoidVariant } from '$lib/boid/types';
-import { createMockBoid } from '../../../../tests/utils/mock-boid';
+import { AlignmentBehavior } from '$boid/behaviors/alignment-behavior';
+import { TestVectorFactory } from '$tests/implementations/vector';
+import { BoidVariant } from '$boid/types';
+import { createMockBoid } from '$tests/utils/mock-boid';
 
 describe('AlignmentBehavior', () => {
   let vectorFactory: TestVectorFactory;

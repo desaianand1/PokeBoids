@@ -1,5 +1,5 @@
-import type { IBoid } from './boid';
-import type { IVector2 } from './vector';
+import type { IBoid } from '$interfaces/boid';
+import type { IVector2 } from '$interfaces/vector';
 
 /**
  * Interface for flocking behavior calculations

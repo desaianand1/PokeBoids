@@ -1,11 +1,11 @@
-import type { IFlockingConfig } from '$lib/interfaces/flocking';
-import type { IBoid } from '$lib/interfaces/boid';
-import type { IVector2, IVectorFactory } from '$lib/interfaces/vector';
-import { AlignmentBehavior } from './behaviors/alignment-behavior';
-import { CohesionBehavior } from './behaviors/cohesion-behavior';
-import { SeparationBehavior } from './behaviors/separation-behavior';
-import { CompositeBehavior } from './behaviors/composite-behavior';
-import type { IGameEventBus } from '$lib/adapters/phaser-events';
+import type { IFlockingConfig } from '$interfaces/flocking';
+import type { IBoid } from '$interfaces/boid';
+import type { IVector2, IVectorFactory } from '$interfaces/vector';
+import { AlignmentBehavior } from '$boid/behaviors/alignment-behavior';
+import { CohesionBehavior } from '$boid/behaviors/cohesion-behavior';
+import { SeparationBehavior } from '$boid/behaviors/separation-behavior';
+import { CompositeBehavior } from '$boid/behaviors/composite-behavior';
+import type { IGameEventBus } from '$adapters/phaser-events';
 
 /**
  * Core flock logic implementation independent of rendering framework

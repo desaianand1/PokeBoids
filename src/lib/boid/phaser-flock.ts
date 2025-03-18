@@ -1,10 +1,10 @@
 import type { Scene } from 'phaser';
-import type { IFlockingConfig } from '$lib/interfaces/flocking';
-import { FlockLogic } from './flock-logic';
-import { PhaserVectorFactory } from '$lib/adapters/phaser-vector';
-import { PhaserBoid } from './phaser-boid';
-import { BoidVariant } from './types';
-import type { IGameEventBus } from '$lib/adapters/phaser-events';
+import type { IFlockingConfig } from '$interfaces/flocking';
+import { FlockLogic } from '$boid/flock-logic';
+import { PhaserVectorFactory } from '$adapters/phaser-vector';
+import { PhaserBoid } from '$boid/phaser-boid';
+import { BoidVariant } from '$boid/types';
+import type { IGameEventBus } from '$adapters/phaser-events';
 
 /**
  * Phaser-specific flock implementation that uses pure FlockLogic

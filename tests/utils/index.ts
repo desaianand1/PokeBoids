@@ -1,6 +1,6 @@
 // Re-export all test utilities
-export * from './assertions';
-export * from './setup';
+export * from '$tests/utils/assertions';
+export * from '$tests/utils/setup';
 
 // Export common test configurations
 export const TEST_CONFIG = {

@@ -1,8 +1,8 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest';
-import { SeparationBehavior } from './separation-behavior';
-import { TestVectorFactory } from '../../../../tests/implementations/vector';
-import { BoidVariant } from '$lib/boid/types';
-import { createMockBoid } from '../../../../tests/utils/mock-boid';
+import { SeparationBehavior } from '$boid/behaviors/separation-behavior';
+import { TestVectorFactory } from '$tests/implementations/vector';
+import { BoidVariant } from '$boid/types';
+import { createMockBoid } from '$tests/utils/mock-boid';
 
 describe('SeparationBehavior', () => {
   let vectorFactory: TestVectorFactory;

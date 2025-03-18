@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { BoidBehavior } from './boid-behavior';
-import { BoidVariant } from './types';
-import { defaultTestDependencies } from '../../../tests/implementations';
-import { TestVector } from '../../../tests/implementations/vector';
-import type { IBoidDependencies } from '$lib/interfaces/boid';
+import { BoidBehavior } from '$boid/boid-behavior';
+import { BoidVariant } from '$boid/types';
+import { defaultTestDependencies } from '$tests/implementations';
+import { TestVector } from '$tests/implementations/vector';
+import type { IBoidDependencies } from '$interfaces/boid';
 
 describe('BoidBehavior', () => {
   let deps: IBoidDependencies;
