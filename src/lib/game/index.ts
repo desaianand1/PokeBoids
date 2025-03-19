@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { Boot } from '$scenes/boot';
 import { Preloader } from '$scenes/preloader';
 import { Game as MainGame } from '$scenes/game';
+import { EventBus } from '$events/event-bus';
 
 export class BoidsGame extends Phaser.Game {
 	constructor(config: Phaser.Types.Core.GameConfig) {
@@ -13,7 +14,14 @@ export class BoidsGame extends Phaser.Game {
 	}
 }
 
-export function createGame(containerId: string): BoidsGame {
+export interface GameOptions {
+	debug?: boolean;
+}
+
+export function createGame(containerId: string, options: GameOptions = {}): BoidsGame {
+	// Set debug mode on EventBus
+	EventBus.setDebug(options.debug ?? false);
+
 	const config: Phaser.Types.Core.GameConfig = {
 		type: Phaser.AUTO,
 		parent: containerId,
@@ -23,7 +31,7 @@ export function createGame(containerId: string): BoidsGame {
 		physics: {
 			default: 'arcade',
 			arcade: {
-				debug: false,
+				debug: options.debug ?? false,
 				gravity: { x: 0, y: 0 }
 			}
 		},

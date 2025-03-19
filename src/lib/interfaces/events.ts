@@ -50,4 +50,6 @@ export interface IEventDispatcher<T extends Record<string, unknown>> {
 /**
  * Combined interface for full event system functionality
  */
-export interface IEventSystem<T extends Record<string, unknown>> extends ITypedEventEmitter<T>, IEventSubscriber<T>, IEventDispatcher<T> {}
+export interface IEventSystem<T extends Record<string, unknown>> extends ITypedEventEmitter<T>, IEventSubscriber<T>, IEventDispatcher<T> {
+  destroy(): void;
+}

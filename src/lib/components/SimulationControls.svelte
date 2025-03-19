@@ -33,21 +33,30 @@
 	function updatePreyCount(event: Event) {
 		const value = parseInt((event.target as HTMLInputElement).value);
 		if (!isNaN(value) && value >= 0) {
-			updateSimulationConfig('initialPreyCount', value);
+			updateSimulationConfig('initialPreyCount', {
+				...simulationConfig.initialPreyCount,
+				default: value
+			});
 		}
 	}
 
 	function updatePredatorCount(event: Event) {
 		const value = parseInt((event.target as HTMLInputElement).value);
 		if (!isNaN(value) && value >= 0) {
-			updateSimulationConfig('initialPredatorCount', value);
+			updateSimulationConfig('initialPredatorCount', {
+				...simulationConfig.initialPredatorCount,
+				default: value
+			});
 		}
 	}
 
 	function updateObstacleCount(event: Event) {
 		const value = parseInt((event.target as HTMLInputElement).value);
 		if (!isNaN(value) && value >= 0) {
-			updateSimulationConfig('obstacleCount', value);
+			updateSimulationConfig('obstacleCount', {
+				...simulationConfig.obstacleCount,
+				default: value
+			});
 		}
 	}
 </script>
@@ -76,20 +85,26 @@
 			{@render populationInput(
 				'prey-count',
 				'Prey Count',
-				simulationConfig.initialPreyCount,
-				updatePreyCount
+				simulationConfig.initialPreyCount.default,
+				updatePreyCount,
+				simulationConfig.initialPreyCount.min,
+				simulationConfig.initialPreyCount.max
 			)}
 			{@render populationInput(
 				'predator-count',
 				'Predator Count',
-				simulationConfig.initialPredatorCount,
-				updatePredatorCount
+				simulationConfig.initialPredatorCount.default,
+				updatePredatorCount,
+				simulationConfig.initialPredatorCount.min,
+				simulationConfig.initialPredatorCount.max
 			)}
 			{@render populationInput(
 				'obstacle-count',
 				'Obstacles',
-				simulationConfig.obstacleCount,
-				updateObstacleCount
+				simulationConfig.obstacleCount.default,
+				updateObstacleCount,
+				simulationConfig.obstacleCount.min,
+				simulationConfig.obstacleCount.max
 			)}
 		</div>
 	</CardContent>
@@ -165,15 +180,17 @@
 	id: string,
 	label: string,
 	value: number,
-	updateFn: (event: Event) => void
+	updateFn: (event: Event) => void,
+	min: number,
+	max: number
 )}
 	<div class="space-y-2">
 		<Label for={id} class="text-sm font-medium">{label}</Label>
 		<Input
 			{id}
 			type="number"
-			min="0"
-			max={id === 'obstacle-count' ? '20' : id === 'predator-count' ? '100' : '500'}
+			{min}
+			{max}
 			{value}
 			onchange={updateFn}
 		/>

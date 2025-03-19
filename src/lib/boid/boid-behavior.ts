@@ -34,13 +34,13 @@ export class BoidBehavior {
 
     // Initialize vectors
     this.position = deps.vectorFactory.create(x, y);
-    this.velocity = deps.vectorFactory.random().scale(deps.config?.maxSpeed ?? 100 * 0.5);
+    this.velocity = deps.vectorFactory.random().scale((deps.config?.maxSpeed?.default ?? 100) * 0.5);
     this.acceleration = deps.vectorFactory.create(0, 0);
 
     // Initialize from config or use defaults
-    this.maxSpeed = deps.config?.maxSpeed ?? 100;
-    this.maxForce = deps.config?.maxForce ?? 1.0;
-    this.perceptionRadius = deps.config?.perceptionRadius ?? 150;
+    this.maxSpeed = deps.config?.maxSpeed?.default ?? 100;
+    this.maxForce = deps.config?.maxForce?.default ?? 1.0;
+    this.perceptionRadius = deps.config?.perceptionRadius?.default ?? 150;
 
     // Initialize stats
     this.initStats();
@@ -123,11 +123,16 @@ export class BoidBehavior {
 
     this.stats.health = Math.max(0, this.stats.health - amount);
 
-    // Emit damage event
+    // Emit damage event with debug info
     this.deps.eventEmitter.emit('boid-damaged', {
       boid: this,
       damage: amount,
-      remainingHealth: this.stats.health
+      remainingHealth: this.stats.health,
+      debug: {
+        position: { x: this.position.x, y: this.position.y },
+        velocity: { x: this.velocity.x, y: this.velocity.y },
+        stats: { ...this.stats }
+      }
     });
 
     return this.stats.health <= 0;
@@ -160,10 +165,15 @@ export class BoidBehavior {
       this.stats.attack += this.deps.random.float(0.5, 1.5);
     }
 
-    // Emit level up event
+    // Emit level up event with debug info
     this.deps.eventEmitter.emit('boid-leveled-up', {
       boid: this,
-      level: this.stats.level
+      level: this.stats.level,
+      debug: {
+        position: { x: this.position.x, y: this.position.y },
+        stats: { ...this.stats },
+        variant: this.variant
+      }
     });
   }
 
@@ -260,7 +270,14 @@ export class BoidBehavior {
       // Check if stamina depleted
       if (this.stats.stamina === 0 && !this.isStaminaDepleted) {
         this.isStaminaDepleted = true;
-        this.deps.eventEmitter.emit('boid-stamina-depleted', { boid: this });
+        this.deps.eventEmitter.emit('boid-stamina-depleted', {
+          boid: this,
+          debug: {
+            position: { x: this.position.x, y: this.position.y },
+            velocity: { x: this.velocity.x, y: this.velocity.y },
+            stats: { ...this.stats }
+          }
+        });
       }
     } else if (this.isStaminaDepleted) {
       // Start recovery timer
@@ -275,7 +292,14 @@ export class BoidBehavior {
           this.stats.stamina = 100;
           this.isStaminaDepleted = false;
           this.staminaRecoveryTimer = 0;
-          this.deps.eventEmitter.emit('boid-stamina-recovered', { boid: this });
+          this.deps.eventEmitter.emit('boid-stamina-recovered', {
+            boid: this,
+            debug: {
+              position: { x: this.position.x, y: this.position.y },
+              velocity: { x: this.velocity.x, y: this.velocity.y },
+              stats: { ...this.stats }
+            }
+          });
         }
       }
     }

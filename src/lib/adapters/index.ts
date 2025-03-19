@@ -1,5 +1,5 @@
 import { PhaserVectorFactory } from '$adapters/phaser-vector';
-import { PhaserEventAdapter, type IGameEventBus } from '$adapters/phaser-events';
+import { PhaserEventAdapter } from '$adapters/phaser-events';
 import {
 	PhaserRandomGenerator,
 	PhaserPhysics,
@@ -7,6 +7,7 @@ import {
 	PhaserDebugRenderer
 } from '$lib/adapters/phaser-system';
 import type { AllDependencies } from '$lib/interfaces';
+import { EventBus } from '$events/event-bus';
 
 /**
  * Create default Phaser-based dependencies
@@ -23,48 +24,13 @@ export const defaultPhaserDependencies: Partial<AllDependencies> = {
  * @returns Scene-specific dependencies
  */
 export function createSceneDependencies(scene: Phaser.Scene): Partial<AllDependencies> {
-	const eventBus: IGameEventBus = {
-		emit: (event, data) => {
-			scene.events.emit(event, data);
-			return true;
-		},
-		on: (event, handler, context) => {
-			scene.events.on(event, handler, context);
-			return eventBus;
-		},
-		once: (event, handler, context) => {
-			scene.events.once(event, handler, context);
-			return eventBus;
-		},
-		off: (event, handler, context) => {
-			scene.events.off(event, handler, context);
-			return eventBus;
-		},
-		removeAllListeners: (event) => {
-			scene.events.removeAllListeners(event);
-			return eventBus;
-		},
-		subscribe: (event, handler, context) => {
-			scene.events.on(event, handler, context);
-		},
-		unsubscribe: (event, handler, context) => {
-			scene.events.off(event, handler, context);
-		},
-		unsubscribeAll: () => {
-			scene.events.removeAllListeners();
-		},
-		dispatch: (event, data) => {
-			scene.events.emit(event, data);
-		},
-		hasListeners: (event) => {
-			return scene.events.listenerCount(event) > 0;
-		}
-	};
+	// Connect the scene to the centralized event bus
+	EventBus.connectScene(scene);
 
 	return {
 		time: new PhaserTimeProvider(scene),
 		debug: new PhaserDebugRenderer(scene),
-		eventEmitter: new PhaserEventAdapter(scene, eventBus),
+		eventEmitter: new PhaserEventAdapter(scene, EventBus),
 		physics: new PhaserPhysics(scene)
 	};
 }

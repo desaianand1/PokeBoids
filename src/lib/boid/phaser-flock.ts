@@ -65,7 +65,7 @@ export class PhaserFlock {
   }
   
   update(deltaTime: number): void {
-    // Update each boid with delta time
+    // Update each boid's behavior
     for (const boid of this.boids) {
       boid.update(deltaTime);
     }
@@ -73,14 +73,9 @@ export class PhaserFlock {
     // Use core logic to update boids
     this.logic.update(this.boids);
     
-    // Update Phaser-specific properties
+    // Sync Phaser-specific properties
     for (const boid of this.boids) {
-      // Update position and rotation from boid state
-      const position = boid.getBoidPosition();
-      const velocity = boid.getBoidVelocity();
-      
-      boid.setPosition(position.x, position.y);
-      boid.rotation = Math.atan2(velocity.y, velocity.x) + Math.PI / 2;
+      boid.syncWithPhaser();
     }
   }
   

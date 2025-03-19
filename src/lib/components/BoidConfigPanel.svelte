@@ -48,17 +48,17 @@
 						<div class="flex justify-between">
 							<Label for="alignment-weight">Alignment</Label>
 							<span class="font-mono text-xs text-muted-foreground">
-								{boidConfig.alignmentWeight.toFixed(1)}
+								{boidConfig.alignmentWeight.default.toFixed(1)}
 							</span>
 						</div>
 						<Slider
 							type="single"
 							id="alignment-weight"
-							min={0}
-							max={2}
-							step={0.1}
-							value={boidConfig.alignmentWeight}
-							onValueChange={(value) => updateBoidConfig('alignmentWeight', value)}
+							min={boidConfig.alignmentWeight.min}
+							max={boidConfig.alignmentWeight.max}
+							step={boidConfig.alignmentWeight.step}
+							value={boidConfig.alignmentWeight.default}
+							onValueChange={(value) => updateBoidConfig('alignmentWeight', { ...boidConfig.alignmentWeight, default: value })}
 						/>
 					</div>
 
@@ -66,17 +66,17 @@
 						<div class="flex justify-between">
 							<Label for="cohesion-weight">Cohesion</Label>
 							<span class="font-mono text-xs text-muted-foreground">
-								{boidConfig.cohesionWeight.toFixed(1)}
+								{boidConfig.cohesionWeight.default.toFixed(1)}
 							</span>
 						</div>
 						<Slider
 							type="single"
 							id="cohesion-weight"
-							min={0}
-							max={2}
-							step={0.1}
-							value={boidConfig.cohesionWeight}
-							onValueChange={(value) => updateBoidConfig('cohesionWeight', value)}
+							min={boidConfig.cohesionWeight.min}
+							max={boidConfig.cohesionWeight.max}
+							step={boidConfig.cohesionWeight.step}
+							value={boidConfig.cohesionWeight.default}
+							onValueChange={(value) => updateBoidConfig('cohesionWeight', { ...boidConfig.cohesionWeight, default: value })}
 						/>
 					</div>
 
@@ -84,17 +84,17 @@
 						<div class="flex justify-between">
 							<Label for="separation-weight">Separation</Label>
 							<span class="font-mono text-xs text-muted-foreground">
-								{boidConfig.separationWeight.toFixed(1)}
+								{boidConfig.separationWeight.default.toFixed(1)}
 							</span>
 						</div>
 						<Slider
 							type="single"
 							id="separation-weight"
-							min={0}
-							max={3}
-							step={0.1}
-							value={boidConfig.separationWeight}
-							onValueChange={(value) => updateBoidConfig('separationWeight', value)}
+							min={boidConfig.separationWeight.min}
+							max={boidConfig.separationWeight.max}
+							step={boidConfig.separationWeight.step}
+							value={boidConfig.separationWeight.default}
+							onValueChange={(value) => updateBoidConfig('separationWeight', { ...boidConfig.separationWeight, default: value })}
 						/>
 					</div>
 
@@ -102,17 +102,17 @@
 						<div class="flex justify-between">
 							<Label for="perception-radius">Perception Radius</Label>
 							<span class="font-mono text-xs text-muted-foreground">
-								{boidConfig.perceptionRadius.toFixed(0)}px
+								{boidConfig.perceptionRadius.default.toFixed(0)}px
 							</span>
 						</div>
 						<Slider
 							type="single"
 							id="perception-radius"
-							min={20}
-							max={200}
-							step={5}
-							value={boidConfig.perceptionRadius}
-							onValueChange={(value) => updateBoidConfig('perceptionRadius', value)}
+							min={boidConfig.perceptionRadius.min}
+							max={boidConfig.perceptionRadius.max}
+							step={boidConfig.perceptionRadius.step}
+							value={boidConfig.perceptionRadius.default}
+							onValueChange={(value) => updateBoidConfig('perceptionRadius', { ...boidConfig.perceptionRadius, default: value })}
 						/>
 					</div>
 
@@ -120,17 +120,17 @@
 						<div class="flex justify-between">
 							<Label for="separation-radius">Separation Radius</Label>
 							<span class="font-mono text-xs text-muted-foreground">
-								{boidConfig.separationRadius.toFixed(0)}px
+								{boidConfig.separationRadius.default.toFixed(0)}px
 							</span>
 						</div>
 						<Slider
 							type="single"
 							id="separation-radius"
-							min={10}
-							max={100}
-							step={5}
-							value={boidConfig.separationRadius}
-							onValueChange={(value) => updateBoidConfig('separationRadius', value)}
+							min={boidConfig.separationRadius.min}
+							max={boidConfig.separationRadius.max}
+							step={boidConfig.separationRadius.step}
+							value={boidConfig.separationRadius.default}
+							onValueChange={(value) => updateBoidConfig('separationRadius', { ...boidConfig.separationRadius, default: value })}
 						/>
 					</div>
 				</div>
@@ -143,17 +143,17 @@
 						<div class="flex justify-between">
 							<Label for="boundary-margin">Boundary Margin</Label>
 							<span class="font-mono text-xs text-muted-foreground">
-								{boidConfig.boundaryMargin.toFixed(0)}px
+								{boidConfig.boundaryMargin.default.toFixed(0)}px
 							</span>
 						</div>
 						<Slider
 							type="single"
 							id="boundary-margin"
-							min={50}
-							max={200}
-							step={10}
-							value={boidConfig.boundaryMargin}
-							onValueChange={(value) => updateBoidConfig('boundaryMargin', value)}
+							min={boidConfig.boundaryMargin.min}
+							max={boidConfig.boundaryMargin.max}
+							step={boidConfig.boundaryMargin.step}
+							value={boidConfig.boundaryMargin.default}
+							onValueChange={(value) => updateBoidConfig('boundaryMargin', { ...boidConfig.boundaryMargin, default: value })}
 						/>
 					</div>
 
@@ -161,17 +161,17 @@
 						<div class="flex justify-between">
 							<Label for="boundary-force">Boundary Force</Label>
 							<span class="font-mono text-xs text-muted-foreground">
-								{boidConfig.boundaryForceMultiplier.toFixed(1)}x
+								{boidConfig.boundaryForceMultiplier.default.toFixed(1)}x
 							</span>
 						</div>
 						<Slider
 							type="single"
 							id="boundary-force"
-							min={1}
-							max={5}
-							step={0.1}
-							value={boidConfig.boundaryForceMultiplier}
-							onValueChange={(value) => updateBoidConfig('boundaryForceMultiplier', value)}
+							min={boidConfig.boundaryForceMultiplier.min}
+							max={boidConfig.boundaryForceMultiplier.max}
+							step={boidConfig.boundaryForceMultiplier.step}
+							value={boidConfig.boundaryForceMultiplier.default}
+							onValueChange={(value) => updateBoidConfig('boundaryForceMultiplier', { ...boidConfig.boundaryForceMultiplier, default: value })}
 						/>
 					</div>
 
@@ -179,17 +179,17 @@
 						<div class="flex justify-between">
 							<Label for="boundary-ramp">Boundary Ramp</Label>
 							<span class="font-mono text-xs text-muted-foreground">
-								{boidConfig.boundaryForceRamp.toFixed(1)}
+								{boidConfig.boundaryForceRamp.default.toFixed(1)}
 							</span>
 						</div>
 						<Slider
 							type="single"
 							id="boundary-ramp"
-							min={1}
-							max={4}
-							step={0.1}
-							value={boidConfig.boundaryForceRamp}
-							onValueChange={(value) => updateBoidConfig('boundaryForceRamp', value)}
+							min={boidConfig.boundaryForceRamp.min}
+							max={boidConfig.boundaryForceRamp.max}
+							step={boidConfig.boundaryForceRamp.step}
+							value={boidConfig.boundaryForceRamp.default}
+							onValueChange={(value) => updateBoidConfig('boundaryForceRamp', { ...boidConfig.boundaryForceRamp, default: value })}
 						/>
 					</div>
 
@@ -197,17 +197,17 @@
 						<div class="flex justify-between">
 							<Label for="obstacle-perception">Obstacle Perception</Label>
 							<span class="font-mono text-xs text-muted-foreground">
-								{boidConfig.obstaclePerceptionRadius.toFixed(0)}px
+								{boidConfig.obstaclePerceptionRadius.default.toFixed(0)}px
 							</span>
 						</div>
 						<Slider
 							type="single"
 							id="obstacle-perception"
-							min={50}
-							max={250}
-							step={10}
-							value={boidConfig.obstaclePerceptionRadius}
-							onValueChange={(value) => updateBoidConfig('obstaclePerceptionRadius', value)}
+							min={boidConfig.obstaclePerceptionRadius.min}
+							max={boidConfig.obstaclePerceptionRadius.max}
+							step={boidConfig.obstaclePerceptionRadius.step}
+							value={boidConfig.obstaclePerceptionRadius.default}
+							onValueChange={(value) => updateBoidConfig('obstaclePerceptionRadius', { ...boidConfig.obstaclePerceptionRadius, default: value })}
 						/>
 					</div>
 
@@ -215,17 +215,17 @@
 						<div class="flex justify-between">
 							<Label for="obstacle-force">Obstacle Force</Label>
 							<span class="font-mono text-xs text-muted-foreground">
-								{boidConfig.obstacleForceMultiplier.toFixed(1)}x
+								{boidConfig.obstacleForceMultiplier.default.toFixed(1)}x
 							</span>
 						</div>
 						<Slider
 							type="single"
 							id="obstacle-force"
-							min={1}
-							max={6}
-							step={0.2}
-							value={boidConfig.obstacleForceMultiplier}
-							onValueChange={(value) => updateBoidConfig('obstacleForceMultiplier', value)}
+							min={boidConfig.obstacleForceMultiplier.min}
+							max={boidConfig.obstacleForceMultiplier.max}
+							step={boidConfig.obstacleForceMultiplier.step}
+							value={boidConfig.obstacleForceMultiplier.default}
+							onValueChange={(value) => updateBoidConfig('obstacleForceMultiplier', { ...boidConfig.obstacleForceMultiplier, default: value })}
 						/>
 					</div>
 				</div>
@@ -238,17 +238,17 @@
 						<div class="flex justify-between">
 							<Label for="max-speed">Max Speed</Label>
 							<span class="font-mono text-xs text-muted-foreground">
-								{boidConfig.maxSpeed.toFixed(0)}
+								{boidConfig.maxSpeed.default.toFixed(0)}
 							</span>
 						</div>
 						<Slider
 							type="single"
 							id="max-speed"
-							min={50}
-							max={300}
-							step={10}
-							value={boidConfig.maxSpeed}
-							onValueChange={(value) => updateBoidConfig('maxSpeed', value)}
+							min={boidConfig.maxSpeed.min}
+							max={boidConfig.maxSpeed.max}
+							step={boidConfig.maxSpeed.step}
+							value={boidConfig.maxSpeed.default}
+							onValueChange={(value) => updateBoidConfig('maxSpeed', { ...boidConfig.maxSpeed, default: value })}
 						/>
 					</div>
 
@@ -256,17 +256,17 @@
 						<div class="flex justify-between">
 							<Label for="max-force">Max Force</Label>
 							<span class="font-mono text-xs text-muted-foreground">
-								{boidConfig.maxForce.toFixed(1)}
+								{boidConfig.maxForce.default.toFixed(1)}
 							</span>
 						</div>
 						<Slider
 							type="single"
 							id="max-force"
-							min={0.2}
-							max={3}
-							step={0.1}
-							value={boidConfig.maxForce}
-							onValueChange={(value) => updateBoidConfig('maxForce', value)}
+							min={boidConfig.maxForce.min}
+							max={boidConfig.maxForce.max}
+							step={boidConfig.maxForce.step}
+							value={boidConfig.maxForce.default}
+							onValueChange={(value) => updateBoidConfig('maxForce', { ...boidConfig.maxForce, default: value })}
 						/>
 					</div>
 				</div>

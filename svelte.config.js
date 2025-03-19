@@ -21,6 +21,7 @@ const config = {
 			$utils: 'src/lib/utils',
 			$boid: 'src/lib/boid',
 			$config: 'src/lib/config',
+			$events: 'src/lib/events',
 			$game: 'src/lib/game',
 			$adapters: 'src/lib/adapters',
 			$interfaces: 'src/lib/interfaces',

@@ -108,9 +108,14 @@ export class PhaserBoid extends Physics.Arcade.Sprite implements IBoid {
 
   // Lifecycle
   update(deltaTime: number): void {
-    // Update behavior
+    // Update behavior only
     this.behavior.update(deltaTime);
+  }
 
+  /**
+   * Synchronize Phaser sprite properties with boid behavior state
+   */
+  syncWithPhaser(): void {
     // Sync position and rotation from behavior
     const position = this.behavior.getBoidPosition();
     const velocity = this.behavior.getBoidVelocity();

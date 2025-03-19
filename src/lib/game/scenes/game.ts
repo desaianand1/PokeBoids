@@ -1,18 +1,15 @@
 import { Scene } from 'phaser';
-import { PhaserFlock } from '$lib/boid/phaser-flock';
-import { BoidFactory } from '$lib/boid/boid-factory';
-import { type IGameEventBus } from '$lib/adapters/phaser-events';
-import { BackgroundManager } from '$lib/game/background-manager';
-import { ObstacleManager } from '$lib/game/obstacle-manager';
-import { DebugManager } from '$lib/game/debug-manager';
-import { EffectsManager } from '$lib/game/effects-manager';
-import {
-	getBoidConfig,
-	getSimulationConfig,
-	type BoidConfig,
-	type SimulationConfig
-} from '$config/simulation-signals.svelte';
-import { createCompleteDependencies } from '$lib/adapters';
+import { PhaserFlock } from '$boid/phaser-flock';
+import { BoidFactory } from '$boid/boid-factory';
+import { type IGameEventBus } from '$adapters/phaser-events';
+import { BackgroundManager } from '$game/background-manager';
+import { ObstacleManager } from '$game/obstacle-manager';
+import { DebugManager } from '$game/debug-manager';
+import { EffectsManager } from '$game/effects-manager';
+import { getBoidConfig, getSimulationConfig } from '$config/simulation-signals.svelte';
+import { createCompleteDependencies } from '$adapters';
+import { EventBus } from '$events/event-bus';
+import type { BoidConfig, SimulationConfig } from '$config/types';
 
 /**
  * Main game scene that coordinates all game components
@@ -40,6 +37,9 @@ export class Game extends Scene {
 	}
 
 	create(): void {
+		// Connect scene to EventBus
+		EventBus.connectScene(this);
+
 		this.initializeComponents();
 		this.setupEventListeners();
 		this.startSimulation();
@@ -68,11 +68,11 @@ export class Game extends Scene {
 
 		// Create flock
 		this.flock = new PhaserFlock(this, this.eventEmitter, {
-			alignmentWeight: this.boidConfig.alignmentWeight ?? 1.0,
-			cohesionWeight: this.boidConfig.cohesionWeight ?? 1.0,
-			separationWeight: this.boidConfig.separationWeight ?? 1.5,
-			perceptionRadius: this.boidConfig.perceptionRadius ?? 150,
-			separationRadius: this.boidConfig.separationRadius ?? 50
+			alignmentWeight: this.boidConfig.alignmentWeight?.default ?? 1.0,
+			cohesionWeight: this.boidConfig.cohesionWeight?.default ?? 1.0,
+			separationWeight: this.boidConfig.separationWeight?.default ?? 1.5,
+			perceptionRadius: this.boidConfig.perceptionRadius?.default ?? 150,
+			separationRadius: this.boidConfig.separationRadius?.default ?? 50
 		});
 	}
 
@@ -93,7 +93,7 @@ export class Game extends Scene {
 		this.eventEmitter.on('boid-config-changed', ({ config }) => (this.boidConfig = config));
 		this.eventEmitter.on('simulation-config-changed', ({ config }) => {
 			this.simulationConfig = config;
-			this.obstacleManager.updateObstacles(config.obstacleCount ?? 0);
+			this.obstacleManager.updateObstacles(config.obstacleCount.default);
 		});
 
 		// Debug events
@@ -115,9 +115,12 @@ export class Game extends Scene {
 		};
 
 		// Create initial boids
-		const prey = this.boidFactory.createPreys(this.simulationConfig.initialPreyCount ?? 0, bounds);
+		const prey = this.boidFactory.createPreys(
+			this.simulationConfig.initialPreyCount?.default ?? 0,
+			bounds
+		);
 		const predators = this.boidFactory.createPredators(
-			this.simulationConfig.initialPredatorCount ?? 0,
+			this.simulationConfig.initialPredatorCount?.default ?? 0,
 			bounds
 		);
 
@@ -125,7 +128,7 @@ export class Game extends Scene {
 		[...prey, ...predators].forEach((boid) => this.flock.addBoid(boid));
 
 		// Create obstacles
-		this.obstacleManager.updateObstacles(this.simulationConfig.obstacleCount ?? 0);
+		this.obstacleManager.updateObstacles(this.simulationConfig.obstacleCount?.default ?? 0);
 
 		// Notify scene is ready
 		this.eventEmitter.emit('scene-ready', { scene: this });
@@ -138,11 +141,11 @@ export class Game extends Scene {
 
 		// Create new flock
 		this.flock = new PhaserFlock(this, this.eventEmitter, {
-			alignmentWeight: this.boidConfig.alignmentWeight ?? 1.0,
-			cohesionWeight: this.boidConfig.cohesionWeight ?? 1.0,
-			separationWeight: this.boidConfig.separationWeight ?? 1.5,
-			perceptionRadius: this.boidConfig.perceptionRadius ?? 150,
-			separationRadius: this.boidConfig.separationRadius ?? 50
+			alignmentWeight: this.boidConfig.alignmentWeight?.default ?? 1.0,
+			cohesionWeight: this.boidConfig.cohesionWeight?.default ?? 1.0,
+			separationWeight: this.boidConfig.separationWeight?.default ?? 1.5,
+			perceptionRadius: this.boidConfig.perceptionRadius?.default ?? 150,
+			separationRadius: this.boidConfig.separationRadius?.default ?? 50
 		});
 
 		// Start new simulation
@@ -167,5 +170,8 @@ export class Game extends Scene {
 		this.obstacleManager.destroy();
 		this.debugManager.destroy();
 		this.flock.destroy();
+
+		// Disconnect scene from EventBus
+		EventBus.disconnectScene(this);
 	}
 }

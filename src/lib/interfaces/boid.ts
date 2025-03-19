@@ -58,14 +58,12 @@ export interface IPredatorBoid extends IBoid {
   // activateStealth(): void;
 }
 
+import type { BoidConfig } from '$config/types';
+
 /**
  * Configuration for boid behavior
  */
-export interface IBoidConfig {
-  maxSpeed?: number;
-  maxForce?: number;
-  perceptionRadius?: number;
-}
+export type IBoidConfig = Partial<BoidConfig>;
 
 /**
  * Dependencies required for boid behavior

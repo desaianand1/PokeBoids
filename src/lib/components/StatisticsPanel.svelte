@@ -21,11 +21,23 @@
 	// FPS indicator style helper
 	function getFpsIndicator(fps: number) {
 		if (fps > 55) {
-			return { class: 'bg-green-100 text-green-800', text: 'Good' };
+			return {
+				class:
+					'bg-emerald-100 text-emerald-800  dark:bg-emerald-600/20 dark:border dark:border-emerald-600 dark:text-emerald-600',
+				text: 'Good'
+			};
 		} else if (fps > 30) {
-			return { class: 'bg-yellow-100 text-yellow-800', text: 'OK' };
+			return {
+				class:
+					'bg-yellow-100 text-yellow-800  dark:bg-yellow-600/20 dark:border dark:border-yellow-600 dark:text-yellow-600',
+				text: 'OK'
+			};
 		} else {
-			return { class: 'bg-red-100 text-red-800', text: 'Low' };
+			return {
+				class:
+					'bg-rose-100 text-rose-800  dark:bg-rose-600/20 dark:border dark:border-rose-600 dark:text-rose-600',
+				text: 'Low'
+			};
 		}
 	}
 

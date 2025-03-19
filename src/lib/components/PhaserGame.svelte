@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { initialize, destroy, phaserGameRef } from '$game/phaser-signals.svelte';
-	import { EventBus } from '$game/event-bus';
+	import { EventBus } from '$events/event-bus';
 	import {
 		AlertDialog,
 		AlertDialogContent,

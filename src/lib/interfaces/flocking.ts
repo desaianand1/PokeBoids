@@ -1,5 +1,6 @@
 import type { IBoid } from '$interfaces/boid';
 import type { IVector2 } from '$interfaces/vector';
+import type { IGameEventBus } from '$adapters/phaser-events';
 
 /**
  * Interface for flocking behavior calculations
@@ -8,7 +9,7 @@ export interface IFlockingBehavior {
   /**
    * Calculate steering force based on boid and its neighbors
    */
-  calculate(boid: IBoid, neighbors: IBoid[]): IVector2;
+  calculate(boid: IBoid, neighbors: IBoid[], eventBus?: IGameEventBus): IVector2;
 }
 
 /**

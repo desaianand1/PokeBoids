@@ -4,6 +4,7 @@
 	import SimulationControls from '$components/SimulationControls.svelte';
 	import BoidConfigPanel from '$components/BoidConfigPanel.svelte';
 	import StatsPanel from '$components/StatisticsPanel.svelte';
+	import EventDebugPanel from '$components/EventDebugPanel.svelte';
 	import { Button } from '$ui/button';
 	import { Sheet, SheetTrigger, SheetContent } from '$ui/sheet';
 	import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '$ui/collapsible';
@@ -29,7 +30,7 @@
 	import { gameVersion } from '$utils/version';
 
 	// UI State
-	let sidebarVisible = $state(true);
+	let sidebarVisible = $state(false);
 
 	function handleSceneReady(scene: Phaser.Scene) {
 		console.debug('Scene ready:', scene.scene.key);
@@ -196,13 +197,14 @@
 	<TabsContent value="config" class="m-0 h-full">
 		<div class="space-y-4">
 			<BoidConfigPanel />
+			{@render performanceTips()}
 		</div>
 	</TabsContent>
 
 	<TabsContent value="stats" class="m-0 h-full">
 		<div class="space-y-4">
 			<StatsPanel />
-			{@render performanceTips()}
+			<EventDebugPanel />
 		</div>
 	</TabsContent>
 {/snippet}

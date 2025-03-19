@@ -1,6 +1,6 @@
 import type { Game, Scene } from 'phaser';
 import { createGame } from '$game';
-import { EventBus } from '$game/event-bus';
+import { EventBus } from '$events/event-bus';
 
 export interface PhaserGameRef {
 	game: Game | null;
@@ -45,35 +45,35 @@ function initialize(containerId: string) {
 	try {
 		phaserGameRef.game = createGame(containerId);
 
-		// Set up event listeners
-		EventBus.on('scene-ready', (data) => {
+		// Set up event listeners with proper type safety
+		EventBus.subscribe('scene-ready', (data) => {
 			phaserGameRef.scene = data.scene;
 			phaserGameRef.isReady = true;
 			startGameRuntimeTimer();
 		});
 
-		// Set up statistics event listeners
-		EventBus.on('flock-updated', ({ count }) => {
+		// Set up statistics event listeners with proper type safety
+		EventBus.subscribe('flock-updated', ({ count }) => {
 			gameStats.totalBoids = count;
 		});
 
-		EventBus.on('prey-count-updated', ({ count }) => {
+		EventBus.subscribe('prey-count-updated', ({ count }) => {
 			gameStats.preyCount = count;
 		});
 
-		EventBus.on('predator-count-updated', ({ count }) => {
+		EventBus.subscribe('predator-count-updated', ({ count }) => {
 			gameStats.predatorCount = count;
 		});
 
-		EventBus.on('boid-reproduced', () => {
+		EventBus.subscribe('boid-reproduced', () => {
 			gameStats.reproductionEvents++;
 		});
 
-		EventBus.on('boid-removed', () => {
+		EventBus.subscribe('boid-removed', () => {
 			gameStats.deathEvents++;
 		});
 
-		EventBus.on('game-reset', () => {
+		EventBus.subscribe('game-reset', () => {
 			gameStats.reproductionEvents = 0;
 			gameStats.deathEvents = 0;
 		});
@@ -95,14 +95,14 @@ function destroy() {
 	phaserGameRef.isReady = false;
 	phaserGameRef.error = null;
 
-	// Clean up event listeners
-	EventBus.off('scene-ready');
-	EventBus.off('flock-updated');
-	EventBus.off('prey-count-updated');
-	EventBus.off('predator-count-updated');
-	EventBus.off('boid-reproduced');
-	EventBus.off('boid-removed');
-	EventBus.off('game-reset');
+	// Clean up event listeners using unsubscribe
+	EventBus.unsubscribe('scene-ready');
+	EventBus.unsubscribe('flock-updated');
+	EventBus.unsubscribe('prey-count-updated');
+	EventBus.unsubscribe('predator-count-updated');
+	EventBus.unsubscribe('boid-reproduced');
+	EventBus.unsubscribe('boid-removed');
+	EventBus.unsubscribe('game-reset');
 }
 
 function resetStats() {

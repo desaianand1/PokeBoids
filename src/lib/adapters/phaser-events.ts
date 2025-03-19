@@ -1,7 +1,8 @@
 import type { Scene } from 'phaser';
-import type { IEventSystem, EventHandler } from '$interfaces/events';
+import type { IEventSystem } from '$interfaces/events';
 import type { IBoid } from '$interfaces/boid';
 import type { BoidConfig, SimulationConfig } from '$config/simulation-signals.svelte';
+import type { BoidStats, BoidVariant } from '$boid/types';
 
 /**
  * Type-safe event definitions for Svelte-Phaser communication
@@ -15,19 +16,78 @@ export type GameEvents = {
   // Boid events
   'boid-added': { boid: IBoid };
   'boid-removed': { boid: IBoid };
-  'boid-damaged': { boid: IBoid; damage: number; remainingHealth: number };
-  'boid-leveled-up': { boid: IBoid; level: number };
-  'boid-stamina-depleted': { boid: IBoid };
-  'boid-stamina-recovered': { boid: IBoid };
+  'boid-damaged': {
+    boid: IBoid;
+    damage: number;
+    remainingHealth: number;
+    debug?: {
+      position: { x: number; y: number };
+      velocity: { x: number; y: number };
+      stats: BoidStats;
+    };
+  };
+  'boid-leveled-up': {
+    boid: IBoid;
+    level: number;
+    debug?: {
+      position: { x: number; y: number };
+      stats: BoidStats;
+      variant: BoidVariant;
+    };
+  };
+  'boid-stamina-depleted': {
+    boid: IBoid;
+    debug?: {
+      position: { x: number; y: number };
+      velocity: { x: number; y: number };
+      stats: BoidStats;
+    };
+  };
+  'boid-stamina-recovered': {
+    boid: IBoid;
+    debug?: {
+      position: { x: number; y: number };
+      velocity: { x: number; y: number };
+      stats: BoidStats;
+    };
+  };
 
   // Flocking behavior events
-  'alignment-updated': { boid: IBoid; neighbors: IBoid[]; strength: number };
-  'coherence-updated': { boid: IBoid; center: { x: number; y: number }; strength: number };
+  'alignment-updated': {
+    boid: IBoid;
+    neighbors: IBoid[];
+    strength: number;
+    debug?: {
+      position: { x: number; y: number };
+      velocity: { x: number; y: number };
+      averageVelocity: { x: number; y: number };
+      neighborCount: number;
+      force: { x: number; y: number };
+    };
+  };
+  'coherence-updated': {
+    boid: IBoid;
+    center: { x: number; y: number };
+    strength: number;
+    debug?: {
+      position: { x: number; y: number };
+      velocity: { x: number; y: number };
+      centerOfMass: { x: number; y: number };
+      neighborCount: number;
+      force: { x: number; y: number };
+    };
+  };
   'separation-updated': {
     boid: IBoid;
     avoidance: { x: number; y: number };
     strength: number;
     nearbyCount: number;
+    debug?: {
+      position: { x: number; y: number };
+      velocity: { x: number; y: number };
+      nearestNeighborDistance: number;
+      force: { x: number; y: number };
+    };
   };
 
   // Flock events
@@ -81,78 +141,57 @@ export interface IGameEventBus extends IEventSystem<GameEvents> {
 }
 
 /**
- * Adapter that bridges between Phaser's event system and our typed event system
+ * Adapter that provides a thin bridge between Phaser's event system and our centralized event bus.
+ * This adapter is primarily responsible for ensuring type safety and proper event forwarding.
  */
 export class PhaserEventAdapter implements IEventSystem<GameEvents> {
-  private handlers: Map<string, Set<EventHandler<unknown>>> = new Map();
-
   constructor(
     private scene: Scene,
     private eventBus: IGameEventBus
   ) {}
 
   emit<K extends keyof GameEvents & string>(event: K, data: GameEvents[K]): boolean {
-    this.scene.events.emit(event, data);
     return this.eventBus.emit(event, data);
   }
 
   on<K extends keyof GameEvents & string>(event: K, handler: (data: GameEvents[K]) => void, context?: unknown): this {
-    if (!this.handlers.has(event)) {
-      this.handlers.set(event, new Set());
-    }
-    this.handlers.get(event)?.add(handler as EventHandler<unknown>);
-    this.scene.events.on(event, handler, context);
+    this.eventBus.on(event, handler, context);
     return this;
   }
 
   once<K extends keyof GameEvents & string>(event: K, handler: (data: GameEvents[K]) => void, context?: unknown): this {
-    const onceHandler = (data: GameEvents[K]) => {
-      handler.call(context, data);
-      this.off(event, onceHandler, context);
-    };
-    return this.on(event, onceHandler, context);
+    this.eventBus.once(event, handler, context);
+    return this;
   }
 
   off<K extends keyof GameEvents & string>(event: K, handler?: (data: GameEvents[K]) => void, context?: unknown): this {
-    if (handler) {
-      this.handlers.get(event)?.delete(handler as EventHandler<unknown>);
-      this.scene.events.off(event, handler, context);
-    } else {
-      this.handlers.delete(event);
-      this.scene.events.off(event);
-    }
+    this.eventBus.off(event, handler, context);
     return this;
   }
 
   removeAllListeners<K extends keyof GameEvents & string>(event?: K): this {
-    if (event) {
-      this.handlers.delete(event);
-      this.scene.events.removeAllListeners(event);
-    } else {
-      this.handlers.clear();
-      this.scene.events.removeAllListeners();
-    }
+    this.eventBus.removeAllListeners(event);
     return this;
   }
 
   subscribe<K extends keyof GameEvents & string>(event: K, handler: (data: GameEvents[K]) => void, context?: unknown): void {
-    this.on(event, handler, context);
+    this.eventBus.subscribe(event, handler, context);
   }
 
   unsubscribe<K extends keyof GameEvents & string>(event: K, handler?: (data: GameEvents[K]) => void, context?: unknown): void {
-    this.off(event, handler, context);
+    this.eventBus.unsubscribe(event, handler, context);
   }
 
   unsubscribeAll(): void {
-    this.removeAllListeners();
+    this.eventBus.unsubscribeAll();
   }
 
   dispatch<K extends keyof GameEvents & string>(event: K, data: GameEvents[K]): void {
-    this.emit(event, data);
+    this.eventBus.dispatch(event, data);
   }
 
   hasListeners(event: string): boolean {
-    return (this.handlers.get(event)?.size ?? 0) > 0;
+    return this.eventBus.hasListeners(event);
   }
 
   destroy(): void {

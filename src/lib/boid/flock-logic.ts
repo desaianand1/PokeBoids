@@ -43,15 +43,8 @@ export class FlockLogic {
   }
   
   calculateForces(boid: IBoid, neighbors: IBoid[]): IVector2 {
-    const force = this.compositeBehavior.calculate(boid, neighbors);
-    
-    // Emit behavior events
-    this.eventBus.emit('alignment-updated', {
-      boid,
-      neighbors: neighbors.filter(n => n.getVariant() === boid.getVariant()),
-      strength: force.length()
-    });
-    
+    // Pass eventBus to composite behavior which will pass it to individual behaviors
+    const force = this.compositeBehavior.calculate(boid, neighbors, this.eventBus);
     return force;
   }
   
