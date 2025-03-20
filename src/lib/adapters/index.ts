@@ -5,8 +5,8 @@ import {
 	PhaserPhysics,
 	PhaserTimeProvider,
 	PhaserDebugRenderer
-} from '$lib/adapters/phaser-system';
-import type { AllDependencies } from '$lib/interfaces';
+} from '$adapters/phaser-system';
+import type { AllDependencies } from '$interfaces';
 import { EventBus } from '$events/event-bus';
 
 /**

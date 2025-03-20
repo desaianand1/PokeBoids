@@ -1,15 +1,13 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
 	import { Card, CardContent, CardHeader, CardTitle } from '$ui/card';
 	import { ChartColumn } from '@lucide/svelte';
 	import { phaserGameRef, gameStats, getRuntimeDuration } from '$game/phaser-signals.svelte';
-	import { cn } from '$utils';
+	import StatItem from '$components/shared/StatItem.svelte';
+	import FpsIndicator from '$components/shared/FpsIndicator.svelte';
 
+	// State
 	let frameRate = $state(0);
 	const runtimeDuration = $derived(getRuntimeDuration());
-
-	// Performance tracking
-	let frameRateInterval: NodeJS.Timeout;
 
 	// Format time as MM:SS
 	function formatTime(seconds: number): string {
@@ -18,52 +16,20 @@
 		return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 	}
 
-	// FPS indicator style helper
-	function getFpsIndicator(fps: number) {
-		if (fps > 55) {
-			return {
-				class:
-					'bg-emerald-100 text-emerald-800  dark:bg-emerald-600/20 dark:border dark:border-emerald-600 dark:text-emerald-600',
-				text: 'Good'
-			};
-		} else if (fps > 30) {
-			return {
-				class:
-					'bg-yellow-100 text-yellow-800  dark:bg-yellow-600/20 dark:border dark:border-yellow-600 dark:text-yellow-600',
-				text: 'OK'
-			};
-		} else {
-			return {
-				class:
-					'bg-rose-100 text-rose-800  dark:bg-rose-600/20 dark:border dark:border-rose-600 dark:text-rose-600',
-				text: 'Low'
-			};
-		}
-	}
+	// Performance tracking using runes
+	$effect(() => {
+		const interval = setInterval(() => {
+			if (phaserGameRef.game) {
+				frameRate = Math.round(phaserGameRef.game.loop.actualFps);
+			}
+		}, 1000);
 
-	// Update frame rate
-	function updateFrameRate() {
-		if (phaserGameRef.game) {
-			frameRate = Math.round(phaserGameRef.game.loop.actualFps);
-		}
-	}
-
-	// Start tracking performance
-	function startPerformanceTracking() {
-		frameRateInterval = setInterval(updateFrameRate, 1000);
-	}
-
-	// Clean up
-	function stopPerformanceTracking() {
-		clearInterval(frameRateInterval);
-	}
-
-	onMount(startPerformanceTracking);
-	onDestroy(stopPerformanceTracking);
+		return () => clearInterval(interval);
+	});
 </script>
 
 <Card class="w-full shadow-md">
-	<CardHeader>
+	<CardHeader  class="pb-4">
 		<CardTitle class="flex items-center text-lg">
 			<ChartColumn class="mr-2 h-5 w-5" />
 			Simulation Statistics
@@ -72,35 +38,17 @@
 	<CardContent>
 		<div class="grid grid-cols-2 gap-4 md:grid-cols-4">
 			<!-- Population Stats -->
-			{@render statItem('Total Boids', gameStats.totalBoids)}
-			{@render statItem('Prey', gameStats.preyCount, 'text-green-500')}
-			{@render statItem('Predators', gameStats.predatorCount, 'text-red-500')}
-			{@render statItem('Runtime', formatTime(runtimeDuration))}
+			<StatItem label="Total Boids" value={gameStats.totalBoids} />
+			<StatItem label="Prey" value={gameStats.preyCount} textClass="text-green-500" />
+			<StatItem label="Predators" value={gameStats.predatorCount} textClass="text-red-500" />
+			<StatItem label="Runtime" value={formatTime(runtimeDuration)} />
 
 			<!-- Performance Stats -->
-			<div class="space-y-1">
-				<p class="text-xs uppercase tracking-wider text-muted-foreground">FPS</p>
-				<p class="flex items-center text-2xl font-semibold">
-					{frameRate}
-					{#if frameRate > 0}
-						{@const indicator = getFpsIndicator(frameRate)}
-						<span class={cn('ml-2 rounded-full px-1.5 py-0.5 text-xs', indicator.class)}>
-							{indicator.text}
-						</span>
-					{/if}
-				</p>
-			</div>
+			<FpsIndicator fps={frameRate} />
 
 			<!-- Event Stats -->
-			{@render statItem('Births', gameStats.reproductionEvents, 'text-blue-500')}
-			{@render statItem('Deaths', gameStats.deathEvents, 'text-gray-500')}
+			<StatItem label="Births" value={gameStats.reproductionEvents} textClass="text-blue-500" />
+			<StatItem label="Deaths" value={gameStats.deathEvents} textClass="text-gray-500" />
 		</div>
 	</CardContent>
 </Card>
-
-{#snippet statItem(label: string, value: number | string, textClass = '')}
-	<div class="space-y-1">
-		<p class="text-xs uppercase tracking-wider text-muted-foreground">{label}</p>
-		<p class={cn('text-2xl font-semibold', textClass)}>{value}</p>
-	</div>
-{/snippet}
