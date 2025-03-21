@@ -1,143 +1,184 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { QuadTreePartitioning } from './quad-tree';
-import { createMockBoid } from '$tests/utils/mock-boid';
-import { TestVectorFactory } from '$tests/implementations/vector';
 import { BoidVariant } from '$boid/types';
+import { TEST_SPATIAL_CONFIG, TEST_TIME_CONFIG, TEST_VECTOR_CONFIG } from '$tests/utils/constants';
+import {
+  createSpatialTestContext,
+  createRandomBoids,
+  createBoidCluster,
+  measurePerformance
+} from '$tests/utils/setup-spatial';
 
 describe('QuadTreePartitioning', () => {
-  let partitioning: QuadTreePartitioning;
-  let vectorFactory: TestVectorFactory;
+  const context = createSpatialTestContext();
   
   beforeEach(() => {
-    vectorFactory = new TestVectorFactory();
-    partitioning = new QuadTreePartitioning(1000, 1000);
+    // Reset context before each test
+    Object.assign(context, createSpatialTestContext());
   });
   
-  it('should insert and find boids', () => {
-    // Create test boids
-    const boid1 = createMockBoid(100, 100, BoidVariant.PREY);
-    const boid2 = createMockBoid(200, 200, BoidVariant.PREY);
-    const boid3 = createMockBoid(500, 500, BoidVariant.PREY);
+  it('should find nearby boids', () => {
+    // Create a cluster of boids
+    const cluster = createBoidCluster(100, 100, 5, 20, BoidVariant.PREY);
+    cluster.forEach(boid => context.partitioning.insert(boid));
     
-    // Insert boids
-    partitioning.insert(boid1);
-    partitioning.insert(boid2);
-    partitioning.insert(boid3);
+    // Query near the cluster center
+    const nearby = context.partitioning.findNearby(
+      context.vectorFactory.create(100, 100),
+      30 // Radius large enough to find cluster
+    );
     
-    // Find nearby boids
-    const nearby = partitioning.findNearby(vectorFactory.create(150, 150), 100);
-    
-    // Should find boids 1 and 2, but not 3
-    expect(nearby).toHaveLength(2);
-    expect(nearby).toContain(boid1);
-    expect(nearby).toContain(boid2);
-    expect(nearby).not.toContain(boid3);
+    // Should find all boids in cluster
+    expect(nearby.length).toBe(5);
+    cluster.forEach(boid => {
+      expect(nearby).toContain(boid);
+    });
   });
   
   it('should update with new boids', () => {
-    // Create test boids
-    const boid1 = createMockBoid(100, 100, BoidVariant.PREY);
-    const boid2 = createMockBoid(200, 200, BoidVariant.PREY);
+    // Create two clusters of boids
+    const cluster1 = createBoidCluster(100, 100, 5, 50, BoidVariant.PREY);
+    const cluster2 = createBoidCluster(300, 300, 5, 50, BoidVariant.PREY);
     
-    // Insert initial boids
-    partitioning.insert(boid1);
-    partitioning.insert(boid2);
+    // Insert first cluster
+    cluster1.forEach(boid => context.partitioning.insert(boid));
     
-    // Create new boids
-    const boid3 = createMockBoid(300, 300, BoidVariant.PREY);
-    const boid4 = createMockBoid(400, 400, BoidVariant.PREY);
+    // Update with second cluster
+    context.partitioning.update(cluster2);
     
-    // Update with new boids
-    partitioning.update([boid3, boid4]);
+    // Find nearby boids in second cluster
+    const nearby = context.partitioning.findNearby(
+      context.vectorFactory.create(300, 300),
+      TEST_VECTOR_CONFIG.defaultTestRadius
+    );
     
-    // Find nearby boids
-    const nearby = partitioning.findNearby(vectorFactory.create(350, 350), 100);
-    
-    // Should find boids 3 and 4, but not 1 and 2
-    expect(nearby).toHaveLength(2);
-    expect(nearby).toContain(boid3);
-    expect(nearby).toContain(boid4);
-    expect(nearby).not.toContain(boid1);
-    expect(nearby).not.toContain(boid2);
+    // Should find only cluster2 boids
+    expect(nearby).toHaveLength(5);
+    cluster2.forEach(boid => {
+      expect(nearby).toContain(boid);
+    });
+    cluster1.forEach(boid => {
+      expect(nearby).not.toContain(boid);
+    });
   });
   
-  it('should update bounds correctly', () => {
-    // Create test boids
-    const boid1 = createMockBoid(100, 100, BoidVariant.PREY);
-    const boid2 = createMockBoid(1100, 1100, BoidVariant.PREY); // Outside initial bounds
+  it('should update bounds through events', () => {
+    // Create a cluster inside bounds
+    const insideCluster = createBoidCluster(100, 100, 5, 50, BoidVariant.PREY);
     
-    // Insert boids
-    partitioning.insert(boid1);
-    partitioning.insert(boid2); // This should not be inserted (outside bounds)
+    // Create a cluster outside bounds
+    const outsideCluster = createBoidCluster(1100, 1100, 5, 50, BoidVariant.PREY);
     
-    // Find nearby boids
-    let nearby = partitioning.findNearby(vectorFactory.create(100, 100), 50);
+    // Insert both clusters
+    [...insideCluster, ...outsideCluster].forEach(boid => {
+      context.partitioning.insert(boid);
+    });
     
-    // Should only find boid1
-    expect(nearby).toHaveLength(1);
-    expect(nearby).toContain(boid1);
+    // Check inside cluster
+    let nearby = context.partitioning.findNearby(
+      context.vectorFactory.create(100, 100),
+      TEST_VECTOR_CONFIG.defaultTestRadius
+    );
     
-    // Update bounds
-    partitioning.updateBounds(2000, 2000);
+    // Should only find inside cluster
+    expect(nearby).toHaveLength(5);
+    insideCluster.forEach(boid => {
+      expect(nearby).toContain(boid);
+    });
     
-    // Insert boids again
-    partitioning.clear();
-    partitioning.insert(boid1);
-    partitioning.insert(boid2); // Now should be inserted
+    // Emit world bounds changed event
+    context.eventBus.emit('world-bounds-changed', { width: 2000, height: 2000 });
     
-    // Find nearby boids
-    nearby = partitioning.findNearby(vectorFactory.create(1100, 1100), 50);
+    // Reinsert both clusters
+    [...insideCluster, ...outsideCluster].forEach(boid => {
+      context.partitioning.insert(boid);
+    });
     
-    // Should find boid2
-    expect(nearby).toHaveLength(1);
-    expect(nearby).toContain(boid2);
+    // Check outside cluster
+    nearby = context.partitioning.findNearby(
+      context.vectorFactory.create(1100, 1100),
+      TEST_VECTOR_CONFIG.defaultTestRadius
+    );
+    
+    // Should find outside cluster
+    expect(nearby).toHaveLength(5);
+    outsideCluster.forEach(boid => {
+      expect(nearby).toContain(boid);
+    });
   });
   
   it('should handle large numbers of boids efficiently', () => {
-    // Create many boids
-    const boids = [];
-    for (let i = 0; i < 1000; i++) {
-      const x = Math.random() * 1000;
-      const y = Math.random() * 1000;
-      boids.push(createMockBoid(x, y, BoidVariant.PREY));
-    }
+    // Create random boids
+    const boids = createRandomBoids(1000, BoidVariant.PREY);
     
-    // Measure time to update and query
-    const startTime = performance.now();
+    // Measure performance of update and queries
+    const duration = measurePerformance(() => {
+      // Update with all boids
+      context.partitioning.update(boids);
+      
+      // Perform multiple queries
+      for (let i = 0; i < 100; i++) {
+        const queryPoint = context.vectorFactory.random()
+          .scale(TEST_SPATIAL_CONFIG.worldWidth);
+        
+        context.partitioning.findNearby(
+          queryPoint,
+          TEST_VECTOR_CONFIG.defaultTestRadius
+        );
+      }
+    });
     
-    // Update with all boids
-    partitioning.update(boids);
-    
-    // Perform multiple queries
-    for (let i = 0; i < 100; i++) {
-      const x = Math.random() * 1000;
-      const y = Math.random() * 1000;
-      partitioning.findNearby(vectorFactory.create(x, y), 100);
-    }
-    
-    const endTime = performance.now();
-    const duration = endTime - startTime;
-    
-    // Should complete within reasonable time (adjust threshold as needed)
-    expect(duration).toBeLessThan(1000); // 1 second
+    // Should complete within reasonable time
+    expect(duration).toBeLessThan(TEST_TIME_CONFIG.maxTestDuration);
   });
   
   it('should clear all boids', () => {
-    // Create test boids
-    const boid1 = createMockBoid(100, 100, BoidVariant.PREY);
-    const boid2 = createMockBoid(200, 200, BoidVariant.PREY);
+    // Create and insert a cluster of boids
+    const boids = createBoidCluster(150, 150, 5, 50, BoidVariant.PREY);
+    boids.forEach(boid => context.partitioning.insert(boid));
     
-    // Insert boids
-    partitioning.insert(boid1);
-    partitioning.insert(boid2);
+    // Verify boids are inserted
+    let nearby = context.partitioning.findNearby(
+      context.vectorFactory.create(150, 150),
+      TEST_VECTOR_CONFIG.defaultTestRadius
+    );
+    expect(nearby).toHaveLength(5);
     
-    // Clear
-    partitioning.clear();
+    // Clear partitioning
+    context.partitioning.clear();
     
-    // Find nearby boids
-    const nearby = partitioning.findNearby(vectorFactory.create(150, 150), 100);
+    // Verify no boids remain
+    nearby = context.partitioning.findNearby(
+      context.vectorFactory.create(150, 150),
+      TEST_VECTOR_CONFIG.defaultTestRadius
+    );
+    expect(nearby).toHaveLength(0);
+  });
+
+  it('should handle world bounds initialization', () => {
+    const context = createSpatialTestContext();
     
-    // Should find no boids
+    // Create a cluster at the edge of the default bounds
+    const edgeCluster = createBoidCluster(
+      TEST_SPATIAL_CONFIG.worldWidth - 50,
+      TEST_SPATIAL_CONFIG.worldHeight - 50,
+      5,
+      30,
+      BoidVariant.PREY
+    );
+    
+    // Insert cluster
+    edgeCluster.forEach(boid => context.partitioning.insert(boid));
+    
+    // Emit initialization event with smaller bounds
+    context.eventBus.emit('world-bounds-initialized', { width: 800, height: 600 });
+    
+    // Query at the edge of new bounds
+    const nearby = context.partitioning.findNearby(
+      context.vectorFactory.create(750, 550),
+      100
+    );
+    
+    // Should not find any boids (they're now outside bounds)
     expect(nearby).toHaveLength(0);
   });
 });

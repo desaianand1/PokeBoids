@@ -1,7 +1,7 @@
 import type { IFlockingBehavior } from '$interfaces/flocking';
 import type { IBoid } from '$interfaces/boid';
 import type { IVector2, IVectorFactory } from '$interfaces/vector';
-import type { IGameEventBus } from '$adapters/phaser-events';
+import type { IGameEventBus } from '$events/types';
 
 /**
  * Implements cohesion behavior - boids steer towards the center of mass of neighbors

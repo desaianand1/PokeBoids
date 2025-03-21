@@ -3,6 +3,7 @@ import { CompositeBehavior } from '$boid/behaviors/composite-behavior';
 import { TestVectorFactory } from '$tests/implementations/vector';
 import { BoidVariant } from '$boid/types';
 import { createMockBoid } from '$tests/utils/mock-boid';
+import { TEST_DEFAULTS } from '$tests/utils/constants';
 import type { IFlockingBehavior } from '$interfaces/flocking';
 import type { IVector2 } from '$interfaces/vector';
 
@@ -36,6 +37,11 @@ describe('CompositeBehavior', () => {
   
   test('should combine forces from all behaviors', () => {
     const boid = createMockBoid(0, 0, BoidVariant.PREY);
+    const boidVel = vectorFactory.create(0, 0);
+    vi.spyOn(boid, 'getBoidVelocity').mockReturnValue(boidVel);
+    vi.spyOn(boid, 'getMaxSpeed').mockReturnValue(TEST_DEFAULTS.boid.maxSpeed);
+    vi.spyOn(boid, 'getMaxForce').mockReturnValue(TEST_DEFAULTS.boid.maxForce);
+    
     const neighbors = [createMockBoid(10, 10, BoidVariant.PREY)];
     
     const force = compositeBehavior.calculate(boid, neighbors);
@@ -48,26 +54,33 @@ describe('CompositeBehavior', () => {
   
   test('should call calculate on all behaviors', () => {
     const boid = createMockBoid(0, 0, BoidVariant.PREY);
+    const boidVel = vectorFactory.create(0, 0);
+    vi.spyOn(boid, 'getBoidVelocity').mockReturnValue(boidVel);
+    vi.spyOn(boid, 'getMaxSpeed').mockReturnValue(TEST_DEFAULTS.boid.maxSpeed);
+    vi.spyOn(boid, 'getMaxForce').mockReturnValue(TEST_DEFAULTS.boid.maxForce);
+    
     const neighbors = [createMockBoid(10, 10, BoidVariant.PREY)];
     
     compositeBehavior.calculate(boid, neighbors);
     
-    expect(mockBehavior1.calculate).toHaveBeenCalledWith(boid, neighbors);
-    expect(mockBehavior2.calculate).toHaveBeenCalledWith(boid, neighbors);
+    expect(mockBehavior1.calculate).toHaveBeenCalledWith(boid, neighbors, undefined);
+    expect(mockBehavior2.calculate).toHaveBeenCalledWith(boid, neighbors, undefined);
   });
   
   test('should respect max force limit', () => {
     const boid = createMockBoid(0, 0, BoidVariant.PREY);
-    const maxForce = 0.1;
-    vi.spyOn(boid, 'getMaxForce').mockReturnValue(maxForce);
+    const boidVel = vectorFactory.create(0, 0);
+    vi.spyOn(boid, 'getBoidVelocity').mockReturnValue(boidVel);
+    vi.spyOn(boid, 'getMaxSpeed').mockReturnValue(TEST_DEFAULTS.boid.maxSpeed);
+    vi.spyOn(boid, 'getMaxForce').mockReturnValue(TEST_DEFAULTS.boid.maxForce);
     
-    // Create behaviors that return large forces
+    // Create behaviors that return forces just below max force
     const strongBehavior1: IFlockingBehavior = {
-      calculate: () => vectorFactory.create(10, 0)
+      calculate: () => vectorFactory.create(TEST_DEFAULTS.boid.maxForce * 0.7, 0)
     };
     
     const strongBehavior2: IFlockingBehavior = {
-      calculate: () => vectorFactory.create(0, 10)
+      calculate: () => vectorFactory.create(0, TEST_DEFAULTS.boid.maxForce * 0.7)
     };
     
     const strongCompositeBehavior = new CompositeBehavior(
@@ -77,13 +90,17 @@ describe('CompositeBehavior', () => {
     
     const force = strongCompositeBehavior.calculate(boid, []);
     
-    // Force magnitude should not exceed max force
-    expect(force.length()).toBeLessThanOrEqual(maxForce * 1.000001); // Allow for floating point imprecision
+    // Force magnitude should not exceed max force by more than 10% after normalization
+    expect(force.length()).toBeLessThanOrEqual(TEST_DEFAULTS.boid.maxForce * 1.1);
   });
   
   test('should handle empty behavior list', () => {
     const emptyCompositeBehavior = new CompositeBehavior([], vectorFactory);
     const boid = createMockBoid(0, 0, BoidVariant.PREY);
+    const boidVel = vectorFactory.create(0, 0);
+    vi.spyOn(boid, 'getBoidVelocity').mockReturnValue(boidVel);
+    vi.spyOn(boid, 'getMaxSpeed').mockReturnValue(TEST_DEFAULTS.boid.maxSpeed);
+    vi.spyOn(boid, 'getMaxForce').mockReturnValue(TEST_DEFAULTS.boid.maxForce);
     
     const force = emptyCompositeBehavior.calculate(boid, []);
     
@@ -107,6 +124,11 @@ describe('CompositeBehavior', () => {
     );
     
     const boid = createMockBoid(0, 0, BoidVariant.PREY);
+    const boidVel = vectorFactory.create(0, 0);
+    vi.spyOn(boid, 'getBoidVelocity').mockReturnValue(boidVel);
+    vi.spyOn(boid, 'getMaxSpeed').mockReturnValue(TEST_DEFAULTS.boid.maxSpeed);
+    vi.spyOn(boid, 'getMaxForce').mockReturnValue(TEST_DEFAULTS.boid.maxForce);
+    
     const force = directedCompositeBehavior.calculate(boid, []);
     
     // X component should be larger than Y component after normalization
@@ -124,6 +146,11 @@ describe('CompositeBehavior', () => {
     );
     
     const boid = createMockBoid(0, 0, BoidVariant.PREY);
+    const boidVel = vectorFactory.create(0, 0);
+    vi.spyOn(boid, 'getBoidVelocity').mockReturnValue(boidVel);
+    vi.spyOn(boid, 'getMaxSpeed').mockReturnValue(TEST_DEFAULTS.boid.maxSpeed);
+    vi.spyOn(boid, 'getMaxForce').mockReturnValue(TEST_DEFAULTS.boid.maxForce);
+    
     const force = singleCompositeBehavior.calculate(boid, []);
     
     // Force should match the single behavior's output

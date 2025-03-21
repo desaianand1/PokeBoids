@@ -3,6 +3,7 @@ import { CohesionBehavior } from '$boid/behaviors/cohesion-behavior';
 import { TestVectorFactory } from '$tests/implementations/vector';
 import { BoidVariant } from '$boid/types';
 import { createMockBoid } from '$tests/utils/mock-boid';
+import { TEST_DEFAULTS } from '$tests/utils/constants';
 
 describe('CohesionBehavior', () => {
   let vectorFactory: TestVectorFactory;
@@ -15,6 +16,11 @@ describe('CohesionBehavior', () => {
   
   test('should return zero force with no neighbors', () => {
     const boid = createMockBoid(100, 100, BoidVariant.PREY);
+    const boidVel = vectorFactory.create(0, 0);
+    vi.spyOn(boid, 'getBoidVelocity').mockReturnValue(boidVel);
+    vi.spyOn(boid, 'getMaxSpeed').mockReturnValue(TEST_DEFAULTS.boid.maxSpeed);
+    vi.spyOn(boid, 'getMaxForce').mockReturnValue(TEST_DEFAULTS.boid.maxForce);
+    
     const force = cohesionBehavior.calculate(boid, []);
     
     expect(force.x).toBe(0);
@@ -25,7 +31,11 @@ describe('CohesionBehavior', () => {
     // Create a boid at (0, 0)
     const boid = createMockBoid(0, 0, BoidVariant.PREY);
     const boidPos = vectorFactory.create(0, 0);
+    const boidVel = vectorFactory.create(0, 0);
     vi.spyOn(boid, 'getBoidPosition').mockReturnValue(boidPos);
+    vi.spyOn(boid, 'getBoidVelocity').mockReturnValue(boidVel);
+    vi.spyOn(boid, 'getMaxSpeed').mockReturnValue(TEST_DEFAULTS.boid.maxSpeed);
+    vi.spyOn(boid, 'getMaxForce').mockReturnValue(TEST_DEFAULTS.boid.maxForce);
     
     // Create two neighbors at (10, 0) and (-10, 0)
     const neighbor1 = createMockBoid(10, 0, BoidVariant.PREY);
@@ -47,7 +57,11 @@ describe('CohesionBehavior', () => {
     // Create a prey boid at (0, 0)
     const boid = createMockBoid(0, 0, BoidVariant.PREY);
     const boidPos = vectorFactory.create(0, 0);
+    const boidVel = vectorFactory.create(0, 0);
     vi.spyOn(boid, 'getBoidPosition').mockReturnValue(boidPos);
+    vi.spyOn(boid, 'getBoidVelocity').mockReturnValue(boidVel);
+    vi.spyOn(boid, 'getMaxSpeed').mockReturnValue(TEST_DEFAULTS.boid.maxSpeed);
+    vi.spyOn(boid, 'getMaxForce').mockReturnValue(TEST_DEFAULTS.boid.maxForce);
     
     // Create a predator neighbor at (10, 0)
     const predator = createMockBoid(10, 0, BoidVariant.PREDATOR);
@@ -63,11 +77,14 @@ describe('CohesionBehavior', () => {
   });
   
   test('should respect max force limit', () => {
+    // Create a boid at (0, 0)
     const boid = createMockBoid(0, 0, BoidVariant.PREY);
-    const maxForce = 0.1;
-    vi.spyOn(boid, 'getMaxForce').mockReturnValue(maxForce);
     const boidPos = vectorFactory.create(0, 0);
+    const boidVel = vectorFactory.create(0, 0);
     vi.spyOn(boid, 'getBoidPosition').mockReturnValue(boidPos);
+    vi.spyOn(boid, 'getBoidVelocity').mockReturnValue(boidVel);
+    vi.spyOn(boid, 'getMaxSpeed').mockReturnValue(TEST_DEFAULTS.boid.maxSpeed);
+    vi.spyOn(boid, 'getMaxForce').mockReturnValue(TEST_DEFAULTS.boid.maxForce);
     
     // Create a distant neighbor to generate large force
     const neighbor = createMockBoid(1000, 0, BoidVariant.PREY);
@@ -77,7 +94,7 @@ describe('CohesionBehavior', () => {
     const force = cohesionBehavior.calculate(boid, [neighbor]);
     
     // Force magnitude should not exceed max force
-    expect(force.length()).toBeLessThanOrEqual(maxForce * 1.000001); // Allow for floating point imprecision
+    expect(force.length()).toBeLessThanOrEqual(TEST_DEFAULTS.boid.maxForce * 1.000001); // Allow for floating point imprecision
   });
   
   test('should apply weight to steering force', () => {
@@ -87,7 +104,11 @@ describe('CohesionBehavior', () => {
     // Create a boid at (0, 0)
     const boid = createMockBoid(0, 0, BoidVariant.PREY);
     const boidPos = vectorFactory.create(0, 0);
+    const boidVel = vectorFactory.create(0, 0);
     vi.spyOn(boid, 'getBoidPosition').mockReturnValue(boidPos);
+    vi.spyOn(boid, 'getBoidVelocity').mockReturnValue(boidVel);
+    vi.spyOn(boid, 'getMaxSpeed').mockReturnValue(TEST_DEFAULTS.boid.maxSpeed);
+    vi.spyOn(boid, 'getMaxForce').mockReturnValue(TEST_DEFAULTS.boid.maxForce);
     
     // Create a neighbor at (10, 0)
     const neighbor = createMockBoid(10, 0, BoidVariant.PREY);
@@ -105,7 +126,11 @@ describe('CohesionBehavior', () => {
     // Create a boid at (0, 0)
     const boid = createMockBoid(0, 0, BoidVariant.PREY);
     const boidPos = vectorFactory.create(0, 0);
+    const boidVel = vectorFactory.create(0, 0);
     vi.spyOn(boid, 'getBoidPosition').mockReturnValue(boidPos);
+    vi.spyOn(boid, 'getBoidVelocity').mockReturnValue(boidVel);
+    vi.spyOn(boid, 'getMaxSpeed').mockReturnValue(TEST_DEFAULTS.boid.maxSpeed);
+    vi.spyOn(boid, 'getMaxForce').mockReturnValue(TEST_DEFAULTS.boid.maxForce);
     
     // Create three neighbors in a triangle
     const neighbor1 = createMockBoid(10, 0, BoidVariant.PREY);

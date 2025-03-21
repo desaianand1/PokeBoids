@@ -1,7 +1,7 @@
 import { Scene } from 'phaser';
 import { PhaserFlock } from '$boid/phaser-flock';
 import { BoidFactory } from '$boid/boid-factory';
-import { type IGameEventBus } from '$adapters/phaser-events';
+import { type IGameEventBus } from '$events/types';
 import { BackgroundManager } from '$game/managers/background-manager';
 import { ObstacleManager } from '$game/managers/obstacle-manager';
 import { DebugManager } from '$game/managers/debug-manager';
@@ -10,6 +10,7 @@ import { getBoidConfig, getSimulationConfig } from '$config/simulation-signals.s
 import { createCompleteDependencies } from '$adapters';
 import { EventBus } from '$events/event-bus';
 import type { BoidConfig, SimulationConfig } from '$config/types';
+import type { IFlockingConfig } from '$interfaces/flocking';
 
 /**
  * Main game scene that coordinates all game components
@@ -42,6 +43,8 @@ export class Game extends Scene {
 
 		this.initializeComponents();
 		this.setupEventListeners();
+		this.emitWorldBounds();
+		this.setupResizeListener();
 		this.startSimulation();
 	}
 
@@ -49,10 +52,22 @@ export class Game extends Scene {
 		const dependencies = createCompleteDependencies(this);
 		this.eventEmitter = dependencies.eventEmitter;
 
+		// Create base configuration
+		const flockingConfig: IFlockingConfig = {
+			alignmentWeight: this.boidConfig.alignmentWeight?.default ?? 1.0,
+			cohesionWeight: this.boidConfig.cohesionWeight?.default ?? 1.0,
+			separationWeight: this.boidConfig.separationWeight?.default ?? 1.5,
+			perceptionRadius: this.boidConfig.perceptionRadius?.default ?? 150,
+			separationRadius: this.boidConfig.separationRadius?.default ?? 50,
+			boundaryMargin: this.boidConfig.boundaryMargin?.default ?? 150,
+			boundaryForceMultiplier: this.boidConfig.boundaryForceMultiplier?.default ?? 2.0,
+			boundaryForceRamp: this.boidConfig.boundaryForceRamp?.default ?? 2.5
+		};
+
 		// Create managers
 		this.backgroundManager = new BackgroundManager(this);
 		this.obstacleManager = new ObstacleManager(this);
-		this.debugManager = new DebugManager(this);
+		this.debugManager = new DebugManager(this, this.eventEmitter, flockingConfig);
 		this.effectsManager = new EffectsManager(this);
 
 		// Create boid factory
@@ -67,13 +82,7 @@ export class Game extends Scene {
 		});
 
 		// Create flock
-		this.flock = new PhaserFlock(this, this.eventEmitter, {
-			alignmentWeight: this.boidConfig.alignmentWeight?.default ?? 1.0,
-			cohesionWeight: this.boidConfig.cohesionWeight?.default ?? 1.0,
-			separationWeight: this.boidConfig.separationWeight?.default ?? 1.5,
-			perceptionRadius: this.boidConfig.perceptionRadius?.default ?? 150,
-			separationRadius: this.boidConfig.separationRadius?.default ?? 50
-		});
+		this.flock = new PhaserFlock(this, this.eventEmitter, flockingConfig);
 	}
 
 	private setupEventListeners(): void {
@@ -102,6 +111,23 @@ export class Game extends Scene {
 		// Collision events
 		this.eventEmitter.on('boundary-collision', ({ boid, boundary }) => {
 			this.effectsManager.createCollisionEffect(boid, boundary);
+		});
+	}
+
+	private emitWorldBounds(): void {
+		const width = this.scale.width;
+		const height = this.scale.height;
+
+		this.eventEmitter.emit('world-bounds-initialized', { width, height });
+	}
+
+	private setupResizeListener(): void {
+		// Listen for resize events from the scene
+		this.scale.on('resize', () => {
+			const width = this.scale.width;
+			const height = this.scale.height;
+
+			this.eventEmitter.emit('world-bounds-changed', { width, height });
 		});
 	}
 
@@ -139,14 +165,19 @@ export class Game extends Scene {
 		// Clean up existing simulation
 		this.flock.destroy();
 
-		// Create new flock
-		this.flock = new PhaserFlock(this, this.eventEmitter, {
+		const flockingConfig: IFlockingConfig = {
 			alignmentWeight: this.boidConfig.alignmentWeight?.default ?? 1.0,
 			cohesionWeight: this.boidConfig.cohesionWeight?.default ?? 1.0,
 			separationWeight: this.boidConfig.separationWeight?.default ?? 1.5,
 			perceptionRadius: this.boidConfig.perceptionRadius?.default ?? 150,
-			separationRadius: this.boidConfig.separationRadius?.default ?? 50
-		});
+			separationRadius: this.boidConfig.separationRadius?.default ?? 50,
+			boundaryMargin: this.boidConfig.boundaryMargin?.default ?? 150,
+			boundaryForceMultiplier: this.boidConfig.boundaryForceMultiplier?.default ?? 2.0,
+			boundaryForceRamp: this.boidConfig.boundaryForceRamp?.default ?? 2.5
+		};
+
+		// Create new flock
+		this.flock = new PhaserFlock(this, this.eventEmitter, flockingConfig);
 
 		// Start new simulation
 		this.startSimulation();
@@ -164,6 +195,7 @@ export class Game extends Scene {
 	}
 
 	shutdown(): void {
+		this.scale.off('resize');
 		// Clean up all components
 		this.eventEmitter.destroy();
 		this.backgroundManager.destroy();

@@ -3,6 +3,7 @@ import { AlignmentBehavior } from '$boid/behaviors/alignment-behavior';
 import { TestVectorFactory } from '$tests/implementations/vector';
 import { BoidVariant } from '$boid/types';
 import { createMockBoid } from '$tests/utils/mock-boid';
+import { TEST_DEFAULTS } from '$tests/utils/constants';
 
 describe('AlignmentBehavior', () => {
   let vectorFactory: TestVectorFactory;
@@ -15,6 +16,11 @@ describe('AlignmentBehavior', () => {
   
   test('should return zero force with no neighbors', () => {
     const boid = createMockBoid(100, 100, BoidVariant.PREY);
+    const boidVel = vectorFactory.create(0, 0);
+    vi.spyOn(boid, 'getBoidVelocity').mockReturnValue(boidVel);
+    vi.spyOn(boid, 'getMaxSpeed').mockReturnValue(TEST_DEFAULTS.boid.maxSpeed);
+    vi.spyOn(boid, 'getMaxForce').mockReturnValue(TEST_DEFAULTS.boid.maxForce);
+    
     const force = alignmentBehavior.calculate(boid, []);
     
     expect(force.x).toBe(0);
@@ -26,6 +32,8 @@ describe('AlignmentBehavior', () => {
     const boid = createMockBoid(100, 100, BoidVariant.PREY);
     const boidVelocity = vectorFactory.create(1, 0);
     vi.spyOn(boid, 'getBoidVelocity').mockReturnValue(boidVelocity);
+    vi.spyOn(boid, 'getMaxSpeed').mockReturnValue(TEST_DEFAULTS.boid.maxSpeed);
+    vi.spyOn(boid, 'getMaxForce').mockReturnValue(TEST_DEFAULTS.boid.maxForce);
     
     // Create neighbors with velocity (0, 1)
     const neighbor1 = createMockBoid(120, 100, BoidVariant.PREY);
@@ -48,6 +56,8 @@ describe('AlignmentBehavior', () => {
     const boid = createMockBoid(100, 100, BoidVariant.PREY);
     const boidVelocity = vectorFactory.create(1, 0);
     vi.spyOn(boid, 'getBoidVelocity').mockReturnValue(boidVelocity);
+    vi.spyOn(boid, 'getMaxSpeed').mockReturnValue(TEST_DEFAULTS.boid.maxSpeed);
+    vi.spyOn(boid, 'getMaxForce').mockReturnValue(TEST_DEFAULTS.boid.maxForce);
     
     // Create a predator neighbor with different velocity (0, 1)
     const predator = createMockBoid(120, 100, BoidVariant.PREDATOR);
@@ -64,18 +74,20 @@ describe('AlignmentBehavior', () => {
   
   test('should respect max force limit', () => {
     const boid = createMockBoid(100, 100, BoidVariant.PREY);
-    const maxForce = 0.1;
-    vi.spyOn(boid, 'getMaxForce').mockReturnValue(maxForce);
+    const boidVel = vectorFactory.create(0, 0);
+    vi.spyOn(boid, 'getBoidVelocity').mockReturnValue(boidVel);
+    vi.spyOn(boid, 'getMaxSpeed').mockReturnValue(TEST_DEFAULTS.boid.maxSpeed);
+    vi.spyOn(boid, 'getMaxForce').mockReturnValue(TEST_DEFAULTS.boid.maxForce);
     
     // Create neighbors with high velocity to generate large force
     const neighbor = createMockBoid(120, 100, BoidVariant.PREY);
-    const highVelocity = vectorFactory.create(10, 10);
+    const highVelocity = vectorFactory.create(TEST_DEFAULTS.boid.maxSpeed * 2, TEST_DEFAULTS.boid.maxSpeed * 2);
     vi.spyOn(neighbor, 'getBoidVelocity').mockReturnValue(highVelocity);
     
     const force = alignmentBehavior.calculate(boid, [neighbor]);
     
     // Force magnitude should not exceed max force
-    expect(force.length()).toBeLessThanOrEqual(maxForce * 1.000001); // Allow for floating point imprecision
+    expect(force.length()).toBeLessThanOrEqual(TEST_DEFAULTS.boid.maxForce * 1.000001); // Allow for floating point imprecision
   });
   
   test('should apply weight to steering force', () => {
@@ -85,6 +97,8 @@ describe('AlignmentBehavior', () => {
     const boid = createMockBoid(100, 100, BoidVariant.PREY);
     const boidVelocity = vectorFactory.create(1, 0);
     vi.spyOn(boid, 'getBoidVelocity').mockReturnValue(boidVelocity);
+    vi.spyOn(boid, 'getMaxSpeed').mockReturnValue(TEST_DEFAULTS.boid.maxSpeed);
+    vi.spyOn(boid, 'getMaxForce').mockReturnValue(TEST_DEFAULTS.boid.maxForce);
     
     const neighbor = createMockBoid(120, 100, BoidVariant.PREY);
     const neighborVelocity = vectorFactory.create(0, 1);

@@ -1,7 +1,7 @@
 import type { ISpatialPartitioning } from '$interfaces/spatial-partitioning';
 import type { IBoid } from '$interfaces/boid';
 import type { IVector2 } from '$interfaces/vector';
-import { TestVectorFactory } from './vector';
+import { TestVectorFactory } from '$tests/implementations/vector';
 
 /**
  * Mock implementation of spatial partitioning for testing

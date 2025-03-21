@@ -1,15 +1,23 @@
-import { TestVectorFactory } from '$tests/implementations/vector';
-import { TestTypedEventEmitter } from '$adapters/phaser-events';
-import { TestRandomGenerator, TestTimeProvider, TestPhysics, TestDebugRenderer } from '$tests/implementations/system';
 import type { AllDependencies } from '$interfaces';
-import type {  } from '$boid/types';
+import { TestVectorFactory } from '$tests/implementations/vector';
+import { TestEventBus } from '$tests/implementations/events';
+import {
+  TestRandomGenerator,
+  TestTimeProvider,
+  TestPhysics,
+  TestDebugRenderer,
+  testRandom,
+  testTime,
+  testPhysics,
+  testDebug
+} from '$tests/implementations/system';
 
 /**
  * Default test dependencies for unit testing
  */
 export const defaultTestDependencies: AllDependencies = {
-  vectorFactory: TestVectorFactory,
-  eventEmitter: new TestTypedEventEmitter<GameEvents>(),
+  vectorFactory: new TestVectorFactory(),
+  eventEmitter: new TestEventBus(),
   random: testRandom,
   time: testTime,
   physics: testPhysics,
@@ -23,7 +31,7 @@ export function resetTestDependencies(): void {
   testRandom.reset();
   testTime.reset();
   testDebug.reset();
-  defaultTestDependencies.eventEmitter = new TestTypedEventEmitter<BoidEvents>();
+  defaultTestDependencies.eventEmitter = new TestEventBus();
 }
 
 /**
@@ -33,7 +41,7 @@ export function resetTestDependencies(): void {
 export function createFreshTestDependencies(): AllDependencies {
   return {
     vectorFactory: new TestVectorFactory(),
-    eventEmitter: new TestTypedEventEmitter<BoidEvents>(),
+    eventEmitter: new TestEventBus(),
     random: new TestRandomGenerator(),
     time: new TestTimeProvider(),
     physics: new TestPhysics(),
@@ -42,11 +50,21 @@ export function createFreshTestDependencies(): AllDependencies {
 }
 
 // Re-export all test implementations
-export * from './vector';
-export * from './events';
-export * from './system';
+export {
+  TestVectorFactory,
+  TestEventBus,
+  TestRandomGenerator,
+  TestTimeProvider,
+  TestPhysics,
+  TestDebugRenderer,
+  // Singleton instances
+  testRandom,
+  testTime,
+  testPhysics,
+  testDebug
+};
 
-// Import types for createFreshTestDependencies
-import { TestVectorFactory } from './vector';
-import { TestRandomGenerator, TestTimeProvider, TestPhysics, TestDebugRenderer } from './system';import type { GameEvents } from '$adapters';
-
+// Re-export implementation files
+export * from '$tests/implementations/vector';
+export * from '$tests/implementations/events';
+export * from '$tests/implementations/system';

@@ -1,15 +1,15 @@
-import type { IGameEventBus } from '$adapters/phaser-events';
+import type { IGameEventBus, GameEvents } from '$events/types';
 
 /**
  * Test implementation of event bus
  */
 export class TestEventBus implements IGameEventBus {
-  private handlers = new Map<string, Set<{ handler: (data: unknown) => void; context?: unknown }>>();
-  private lastEmittedData = new Map<string, unknown>();
+  private handlers = new Map<keyof GameEvents, Set<{ handler: (data: GameEvents[keyof GameEvents]) => void; context?: unknown }>>();
+  private lastEmittedData = new Map<keyof GameEvents, GameEvents[keyof GameEvents]>();
 
-  emit<K extends string>(event: K, data: unknown): boolean {
+  emit<K extends keyof GameEvents>(event: K, data: GameEvents[K]): boolean {
     const eventHandlers = this.handlers.get(event);
-    this.lastEmittedData.set(event, data);
+    this.lastEmittedData.set(event as keyof GameEvents, data);
     
     if (!eventHandlers || eventHandlers.size === 0) {
       return false;
@@ -25,7 +25,7 @@ export class TestEventBus implements IGameEventBus {
     return true;
   }
 
-  on<K extends string>(event: K, handler: (data: unknown) => void, context?: unknown): this {
+  on<K extends keyof GameEvents>(event: K, handler: (data: GameEvents[K]) => void, context?: unknown): this {
     if (!this.handlers.has(event)) {
       this.handlers.set(event, new Set());
     }
@@ -33,8 +33,8 @@ export class TestEventBus implements IGameEventBus {
     return this;
   }
 
-  once<K extends string>(event: K, handler: (data: unknown) => void, context?: unknown): this {
-    const onceHandler = (data: unknown) => {
+  once<K extends keyof GameEvents>(event: K, handler: (data: GameEvents[K]) => void, context?: unknown): this {
+    const onceHandler = (data: GameEvents[K]) => {
       if (context) {
         handler.call(context, data);
       } else {
@@ -45,7 +45,7 @@ export class TestEventBus implements IGameEventBus {
     return this.on(event, onceHandler, context);
   }
 
-  off<K extends string>(event: K, handler?: (data: unknown) => void, context?: unknown): this {
+  off<K extends keyof GameEvents>(event: K, handler?: (data: GameEvents[K]) => void, context?: unknown): this {
     if (handler) {
       const handlers = this.handlers.get(event);
       if (handlers) {
@@ -62,7 +62,7 @@ export class TestEventBus implements IGameEventBus {
     return this;
   }
 
-  removeAllListeners<K extends string>(event?: K): this {
+  removeAllListeners<K extends keyof GameEvents>(event?: K): this {
     if (event) {
       this.handlers.delete(event);
     } else {
@@ -71,11 +71,11 @@ export class TestEventBus implements IGameEventBus {
     return this;
   }
 
-  subscribe<K extends string>(event: K, handler: (data: unknown) => void, context?: unknown): void {
+  subscribe<K extends keyof GameEvents>(event: K, handler: (data: GameEvents[K]) => void, context?: unknown): void {
     this.on(event, handler, context);
   }
 
-  unsubscribe<K extends string>(event: K, handler?: (data: unknown) => void, context?: unknown): void {
+  unsubscribe<K extends keyof GameEvents>(event: K, handler?: (data: GameEvents[K]) => void, context?: unknown): void {
     this.off(event, handler, context);
   }
 
@@ -83,16 +83,16 @@ export class TestEventBus implements IGameEventBus {
     this.removeAllListeners();
   }
 
-  dispatch<K extends string>(event: K, data: unknown): void {
+  dispatch<K extends keyof GameEvents>(event: K, data: GameEvents[K]): void {
     this.emit(event, data);
   }
 
-  hasListeners(event: string): boolean {
+  hasListeners(event: keyof GameEvents): boolean {
     return (this.handlers.get(event)?.size ?? 0) > 0;
   }
 
-  getLastEmittedData(event: string): unknown {
-    return this.lastEmittedData.get(event);
+  getLastEmittedData<K extends keyof GameEvents>(event: K): GameEvents[K] | undefined {
+    return this.lastEmittedData.get(event) as GameEvents[K] | undefined;
   }
 
   destroy(): void {

@@ -26,8 +26,4 @@ export interface ISpatialPartitioning {
 	 */
 	clear(): void;
 
-	/**
-	 * Update the bounds of the spatial partitioning structure
-	 */
-	updateBounds(width: number, height: number): void;
 }
