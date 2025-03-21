@@ -33,7 +33,7 @@
 			>
 		</Tooltip>
 
-		<div class="w-20 text-center font-mono text-xs">
+		<div class="w-20 text-center font-mono text-sm">
 			{speed.toFixed(1)}x
 		</div>
 		<Tooltip>

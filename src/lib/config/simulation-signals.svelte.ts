@@ -10,7 +10,7 @@ const DEFAULT_BOID_CONFIG: BoidConfig = {
 	alignmentWeight: { default: 1.0, min: 0.0, max: 2.0, step: 0.1 },
 	cohesionWeight: { default: 1.0, min: 0.0, max: 2.0, step: 0.1 },
 	separationWeight: { default: 1.5, min: 0.0, max: 3.0, step: 0.1 },
-	perceptionRadius: { default: 100, min: 20, max: 200, step: 5 },
+	perceptionRadius: { default: 25, min: 5, max: 200, step: 5 },
 	separationRadius: { default: 30, min: 10, max: 100, step: 5 },
 	boundaryMargin: { default: 150, min: 50, max: 200, step: 10 },
 	boundaryForceMultiplier: { default: 2.0, min: 1.0, max: 5.0, step: 0.1 },
@@ -23,8 +23,8 @@ const DEFAULT_BOID_CONFIG: BoidConfig = {
 
 // Default configuration with values from SimulationControls.svelte
 const DEFAULT_SIMULATION_CONFIG: SimulationConfig = {
-	initialPreyCount: { default: 50, min: 0, max: 100, step: 1 },
-	initialPredatorCount: { default: 5, min: 0, max: 100, step: 1 },
+	initialPreyCount: { default: 50, min: 0, max: 500, step: 1 },
+	initialPredatorCount: { default: 5, min: 0, max: 500, step: 1 },
 	obstacleCount: { default: 0, min: 0, max: 20, step: 1 },
 	trackStats: { default: true }
 };

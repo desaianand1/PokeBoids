@@ -5,9 +5,10 @@
   import { Copy } from '@lucide/svelte';
   import { toast } from 'svelte-sonner';
   import type { EventDetails } from '$utils/event-debug';
+  import type { GameEvents } from '$events/types';
 
   interface EventDetailsProps {
-    selectedEventId: string | null;
+    selectedEventId: (keyof GameEvents & string) | null;
     details: EventDetails | null;
   }
 
@@ -29,7 +30,7 @@
   }
 </script>
 
-<ScrollArea.Root class="h-64">
+<ScrollArea.Root class="h-60 max-h-80">
   {#if selectedEventId !== null && details}
     <div class="mb-2 flex items-center justify-between">
       <h3 class="font-semibold">

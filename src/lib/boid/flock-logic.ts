@@ -1,10 +1,12 @@
 import type { IFlockingConfig } from '$interfaces/flocking';
 import type { IBoid } from '$interfaces/boid';
 import type { IVector2, IVectorFactory } from '$interfaces/vector';
+import type { ISpatialPartitioning } from '$interfaces/spatial-partitioning';
 import { AlignmentBehavior } from '$boid/behaviors/alignment-behavior';
 import { CohesionBehavior } from '$boid/behaviors/cohesion-behavior';
 import { SeparationBehavior } from '$boid/behaviors/separation-behavior';
 import { CompositeBehavior } from '$boid/behaviors/composite-behavior';
+import { QuadTreePartitioning } from '$boid/spatial/quad-tree';
 import type { IGameEventBus } from '$adapters/phaser-events';
 
 /**
@@ -12,12 +14,18 @@ import type { IGameEventBus } from '$adapters/phaser-events';
  */
 export class FlockLogic {
   private compositeBehavior: CompositeBehavior;
+  private spatialPartitioning!: ISpatialPartitioning;
+  private worldWidth: number = 3000; // Default value
+  private worldHeight: number = 3000; // Default value
   
   constructor(
     private vectorFactory: IVectorFactory,
     private eventBus: IGameEventBus,
     config: IFlockingConfig
   ) {
+    this.initializeSpatialPartitioning();
+    this.setupWorldBoundsListeners();
+    
     // Create individual behaviors
     const alignmentBehavior = new AlignmentBehavior(
       vectorFactory,
@@ -48,11 +56,54 @@ export class FlockLogic {
     return force;
   }
   
+  private initializeSpatialPartitioning(): void {
+    this.spatialPartitioning = new QuadTreePartitioning(
+      this.worldWidth,
+      this.worldHeight
+    );
+  }
+  
+  private setupWorldBoundsListeners(): void {
+    // Listen for world bounds initialization
+    this.eventBus.on('world-bounds-initialized', (data) => {
+      this.worldWidth = data.width;
+      this.worldHeight = data.height;
+      
+      // If spatialPartitioning is already initialized, update its bounds
+      if (this.spatialPartitioning) {
+        this.spatialPartitioning.updateBounds(
+          this.worldWidth,
+          this.worldHeight
+        );
+      } else {
+        // Otherwise, initialize it
+        this.initializeSpatialPartitioning();
+      }
+    }, this);
+    
+    // Listen for world bounds changes
+    this.eventBus.on('world-bounds-changed', (data) => {
+      this.worldWidth = data.width;
+      this.worldHeight = data.height;
+      
+      // Update the bounds of the spatial partitioning
+      if (this.spatialPartitioning) {
+        this.spatialPartitioning.updateBounds(
+          this.worldWidth,
+          this.worldHeight
+        );
+      }
+    }, this);
+  }
+  
   update(boids: IBoid[]): void {
+    // Update spatial partitioning with current boids
+    this.spatialPartitioning.update(boids);
+    
     // For each boid, find neighbors and apply forces
     for (const boid of boids) {
-      // Find neighbors within perception radius
-      const neighbors = this.findNeighbors(boid, boids, boid.getPerceptionRadius());
+      // Find neighbors within perception radius using spatial partitioning
+      const neighbors = this.findNeighbors(boid, boid.getPerceptionRadius());
       
       // Calculate and apply forces
       const force = this.calculateForces(boid, neighbors);
@@ -60,25 +111,19 @@ export class FlockLogic {
     }
   }
   
-  private findNeighbors(boid: IBoid, allBoids: IBoid[], radius: number): IBoid[] {
-    const neighbors: IBoid[] = [];
-    const radiusSquared = radius * radius;
+  private findNeighbors(boid: IBoid, radius: number): IBoid[] {
+    const position = boid.getBoidPosition();
+    // Use spatial partitioning to efficiently find nearby boids
+    return this.spatialPartitioning.findNearby(position, radius)
+      .filter(other => other !== boid); // Filter out the boid itself
+  }
+  
+  destroy(): void {
+    // Remove event listeners
+    this.eventBus.off('world-bounds-initialized', undefined, this);
+    this.eventBus.off('world-bounds-changed', undefined, this);
     
-    for (const other of allBoids) {
-      if (other === boid) continue;
-      
-      const boidPos = boid.getBoidPosition();
-      const otherPos = other.getBoidPosition();
-      
-      const dx = otherPos.x - boidPos.x;
-      const dy = otherPos.y - boidPos.y;
-      const distSquared = dx * dx + dy * dy;
-      
-      if (distSquared < radiusSquared) {
-        neighbors.push(other);
-      }
-    }
-    
-    return neighbors;
+    // Clean up spatial partitioning
+    this.spatialPartitioning.clear();
   }
 }

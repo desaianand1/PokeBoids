@@ -4,13 +4,14 @@
   import * as ScrollArea from '$ui/scroll-area';
   import { cn } from '$lib/utils';
   import type { EventSummary, StreamEvent, EventCategory } from '$utils/event-debug';
+  import type { GameEvents } from '$events/types';
   import { categoryStyles, formatTime } from '$utils/event-debug';
 
   interface EventListProps {
     events: EventSummary[] | StreamEvent[];
-    selectedEventId: string | null;
+    selectedEventId: (keyof GameEvents & string) | null;
     viewType: 'aggregate' | 'stream';
-    onSelectEvent: (id: string) => void;
+    onSelectEvent: (id: keyof GameEvents & string) => void;
     searchQuery?: string;
     selectedCategory?: 'all' | EventCategory;
   }
@@ -41,7 +42,7 @@
   }
 </script>
 
-<ScrollArea.Root class="h-64">
+<ScrollArea.Root class="h-60 max-h-80">
   {#if events.length > 0}
     <div class="space-y-1 p-1">
       {#each events as event}

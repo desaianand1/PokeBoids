@@ -94,4 +94,9 @@ export class TestEventBus implements IGameEventBus {
   getLastEmittedData(event: string): unknown {
     return this.lastEmittedData.get(event);
   }
+
+  destroy(): void {
+    this.handlers.clear();
+    this.lastEmittedData.clear();
+  }
 }

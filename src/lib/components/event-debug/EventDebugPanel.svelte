@@ -6,6 +6,7 @@
 	import * as Tabs from '$ui/tabs';
 	import { Bug, Clock, Rows3 } from '@lucide/svelte';
 	import { EventBus } from '$events/event-bus';
+	import type { GameEvents } from '$events/types';
 	import { onDestroy } from 'svelte';
 	import { toast } from 'svelte-sonner';
 
@@ -68,7 +69,7 @@
 	);
 
 	// Event handling
-	function processEvent(type: string, data: unknown): void {
+	function processEvent(type: keyof GameEvents & string, data: GameEvents[keyof GameEvents]): void {
 		if (!isDebugEnabled || isPaused) return;
 
 		pendingEvents.push({ type, data });
@@ -117,7 +118,7 @@
 		}, 0);
 	}
 
-	function processEventImmediately(type: string, data: unknown): void {
+	function processEventImmediately(type: keyof GameEvents & string, data: GameEvents[keyof GameEvents]): void {
 		if (!isDebugEnabled || isPaused) return;
 
 		const now = Date.now();
@@ -170,7 +171,7 @@
 		eventMap = newMap;
 	}
 
-	function addStreamEvent(type: string, category: EventCategory, timestamp: number): void {
+	function addStreamEvent(type: keyof GameEvents & string, category: EventCategory, timestamp: number): void {
 		const streamEvent: StreamEvent = {
 			id: `${type}-${timestamp}`,
 			type,
@@ -218,7 +219,7 @@
 		EventBus.setDebug(enabled);
 
 		if (enabled) {
-			console.debug('Debug mode enabled, ready to capture events');
+			console.debug('Event Debug mode enabled, ready to capture events');
 		} else {
 			clearEvents();
 		}
@@ -227,11 +228,11 @@
 	function togglePause(): void {
 		isPaused = !isPaused;
 		if (isPaused) {
-			toast.warning('Event monitoring paused', {
+			toast.warning('Event monitoring Paused', {
 				description: 'Events will not be captured until resumed'
 			});
 		} else {
-			toast.success('Event monitoring resumed', {
+			toast.success('Event monitoring Resumed', {
 				description: 'Now capturing new events'
 			});
 		}
@@ -239,7 +240,6 @@
 
 	function clearEvents(): void {
 		if (eventMap.size === 0 && streamEvents.length === 0) {
-			toast.info('No events to clear');
 			return;
 		}
 
@@ -293,12 +293,12 @@
 	$effect(() => {
 		if (!isDebugEnabled) return;
 
-		const handler = (type: string, data: unknown) => {
+		const handler = (type: keyof GameEvents & string, data: GameEvents[keyof GameEvents]) => {
 			processEvent(type, data);
 		};
 
-		EventBus.onAny(handler);
-		return () => EventBus.offAny(handler);
+		EventBus.onAny(handler as (type: string, data: unknown) => void);
+		return () => EventBus.offAny(handler as (type: string, data: unknown) => void);
 	});
 
 	// Cleanup
@@ -350,12 +350,12 @@
 					<Tabs.Trigger value="aggregate" class="gap-2">
 						<Rows3 class="h-4 w-4" />
 						Aggregated
-						<Badge variant="outline" class="ml-1">{eventMap.size}</Badge>
+						<Badge variant="outline" class="ml-1">{filteredEvents.length}</Badge>
 					</Tabs.Trigger>
 					<Tabs.Trigger value="stream" class="gap-2">
 						<Clock class="h-4 w-4" />
 						Stream
-						<Badge variant="outline" class="ml-1">{streamEvents.length}</Badge>
+						<Badge variant="outline" class="ml-1">{filteredStreamEvents.length}</Badge>
 					</Tabs.Trigger>
 				</Tabs.List>
 

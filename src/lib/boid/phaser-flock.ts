@@ -25,6 +25,12 @@ export class PhaserFlock {
     
     // Create core flock logic
     this.logic = new FlockLogic(vectorFactory, eventBus, config);
+    
+    // Emit initial world bounds
+    this.emitWorldBounds();
+    
+    // Listen for scene resize events
+    this.setupResizeListener();
   }
   
   addBoid(boid: PhaserBoid): void {
@@ -100,7 +106,32 @@ export class PhaserFlock {
     }
   }
   
+  private emitWorldBounds(): void {
+    const width = this.scene.scale.width;
+    const height = this.scene.scale.height;
+    
+    this.eventBus.emit('world-bounds-initialized', { width, height });
+  }
+  
+  private setupResizeListener(): void {
+    // Listen for resize events from the scene
+    this.scene.scale.on('resize', () => {
+      const width = this.scene.scale.width;
+      const height = this.scene.scale.height;
+      
+      this.eventBus.emit('world-bounds-changed', { width, height });
+    });
+  }
+
   destroy(): void {
+    // Remove resize listener
+    this.scene.scale.off('resize');
+    
+    // Clean up logic
+    if (this.logic && 'destroy' in this.logic) {
+      this.logic.destroy();
+    }
+    
     this.clear();
   }
 }
