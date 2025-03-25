@@ -3,7 +3,6 @@ dist
 test-results/
 package-lock.json
 yarn.lock
-memory-bank/
 
 # Output
 .output
