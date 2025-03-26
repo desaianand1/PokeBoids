@@ -9,7 +9,7 @@ import { BoidVariant } from '$boid/types';
 export class BoidFactory {
   constructor(
     private scene: Scene,
-    private deps: IBoidDependencies
+    private deps: Omit<IBoidDependencies, 'config'>
   ) {}
 
   /**
@@ -21,7 +21,7 @@ export class BoidFactory {
     variant: BoidVariant,
     config?: IBoidConfig
   ): PhaserBoid {
-    // Create a new boid with merged configuration
+    // Create a new boid with provided configuration
     const boid = new PhaserBoid(
       this.scene,
       x,
@@ -29,10 +29,7 @@ export class BoidFactory {
       variant,
       {
         ...this.deps,
-        config: {
-          ...this.deps.config,
-          ...config
-        }
+        config
       }
     );
 
@@ -78,12 +75,7 @@ export class BoidFactory {
     y: number,
     config?: IBoidConfig
   ): PhaserBoid {
-    return this.createBoid(x, y, BoidVariant.PREDATOR, {
-      maxSpeed: 150,
-      maxForce: 2.0,
-      perceptionRadius: 200,
-      ...config
-    });
+    return this.createBoid(x, y, BoidVariant.PREDATOR, config);
   }
 
   /**
@@ -98,12 +90,7 @@ export class BoidFactory {
       maxY?: number;
     }
   ): PhaserBoid[] {
-    return this.createBoids(count, BoidVariant.PREDATOR, {
-      maxSpeed: 150,
-      maxForce: 2.0,
-      perceptionRadius: 200,
-      ...config
-    });
+    return this.createBoids(count, BoidVariant.PREDATOR, config);
   }
 
   /**
@@ -114,12 +101,7 @@ export class BoidFactory {
     y: number,
     config?: IBoidConfig
   ): PhaserBoid {
-    return this.createBoid(x, y, BoidVariant.PREY, {
-      maxSpeed: 100,
-      maxForce: 1.0,
-      perceptionRadius: 150,
-      ...config
-    });
+    return this.createBoid(x, y, BoidVariant.PREY, config);
   }
 
   /**
@@ -134,11 +116,6 @@ export class BoidFactory {
       maxY?: number;
     }
   ): PhaserBoid[] {
-    return this.createBoids(count, BoidVariant.PREY, {
-      maxSpeed: 100,
-      maxForce: 1.0,
-      perceptionRadius: 150,
-      ...config
-    });
+    return this.createBoids(count, BoidVariant.PREY, config);
   }
 }

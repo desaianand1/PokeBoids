@@ -70,15 +70,14 @@ export class Game extends Scene {
 		this.debugManager = new DebugManager(this, this.eventEmitter, flockingConfig);
 		this.effectsManager = new EffectsManager(this);
 
-		// Create boid factory
+		// Create boid factory with dependencies (config will be passed during creation)
 		const vectorFactory = dependencies.vectorFactory;
 		this.boidFactory = new BoidFactory(this, {
 			vectorFactory,
 			eventEmitter: this.eventEmitter,
 			random: dependencies.random,
 			time: dependencies.time,
-			physics: dependencies.physics,
-			config: this.boidConfig
+			physics: dependencies.physics
 		});
 
 		// Create flock
@@ -140,14 +139,20 @@ export class Game extends Scene {
 			maxY: this.scale.height - margin
 		};
 
-		// Create initial boids
+		// Create initial boids with current config
 		const prey = this.boidFactory.createPreys(
 			this.simulationConfig.initialPreyCount?.default ?? 0,
-			bounds
+			{
+				...bounds,
+				...this.boidConfig
+			}
 		);
 		const predators = this.boidFactory.createPredators(
 			this.simulationConfig.initialPredatorCount?.default ?? 0,
-			bounds
+			{
+				...bounds,
+				...this.boidConfig
+			}
 		);
 
 		// Add boids to flock
@@ -164,6 +169,10 @@ export class Game extends Scene {
 	private resetSimulation(): void {
 		// Clean up existing simulation
 		this.flock.destroy();
+
+		// Refresh configuration values
+		this.boidConfig = getBoidConfig();
+		this.simulationConfig = getSimulationConfig();
 
 		const flockingConfig: IFlockingConfig = {
 			alignmentWeight: this.boidConfig.alignmentWeight?.default ?? 1.0,
