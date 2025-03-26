@@ -3,7 +3,7 @@
 	import { Label } from '$ui/label';
 	import { Separator } from '$ui/separator';
 	import { Switch } from '$ui/switch';
-	import { Cpu } from '@lucide/svelte';
+	import { Cpu, History } from '@lucide/svelte';
 	import { MediaQuery } from 'svelte/reactivity';
 
 	import {
@@ -17,17 +17,19 @@
 		getSimulationConfig,
 		slowSimulationSpeed,
 		advanceSimulationSpeed,
-		getSimulationSpeedRange
+		getSimulationSpeedRange,
+		resetToDefaults
 	} from '$config/simulation-signals.svelte';
 
 	// Import subcomponents
 	import PlaybackControls from '$components/simulation/PlaybackControls.svelte';
 	import SpeedControls from '$components/simulation/SpeedControls.svelte';
 	import PopulationControls from '$components/simulation/PopulationControls.svelte';
+	import { Button } from '$ui/button';
 
 	// State
-	const isLargeScreen = new MediaQuery('min-width: 768px');
 	const { min: minSimSpeed, max: maxSimSpeed } = getSimulationSpeedRange();
+	const isLargeScreen = new MediaQuery('min-width: 1024px');
 
 	const simulationConfig = $derived(getSimulationConfig());
 	const isPlaying = $derived(isSimulationPlaying());
@@ -43,7 +45,7 @@
 </script>
 
 <Card class="w-full shadow-md">
-	<CardHeader  class="pb-4">
+	<CardHeader class="pb-4">
 		<CardTitle class="flex items-center text-lg">
 			<Cpu class="mr-2 h-5 w-5" />
 			Simulation Controls
@@ -51,15 +53,17 @@
 	</CardHeader>
 	<CardContent class="space-y-8">
 		<!-- Playback Controls -->
-		<div class="mb-4 flex flex-col items-center gap-4 md:flex-row">
+		<div class="flex flex-col items-center gap-4 lg:flex-row">
+			<!-- Playback Group -->
 			<PlaybackControls {isPlaying} onTogglePlayPause={togglePlayPause} onReset={resetSimulation} />
 
 			{#if isLargeScreen.current}
-				<Separator orientation="vertical" class="mx-2 h-8" />
+				<Separator orientation="vertical" class="mx-0.5 h-8" />
 			{:else}
 				<Separator orientation="horizontal" />
 			{/if}
 
+			<!-- Speed Group -->
 			<SpeedControls
 				speed={simulationSpeed}
 				minSpeed={minSimSpeed}
@@ -69,14 +73,31 @@
 			/>
 
 			{#if isLargeScreen.current}
-				<Separator orientation="vertical" class="mx-2 h-8" />
+				<Separator orientation="vertical" class="mx-0.5 h-8" />
 			{:else}
 				<Separator orientation="horizontal" />
 			{/if}
 
-			<div class="flex items-center gap-2">
-				<Label for="debug-mode" class="cursor-pointer text-sm font-medium">Debug</Label>
-				<Switch id="debug-mode" checked={debugMode} onCheckedChange={toggleDebugMode} />
+			<div class="flex items-center gap-4">
+				<!-- Debug Group -->
+				<div class="flex items-center justify-center gap-2 text-center">
+					<Label for="debug-mode" class="text-sm font-medium">Debug</Label>
+					<Switch id="debug-mode" checked={debugMode} onCheckedChange={toggleDebugMode} />
+				</div>
+
+				<Separator orientation="vertical" class="mx-1 h-8" />
+
+				<!-- Defaults Group -->
+				<Button
+					variant="destructive"
+					size="sm"
+					class="h-8 px-2 text-xs"
+					onclick={resetToDefaults}
+					title="Reset to defaults"
+				>
+					<History class="mr-1 h-3.5 w-3.5" />
+					Defaults
+				</Button>
 			</div>
 		</div>
 

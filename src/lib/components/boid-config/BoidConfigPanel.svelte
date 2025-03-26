@@ -64,6 +64,7 @@
 					separationWeight={boidConfig.separationWeight}
 					perceptionRadius={boidConfig.perceptionRadius}
 					separationRadius={boidConfig.separationRadius}
+					fieldOfViewAngle={boidConfig.fieldOfViewAngle}
 					onUpdate={handleUpdate}
 				/>
 			</TabsContent>

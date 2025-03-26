@@ -13,6 +13,11 @@
   - [x] Implemented quad tree spatial partitioning
   - [x] Added event-based world bounds handling
   - [x] Created comprehensive tests and benchmarks
+- [x] Field of view (FoV) system
+  - [x] Cone-based perception radius
+  - [x] Type-specific FoV angles and perception ranges
+  - [x] Biologically inspired vision patterns
+  - [x] UI controls for base FoV angle
 - [ ] Advanced predator-prey dynamics
 - [ ] Biological features (health, stamina, reproduction)
 - [ ] Performance optimization for 60 FPS target
@@ -51,6 +56,10 @@
 - Clean separation of core logic from rendering
 - Adapter pattern for Phaser integration
 - Type-safe event system
+- Advanced perception system:
+  - Predator: Narrow FoV (70%) with extended range (130%)
+  - Prey: Wide FoV (130%) with reduced range (80%)
+  - Visual debugging with FoV cones
 
 ### 2. User Interface
 

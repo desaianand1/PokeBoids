@@ -24,6 +24,11 @@ export interface IVector2 {
   clone(): IVector2;
   copy(v: IVector2): IVector2;
   
+  // Vector operations
+  dot(other: IVector2): number;
+  distanceTo(other: IVector2): number;
+  distanceToSquared(other: IVector2): number;
+  
   // Optional angle methods
   angle?(): number;
   setAngle?(angle: number): IVector2;
@@ -48,20 +53,4 @@ export interface IVectorFactory {
    * Creates a random vector with the given magnitude
    */
   random(magnitude?: number): IVector2;
-}
-
-/**
- * Interface for distance calculations between points or vectors
- */
-export interface IDistanceCalculator {
-  /**
-   * Calculate distance between two points
-   */
-  between(v1: IVector2, v2: IVector2): number;
-  /**
-   * Calculate squared distance between two points
-   * (More efficient when exact distance isn't needed)
-   */
-  betweenSquared(v1: IVector2, v2: IVector2): number;
-
 }

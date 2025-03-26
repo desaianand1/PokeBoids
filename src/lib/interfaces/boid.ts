@@ -24,6 +24,8 @@ export interface IBoid {
   setMaxForce(force: number): void;
   getPerceptionRadius(): number;
   setPerceptionRadius(radius: number): void;
+  getFieldOfViewAngle(): number;
+  isInFieldOfView(other: IBoid): boolean;
 
   // Stats and State
   getStats(): BoidStats;

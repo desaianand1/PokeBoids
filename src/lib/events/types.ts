@@ -113,6 +113,11 @@ export type ConfigEvents = {
 	'separation-weight-changed': { value: number };
 	'perception-radius-changed': { value: number };
 	'separation-radius-changed': { value: number };
+	'field-of-view-angle-changed': { value: number };
+	'predator-fov-multiplier-changed': { value: number };
+	'prey-fov-multiplier-changed': { value: number };
+	'predator-perception-multiplier-changed': { value: number };
+	'prey-perception-multiplier-changed': { value: number };
 	'boundary-margin-changed': { value: number };
 	'boundary-force-changed': { value: number };
 	'boundary-force-ramp-changed': { value: number };

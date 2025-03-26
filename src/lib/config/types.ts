@@ -14,6 +14,11 @@ export type Parameter<T> = T extends boolean
 		// Perception
 		perceptionRadius: number;
 		separationRadius: number;
+		fieldOfViewAngle: number;         // Base FoV angle in radians
+		predatorFovMultiplier: number;    // Narrows predator FoV
+		preyFovMultiplier: number;        // Widens prey FoV
+		predatorPerceptionMultiplier: number; // Increases predator perception radius
+		preyPerceptionMultiplier: number;     // Decreases prey perception radius
 	
 		// Boundary handling
 		boundaryMargin: number;

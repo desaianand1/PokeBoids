@@ -89,6 +89,14 @@ export class PhaserBoid extends Physics.Arcade.Sprite implements IBoid {
     this.behavior.setPerceptionRadius(radius);
   }
 
+  getFieldOfViewAngle(): number {
+    return this.behavior.getFieldOfViewAngle();
+  }
+
+  isInFieldOfView(other: IBoid): boolean {
+    return this.behavior.isInFieldOfView(other);
+  }
+
   // Stats and State
   getStats(): BoidStats {
     return this.behavior.getStats();

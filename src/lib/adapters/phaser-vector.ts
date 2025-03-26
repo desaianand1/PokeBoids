@@ -1,5 +1,5 @@
 import { Math as PhaserMath } from 'phaser';
-import type { IVector2, IVectorFactory, IDistanceCalculator } from '$interfaces/vector';
+import type { IVector2, IVectorFactory } from '$interfaces/vector';
 
 /**
  * Phaser-specific vector implementation
@@ -112,12 +112,22 @@ export class PhaserVector implements IVector2 {
   setLength(length: number): IVector2 {
     return this.normalize().scale(length);
   }
+
+  distanceTo(other: IVector2): number {
+    return Math.sqrt(this.distanceToSquared(other));
+  }
+
+  distanceToSquared(other: IVector2): number {
+    const dx = other.x - this.x;
+    const dy = other.y - this.y;
+    return dx * dx + dy * dy;
+  }
 }
 
 /**
  * Factory for creating Phaser vectors
  */
-export class PhaserVectorFactory implements IVectorFactory, IDistanceCalculator {
+export class PhaserVectorFactory implements IVectorFactory {
  
   create(x: number, y: number): IVector2 {
     return new PhaserVector(x, y);
@@ -136,15 +146,7 @@ export class PhaserVectorFactory implements IVectorFactory, IDistanceCalculator 
     return this.create(Math.cos(angle), Math.sin(angle));
   }
 
-  between(v1: IVector2, v2: IVector2): number {
-    return Math.sqrt(this.betweenSquared(v1, v2));
-  }
-
-  betweenSquared(v1: IVector2, v2: IVector2): number {
-    const dx = v2.x - v1.x;
-    const dy = v2.y - v1.y;
-    return dx * dx + dy * dy;
-  }
+ 
 
   angle(v1: IVector2, v2: IVector2): number {
     return Math.atan2(v2.y - v1.y, v2.x - v1.x);

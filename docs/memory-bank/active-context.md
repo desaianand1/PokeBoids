@@ -34,6 +34,11 @@
 - Updated Phaser to latest version with modern syntax
 - Integrated shadcn-svelte components with TailwindCSS
 - Completed core behavior separation with adapter pattern
+- Implemented field of view (FoV) system:
+  - Predators: Narrower FoV (70%) with larger perception radius (130%)
+  - Prey: Wider FoV (130%) with shorter perception radius (80%)
+  - Added UI controls for base FoV angle
+  - Visual debugging with FoV cones
 
 ### 2. Architecture Changes
 
@@ -44,6 +49,10 @@
 - Separated core boid logic from rendering concerns
 - Simplified event handling with type-safe adapters
 - Added event debugging and monitoring capabilities
+- Enhanced boid perception system:
+  - Field of view cone-based perception
+  - Type-specific perception multipliers
+  - Biologically inspired vision patterns
 
 ### 3. Dependency Updates
 

@@ -82,7 +82,8 @@ export class FlockLogic {
     const position = boid.getBoidPosition();
     // Use spatial partitioning to efficiently find nearby boids
     return this.spatialPartitioning.findNearby(position, radius)
-      .filter(other => other !== boid); // Filter out the boid itself
+      .filter(other => other !== boid) // Filter out the boid itself
+      .filter(other => boid.isInFieldOfView(other)); // Filter based on field of view
   }
   
   destroy(): void {

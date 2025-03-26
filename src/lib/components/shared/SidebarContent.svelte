@@ -12,12 +12,11 @@
 	import EventDebugPanel from '$components/event-debug/EventDebugPanel.svelte';
 	import InfoCollapsible from '$components/shared/InfoCollapsible.svelte';
 
-	interface SidebarContentProps {
-		activeTab: string;
-		onTabChange: (value: string) => void;
-	}
+	let activeTab = $state('controls');
 
-	const { activeTab, onTabChange }: SidebarContentProps = $props();
+	function handleTabChange(value: string) {
+		activeTab = value;
+	}
 
 	const tabs = [
 		{ value: 'controls', icon: Cpu, label: 'Sim' },
@@ -26,7 +25,7 @@
 	] as const;
 </script>
 
-<Tabs value={activeTab} class="flex flex-1 flex-col" onValueChange={onTabChange}>
+<Tabs value={activeTab} class="flex flex-1 flex-col" onValueChange={handleTabChange}>
 	<div class="border-b px-4 py-2">
 		<TabsList class="grid w-full grid-cols-3">
 			{#each tabs as { value, icon: Icon, label }}
@@ -43,7 +42,9 @@
 			<div class="flex h-full flex-col space-y-4">
 				<SimulationControls />
 				<InfoCollapsible title="Simulation Info" class="mt-auto">
-					<p>The Boids simulation demonstrates emergent flocking behaviors with three simple rules:</p>
+					<p>
+						The Boids simulation demonstrates emergent flocking behaviors with three simple rules:
+					</p>
 					<ul class="ml-4 mt-2 list-disc space-y-1">
 						<li>Separation: Avoid crowding neighbors</li>
 						<li>Alignment: Steer towards average heading</li>
@@ -75,7 +76,9 @@
 		</TabsContent>
 	</div>
 
-	<footer class="flex items-center justify-between border-t px-4 py-2 text-xs text-muted-foreground">
+	<footer
+		class="fixed bottom-0 flex w-full items-center justify-between border-t px-4 py-2 text-xs text-muted-foreground"
+	>
 		<span class="flex items-center justify-center gap-4 p-2">
 			<ThemeSwitcher variant="outline" size="icon" />
 			<Badge variant="outline" class="py-2 font-mono text-xs">Boids Simulation</Badge>

@@ -123,18 +123,30 @@ export class DebugManager {
 	}
 
 	private drawBoidDebug(boid: IBoid): void {
-		// Draw perception radius
-		const perceptionRadius = boid.getPerceptionRadius();
-		this.graphics.lineStyle(
-			2,
-			boid.getVariant() === BoidVariant.PREDATOR ? 0xff8c00 : 0x00ff7f,
-			0.5
-		);
 		const { x, y } = boid.getBoidPosition();
-		this.graphics.strokeCircle(x, y, perceptionRadius);
+		const velocity = boid.getBoidVelocity();
+		const perceptionRadius = boid.getPerceptionRadius();
+		const fovAngle = boid.getFieldOfViewAngle();
+		const direction = Math.atan2(velocity.y, velocity.x);
+		const color = boid.getVariant() === BoidVariant.PREDATOR ? 0xff8c00 : 0x00ff7f;
+
+		// Draw field of view cone
+		this.graphics.lineStyle(2, color, 0.5);
+		this.graphics.beginPath();
+		this.graphics.moveTo(x, y);
+		
+		// Draw arc for field of view
+		const startAngle = direction - fovAngle / 2;
+		const endAngle = direction + fovAngle / 2;
+		this.graphics.arc(x, y, perceptionRadius, startAngle, endAngle);
+		
+		// Draw lines back to center
+		this.graphics.lineTo(x, y);
+		
+		// Stroke the path
+		this.graphics.strokePath();
 
 		// Draw velocity vector
-		const velocity = boid.getBoidVelocity();
 		const lineLength = velocity.length() * 0.05;
 		this.graphics.lineStyle(2, 0xffffff, 0.5);
 		this.graphics.lineBetween(x, y, x + velocity.x * lineLength, y + velocity.y * lineLength);

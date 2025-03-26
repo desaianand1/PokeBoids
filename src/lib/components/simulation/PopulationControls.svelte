@@ -47,7 +47,7 @@
 </script>
 
 <TooltipProvider>
-	<div class="grid grid-rows-3 gap-12 md:grid-cols-3 md:grid-rows-none">
+	<div class="grid grid-rows-3 gap-8">
 		<!-- Prey Count -->
 		<div class="space-y-4">
 			<div class="flex items-center justify-between">
