@@ -2,6 +2,13 @@
  * Test constants for boid configuration
  */
 export const TEST_BOID_CONFIG = {
+  // Perception multipliers
+  predatorFovMultiplier: { min: 0, max: 2, default: 0.7, step: 0.1 },
+  preyFovMultiplier: { min: 0, max: 2, default: 1.3, step: 0.1 },
+  predatorPerceptionMultiplier: { min: 0, max: 2, default: 1.3, step: 0.1 },
+  preyPerceptionMultiplier: { min: 0, max: 2, default: 0.8, step: 0.1 },
+  fieldOfViewAngle: { min: 0, max: Math.PI, default: Math.PI / 4, step: 0.1 },
+
   // Movement
   maxSpeed: { min: 0, max: 200, default: 100, step: 1 },
   maxForce: { min: 0, max: 2, default: 1.0, step: 0.1 },
@@ -66,6 +73,11 @@ export const TEST_DEFAULTS = {
     maxSpeed: TEST_BOID_CONFIG.maxSpeed.default,
     maxForce: TEST_BOID_CONFIG.maxForce.default,
     perceptionRadius: TEST_BOID_CONFIG.perceptionRadius.default,
+    fieldOfViewAngle: TEST_BOID_CONFIG.fieldOfViewAngle.default,
+    predatorFovMultiplier: TEST_BOID_CONFIG.predatorFovMultiplier.default,
+    preyFovMultiplier: TEST_BOID_CONFIG.preyFovMultiplier.default,
+    predatorPerceptionMultiplier: TEST_BOID_CONFIG.predatorPerceptionMultiplier.default,
+    preyPerceptionMultiplier: TEST_BOID_CONFIG.preyPerceptionMultiplier.default,
     separationRadius: TEST_BOID_CONFIG.separationRadius.default,
     alignmentWeight: TEST_BOID_CONFIG.alignmentWeight.default,
     cohesionWeight: TEST_BOID_CONFIG.cohesionWeight.default,
