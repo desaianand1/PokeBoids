@@ -29,6 +29,7 @@
 
 ### 1. Codebase Updates
 
+- Fixed bug with simulation reset not using default configuration values
 - Fully migrated to Svelte 5 runes syntax (no stores)
 - Implemented strict TypeScript types throughout
 - Updated Phaser to latest version with modern syntax

@@ -137,6 +137,7 @@
 
 ### 4. Simulation
 
+- ~~Reset not using default configuration values~~ (Fixed in v0.2.4)
 - Boundary collision edge cases
 - Predator targeting efficiency
 - Reproduction timing issues
