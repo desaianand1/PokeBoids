@@ -3,7 +3,7 @@
 	import { Badge } from '$ui/badge';
 	import { Cpu, SlidersVertical, ChartColumn } from '@lucide/svelte';
 	import ThemeSwitcher from '$components/ThemeSwitcher.svelte';
-	import { gameVersion } from '$utils/version';
+	import { formatVersion } from '$utils/version';
 
 	// Import components
 	import SimulationControls from '$components/simulation/SimulationControls.svelte';
@@ -83,6 +83,11 @@
 			<ThemeSwitcher variant="outline" size="icon" />
 			<Badge variant="outline" class="py-2 font-mono text-xs">Boids Simulation</Badge>
 		</span>
-		<span class="text-secondary">v{gameVersion}</span>
+		<span class="text-secondary flex items-center gap-1">
+			{formatVersion()}
+			{#if import.meta.env.DEV}
+				<Badge variant="outline" class="py-0 text-xs">dev</Badge>
+			{/if}
+		</span>
 	</footer>
 </Tabs>

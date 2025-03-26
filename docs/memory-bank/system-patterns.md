@@ -130,6 +130,19 @@
 - Efficient event propagation
 - Clear event hierarchies
 
+### 6.4 Versioning Pattern
+
+- **Semantic Versioning**: Following SemVer 2.0.0 specification
+  - MAJOR: Breaking changes
+  - MINOR: New features
+  - PATCH: Bug fixes
+
+- **Version Management**:
+  - Single source of truth in package.json
+  - Automated sync to application code
+  - Consistent display in UI
+  - Standardized bump commands
+
 ## 7. Testing Patterns
 
 ### 7.1 Core Logic Testing

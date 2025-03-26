@@ -109,6 +109,16 @@
 - Themed components
 - Responsive design
 
+### 5.4 Versioning Standards
+
+- **Semantic Versioning**: SemVer 2.0.0
+- **Version Commands**:
+  - `pnpm version:patch`: Bug fixes
+  - `pnpm version:minor`: New features
+  - `pnpm version:major`: Breaking changes
+- **Version Display**: Enhanced UI with environment indicators
+- **Version Sync**: Automatic via postversion hook
+
 ## 6. Testing Strategy
 
 ### 6.1 Unit Testing

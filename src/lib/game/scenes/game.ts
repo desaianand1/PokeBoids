@@ -56,10 +56,10 @@ export class Game extends Scene {
 		const flockingConfig: IFlockingConfig = {
 			alignmentWeight: this.boidConfig.alignmentWeight?.default ?? 1.0,
 			cohesionWeight: this.boidConfig.cohesionWeight?.default ?? 1.0,
-			separationWeight: this.boidConfig.separationWeight?.default ?? 1.5,
-			perceptionRadius: this.boidConfig.perceptionRadius?.default ?? 150,
+			separationWeight: this.boidConfig.separationWeight?.default ?? 1.0,
+			perceptionRadius: this.boidConfig.perceptionRadius?.default ?? 50,
 			separationRadius: this.boidConfig.separationRadius?.default ?? 50,
-			boundaryMargin: this.boidConfig.boundaryMargin?.default ?? 150,
+			boundaryMargin: this.boidConfig.boundaryMargin?.default ?? 50,
 			boundaryForceMultiplier: this.boidConfig.boundaryForceMultiplier?.default ?? 2.0,
 			boundaryForceRamp: this.boidConfig.boundaryForceRamp?.default ?? 2.5
 		};
@@ -168,10 +168,10 @@ export class Game extends Scene {
 		const flockingConfig: IFlockingConfig = {
 			alignmentWeight: this.boidConfig.alignmentWeight?.default ?? 1.0,
 			cohesionWeight: this.boidConfig.cohesionWeight?.default ?? 1.0,
-			separationWeight: this.boidConfig.separationWeight?.default ?? 1.5,
-			perceptionRadius: this.boidConfig.perceptionRadius?.default ?? 150,
+			separationWeight: this.boidConfig.separationWeight?.default ?? 1.0,
+			perceptionRadius: this.boidConfig.perceptionRadius?.default ?? 50,
 			separationRadius: this.boidConfig.separationRadius?.default ?? 50,
-			boundaryMargin: this.boidConfig.boundaryMargin?.default ?? 150,
+			boundaryMargin: this.boidConfig.boundaryMargin?.default ?? 50,
 			boundaryForceMultiplier: this.boidConfig.boundaryForceMultiplier?.default ?? 2.0,
 			boundaryForceRamp: this.boidConfig.boundaryForceRamp?.default ?? 2.5
 		};
