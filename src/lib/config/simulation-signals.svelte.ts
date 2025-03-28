@@ -8,28 +8,28 @@ export type SimulationSpeed = (typeof simulationSpeeds)[number];
 
 // Default configuration with values from BoidConfigPanel.svelte
 const DEFAULT_BOID_CONFIG: BoidConfig = {
-	alignmentWeight: { default: 0.5, min: 0.0, max: 2.0, step: 0.1 },
+	alignmentWeight: { default: 0.7, min: 0.0, max: 2.0, step: 0.1 },
 	cohesionWeight: { default: 0.5, min: 0.0, max: 2.0, step: 0.1 },
-	separationWeight: { default: 0.5, min: 0.0, max: 2.0, step: 0.1 },
-	perceptionRadius: { default: 20, min: 10, max: 200, step: 10 },
-	separationRadius: { default: 50, min: 10, max: 100, step: 5 },
+	separationWeight: { default: 1.2, min: 0.0, max: 2.0, step: 0.1 },
+	perceptionRadius: { default: 50, min: 20, max: 250, step: 5 },
+	separationRadius: { default: 35, min: 15, max: 100, step: 5 },
 	fieldOfViewAngle: {
 		default: safeAngle(Math.PI / 3),
-		min: Math.PI / 5, // 36 degrees
+		min: Math.PI / 6, // 36 degrees
 		max: Math.PI * 1.5, // 270 degrees
-		step: Math.PI / 10 // 18 degree steps (adjusted to avoid exact 90 degrees)
+		step: Math.PI / 18 // 18 degree steps (adjusted to avoid exact 90 degrees)
 	},
-	predatorFovMultiplier: { default: 0.7, min: 0.1, max: 2.0, step: 0.1 },
-	preyFovMultiplier: { default: 1.3, min: 0.1, max: 2.0, step: 0.1 },
-	predatorPerceptionMultiplier: { default: 1.3, min: 0.1, max: 2.0, step: 0.1 },
-	preyPerceptionMultiplier: { default: 0.8, min: 0.1, max: 2.0, step: 0.1 },
-	boundaryMargin: { default: 50, min: 10, max: 200, step: 10 },
-	boundaryForceMultiplier: { default: 2.5, min: 1.0, max: 5.0, step: 0.1 },
-	boundaryForceRamp: { default: 2.5, min: 1.0, max: 4.0, step: 0.1 },
+	predatorFovMultiplier: { default: 0.7, min: 0.4, max: 1.5, step: 0.1 },
+	preyFovMultiplier: { default: 1.3, min: 0.5, max: 1.5, step: 0.1 },
+	predatorPerceptionMultiplier: { default: 1.5, min: 0.7, max: 2.0, step: 0.1 },
+	preyPerceptionMultiplier: { default: 1.0, min: 0.5, max: 1.5, step: 0.1 },
+	boundaryMargin: { default: 50, min: 25, max: 150, step: 5 },
+	boundaryForceMultiplier: { default: 2.0, min: 0.5, max: 3.0, step: 0.1 },
+	boundaryForceRamp: { default: 2.0, min: 0.8, max: 3.0, step: 0.1 },
 	obstaclePerceptionRadius: { default: 150, min: 50, max: 250, step: 10 },
-	obstacleForceMultiplier: { default: 4.0, min: 1.0, max: 6.0, step: 0.2 },
-	maxSpeed: { default: 100, min: 50, max: 500, step: 10 },
-	maxForce: { default: 1.0, min: 0.1, max: 5.0, step: 0.1 }
+	obstacleForceMultiplier: { default: 3.0, min: 1.0, max: 4.0, step: 0.5 },
+	maxSpeed: { default: 120, min: 40, max: 500, step: 10 },
+	maxForce: { default: 1.4, min: 0.5, max: 3.0, step: 0.1 }
 };
 
 // Default configuration with values from SimulationControls.svelte
