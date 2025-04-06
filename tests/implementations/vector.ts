@@ -5,6 +5,8 @@ import type { IVector2, IVectorFactory } from '$interfaces/vector';
  * without Phaser dependencies
  */
 export class TestVector implements IVector2 {
+	private static readonly EPSILON_SQUARED = 0.0001; // Threshold for "zero" vector
+
 	constructor(
 		public x: number,
 		public y: number
@@ -62,6 +64,10 @@ export class TestVector implements IVector2 {
 		return this.x * this.x + this.y * this.y;
 	}
 
+	hasSignificantLength(): boolean {
+		return this.lengthSquared() > TestVector.EPSILON_SQUARED;
+	}
+
 	dot(other: IVector2): number {
 		return this.x * other.x + this.y * other.y;
 	}
@@ -109,6 +115,21 @@ export class TestVector implements IVector2 {
  * Test implementation of IVectorFactory for creating test vectors
  */
 export class TestVectorFactory implements IVectorFactory {
+	zero(): IVector2 {
+		return new TestVector(0, 0);
+	}
+	up(): IVector2 {
+		return new TestVector(0, -1);
+	}
+	down(): IVector2 {
+		return new TestVector(0, 1);
+	}
+	left(): IVector2 {
+		return new TestVector(-1, 0);
+	}
+	right(): IVector2 {
+		return new TestVector(1, 0);
+	}
 	create(x: number, y: number): IVector2 {
 		return new TestVector(x, y);
 	}
