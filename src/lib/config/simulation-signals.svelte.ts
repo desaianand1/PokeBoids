@@ -1,12 +1,10 @@
 import { EventBus } from '$events/event-bus';
 import type { BoidConfig, SimulationConfig } from '$config/types';
 import { toast } from 'svelte-sonner';
-import { safeAngle } from '$utils/angles';
 
 const simulationSpeeds = [0.2, 0.5, 1.0, 1.5, 2.0, 3.0] as const;
 export type SimulationSpeed = (typeof simulationSpeeds)[number];
 
-// Default configuration with values from BoidConfigPanel.svelte
 const DEFAULT_BOID_CONFIG: BoidConfig = {
 	alignmentWeight: { default: 0.7, min: 0.0, max: 2.0, step: 0.1 },
 	cohesionWeight: { default: 0.5, min: 0.0, max: 2.0, step: 0.1 },
@@ -14,10 +12,10 @@ const DEFAULT_BOID_CONFIG: BoidConfig = {
 	perceptionRadius: { default: 50, min: 20, max: 250, step: 5 },
 	separationRadius: { default: 35, min: 15, max: 100, step: 5 },
 	fieldOfViewAngle: {
-		default: safeAngle(Math.PI / 3),
+		default: Math.PI / 3,
 		min: Math.PI / 6, // 36 degrees
 		max: Math.PI * 1.5, // 270 degrees
-		step: Math.PI / 18 // 18 degree steps (adjusted to avoid exact 90 degrees)
+		step: Math.PI / 18
 	},
 	predatorFovMultiplier: { default: 0.7, min: 0.4, max: 1.5, step: 0.1 },
 	preyFovMultiplier: { default: 1.3, min: 0.5, max: 1.5, step: 0.1 },
@@ -32,7 +30,6 @@ const DEFAULT_BOID_CONFIG: BoidConfig = {
 	maxForce: { default: 1.4, min: 0.5, max: 3.0, step: 0.1 }
 };
 
-// Default configuration with values from SimulationControls.svelte
 const DEFAULT_SIMULATION_CONFIG: SimulationConfig = {
 	initialPreyCount: { default: 100, min: 0, max: 500, step: 1 },
 	initialPredatorCount: { default: 5, min: 0, max: 500, step: 1 },
@@ -40,7 +37,6 @@ const DEFAULT_SIMULATION_CONFIG: SimulationConfig = {
 	trackStats: { default: true }
 };
 
-// Create state for configuration
 let boidConfig = $state<BoidConfig>({ ...DEFAULT_BOID_CONFIG });
 let simulationConfig = $state<SimulationConfig>({ ...DEFAULT_SIMULATION_CONFIG });
 
@@ -58,7 +54,7 @@ const boidConfigValues = $derived({
 	separationWeight: boidConfig.separationWeight.default,
 	perceptionRadius: boidConfig.perceptionRadius.default,
 	separationRadius: boidConfig.separationRadius.default,
-	fieldOfViewAngle: safeAngle(boidConfig.fieldOfViewAngle.default),
+	fieldOfViewAngle: boidConfig.fieldOfViewAngle.default,
 	predatorFovMultiplier: boidConfig.predatorFovMultiplier.default,
 	preyFovMultiplier: boidConfig.preyFovMultiplier.default,
 	predatorPerceptionMultiplier: boidConfig.predatorPerceptionMultiplier.default,
@@ -83,7 +79,7 @@ $effect.root(() => {
 	// Emit boid config events only when values change
 	$effect(() => {
 		const values = boidConfigValues;
-
+		console.debug('$effect triggered, fov is %f', values.fieldOfViewAngle);
 		// Emit individual events
 		EventBus.emit('alignment-weight-changed', { value: values.alignmentWeight });
 		EventBus.emit('cohesion-weight-changed', { value: values.cohesionWeight });
@@ -141,18 +137,18 @@ $effect.root(() => {
 
 // Functions to update configuration
 function updateBoidConfig<K extends keyof BoidConfig>(key: K, value: BoidConfig[K]) {
-	// Apply safety for field of view angle
-	if (key === 'fieldOfViewAngle' && 'default' in value) {
-		value = {
-			...value,
-			default: safeAngle(value.default)
-		} as BoidConfig[K];
-	}
-
-	// Only update if value has actually changed
+	// Skip update if no meaningful change
 	const currentValue = boidConfig[key];
-	if ('default' in currentValue && 'default' in value && currentValue.default !== value.default) {
-		boidConfig = { ...boidConfig, [key]: value };
+	console.debug('attempting boid config update: boiConfig[%s]=%o', key, value);
+	if ('default' in currentValue && 'default' in value) {
+		// Use appropriate threshold based on the parameter type
+		const threshold = key === 'fieldOfViewAngle' ? 0.005 : 0.0001;
+
+		// Only update if change exceeds threshold
+		if (Math.abs(currentValue.default - value.default) > threshold) {
+			// Update config with new value
+			boidConfig = { ...boidConfig, [key]: value };
+		}
 	}
 }
 
@@ -176,16 +172,7 @@ function getSimulationConfig(): SimulationConfig {
 }
 
 function resetToDefaults() {
-	// Create a copy with safe angles
-	const safeDefaults = {
-		...DEFAULT_BOID_CONFIG,
-		fieldOfViewAngle: {
-			...DEFAULT_BOID_CONFIG.fieldOfViewAngle,
-			default: safeAngle(DEFAULT_BOID_CONFIG.fieldOfViewAngle.default)
-		}
-	};
-
-	boidConfig = { ...safeDefaults };
+	boidConfig = { ...DEFAULT_BOID_CONFIG };
 	simulationConfig = { ...DEFAULT_SIMULATION_CONFIG };
 	simulationSpeedIndex = DEFAULT_SIM_SPEED_INDEX;
 	toast.error('Configuration Reset', {
