@@ -3,7 +3,7 @@ import type { IVector2 } from '$interfaces/vector';
 import { BoidVariant, isPredator, type BoidStats } from '$boid/types';
 import type { IBoid, IBoidDependencies } from '$interfaces/boid';
 import type { GameEvents } from '$events/types';
-import { safeAngle, clampDotProduct } from '$utils/angles';
+import { clamp, normalizeAngle } from '$utils/angles';
 
 /**
  * Core boid behavior implementation independent of rendering framework
@@ -13,6 +13,7 @@ export class BoidBehavior {
 	private position: IVector2;
 	private velocity: IVector2;
 	private acceleration: IVector2;
+	private direction: IVector2;
 	private stats!: BoidStats;
 
 	// Config-driven properties
@@ -43,12 +44,14 @@ export class BoidBehavior {
 			.random()
 			.scale((deps.config?.maxSpeed?.default ?? 100) * 0.5);
 		this.acceleration = deps.vectorFactory.create(0, 0);
+		this.direction = deps.vectorFactory.right();
 
 		// Initialize from config or use defaults
 		this.maxSpeed = deps.config?.maxSpeed?.default ?? 100;
 		this.maxForce = deps.config?.maxForce?.default ?? 1.0;
-		this.fieldOfViewAngle = safeAngle(deps.config?.fieldOfViewAngle?.default ?? Math.PI / 4);
+		this.fieldOfViewAngle = deps.config?.fieldOfViewAngle?.default ?? Math.PI / 3;
 
+		this.updateDirection();
 		// Set type-specific multipliers
 		if (variant === BoidVariant.PREDATOR) {
 			this.fovMultiplier = deps.config?.predatorFovMultiplier?.default ?? 0.7;
@@ -139,35 +142,51 @@ export class BoidBehavior {
 	}
 
 	getFieldOfViewAngle(): number {
-		return safeAngle(this.fieldOfViewAngle * this.fovMultiplier);
+		return normalizeAngle(this.fieldOfViewAngle * this.fovMultiplier);
 	}
 
 	isInFieldOfView(other: IBoid): boolean {
-		// Get positions and calculate direction vector
+		const EPSILON = 0.0001;
+		// Get positions
 		const myPos = this.position;
 		const otherPos = other.getBoidPosition();
-
-		// Quick distance check before doing angle calculations
-		if (myPos.distanceToSquared(otherPos) > this.perceptionRadius * this.perceptionRadius) {
+		const distSquared = myPos.distanceToSquared(otherPos);
+		// Quick distance check first
+		if (distSquared > this.perceptionRadius * this.perceptionRadius) {
 			return false;
 		}
 
-		const direction = this.velocity.clone().normalize();
+		// If boids are at the same position, they can see each other
+		if (distSquared < EPSILON) {
+			return true;
+		}
 
 		// Calculate vector to other boid
-		const toOther = this.deps.vectorFactory
-			.create(otherPos.x - myPos.x, otherPos.y - myPos.y)
-			.normalize();
+		const toOther = this.deps.vectorFactory.create(otherPos.x - myPos.x, otherPos.y - myPos.y);
 
-		// Instead of using acos, we can use the dot product directly
-		// cos(angle) = dot product of normalized vectors
-		// If cos(angle) >= cos(halfFOV), then angle <= halfFOV
-		const dotProduct = clampDotProduct(direction.dot(toOther));
-		const halfFOV = this.getFieldOfViewAngle() / 2;
-		const cosHalfFOV = Math.cos(halfFOV);
+		// Check if the vector has significant length before normalizing
+		if (toOther.hasSignificantLength()) {
+			toOther.normalize();
+		}
 
-		// This comparison avoids the acos calculation entirely
-		return dotProduct >= cosHalfFOV;
+		const dot = clamp(this.direction.dot(toOther));
+
+		// Compare with cosine of half FOV angle
+		// This avoids the problematic acos calculation
+		const cosHalfFOV = Math.cos(this.getFieldOfViewAngle() / 2);
+
+		return dot >= cosHalfFOV;
+	}
+
+	/**
+	 * Updates the boid's direction based on its velocity
+	 * Maintains the current direction if velocity is near zero
+	 */
+	private updateDirection(): void {
+		if (this.velocity.hasSignificantLength()) {
+			this.direction.copy(this.velocity).normalize();
+		}
+		// If velocity is too small, keep the existing direction
 	}
 
 	// Stats and State
@@ -245,6 +264,9 @@ export class BoidBehavior {
 		// Apply speed limit based on stamina
 		const currentMaxSpeed = this.isStaminaDepleted ? this.maxSpeed * 0.5 : this.maxSpeed;
 		this.velocity.limit(currentMaxSpeed);
+
+		// Update direction if velocity changed significantly
+		this.updateDirection();
 
 		// Update position based on velocity
 		const scaledVelocity = this.velocity.clone().scale(deltaTime / 1000);
@@ -331,7 +353,6 @@ export class BoidBehavior {
 			(data: GameEvents['field-of-view-angle-changed']) => {
 				// Use approximate equality check with a small epsilon
 				if (Math.abs(this.fieldOfViewAngle - data.value) > 0.0001) {
-					// Don't apply safeAngle again - assume it was already applied
 					this.fieldOfViewAngle = data.value;
 				}
 			},
