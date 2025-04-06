@@ -6,6 +6,7 @@ import type { IVector2, IVectorFactory } from '$interfaces/vector';
  */
 export class PhaserVector implements IVector2 {
 	private vector: PhaserMath.Vector2;
+	private static readonly EPSILON_SQUARED = 0.0001; // Threshold for "zero" vector
 
 	constructor(x: number, y: number) {
 		this.vector = new PhaserMath.Vector2(x, y);
@@ -71,6 +72,10 @@ export class PhaserVector implements IVector2 {
 		return this.x * this.x + this.y * this.y;
 	}
 
+	hasSignificantLength(): boolean {
+		// faster than calculating real length with sqrt
+		return this.lengthSquared() > PhaserVector.EPSILON_SQUARED;
+	}
 	dot(other: IVector2): number {
 		return this.x * other.x + this.y * other.y;
 	}
@@ -101,6 +106,10 @@ export class PhaserVector implements IVector2 {
 		return this;
 	}
 
+	angle(other: IVector2): number {
+		return Math.atan2(other.y - this.y, other.x - this.x);
+	}
+
 	limit(max: number): IVector2 {
 		const lengthSq = this.lengthSquared();
 		if (lengthSq > max * max) {
@@ -128,6 +137,20 @@ export class PhaserVector implements IVector2 {
  * Factory for creating Phaser vectors
  */
 export class PhaserVectorFactory implements IVectorFactory {
+	private readonly zeroVector: PhaserVector;
+	private readonly upVector: PhaserVector;
+	private readonly downVector: PhaserVector;
+	private readonly leftVector: PhaserVector;
+	private readonly rightVector: PhaserVector;
+
+	constructor() {
+		this.zeroVector = new PhaserVector(0, 0);
+		this.upVector = new PhaserVector(0, -1);
+		this.downVector = new PhaserVector(0, 1);
+		this.leftVector = new PhaserVector(-1, 0);
+		this.rightVector = new PhaserVector(1, 0);
+	}
+
 	create(x: number, y: number): IVector2 {
 		return new PhaserVector(x, y);
 	}
@@ -137,15 +160,24 @@ export class PhaserVectorFactory implements IVectorFactory {
 		return this.fromAngle(angle);
 	}
 
-	zero(): IVector2 {
-		return this.create(0, 0);
-	}
-
 	fromAngle(angle: number): IVector2 {
 		return this.create(Math.cos(angle), Math.sin(angle));
 	}
 
-	angle(v1: IVector2, v2: IVector2): number {
-		return Math.atan2(v2.y - v1.y, v2.x - v1.x);
+	zero(): IVector2 {
+		return this.zeroVector;
+	}
+
+	up(): IVector2 {
+		return this.upVector;
+	}
+	down(): IVector2 {
+		return this.downVector;
+	}
+	left(): IVector2 {
+		return this.leftVector;
+	}
+	right(): IVector2 {
+		return this.rightVector;
 	}
 }
