@@ -9,7 +9,7 @@ import { EffectsManager } from '$game/managers/effects-manager';
 import { getBoidConfig, getSimulationConfig } from '$config/simulation-signals.svelte';
 import { createCompleteDependencies } from '$adapters';
 import { EventBus } from '$events/event-bus';
-import type { BoidConfig, SimulationConfig } from '$config/types';
+import type { BoidConfig, BoundaryMode, SimulationConfig } from '$config/types';
 import type { IFlockingConfig } from '$interfaces/flocking';
 
 /**
@@ -61,7 +61,9 @@ export class Game extends Scene {
 			separationRadius: this.boidConfig.separationRadius?.default ?? 50,
 			boundaryMargin: this.boidConfig.boundaryMargin?.default ?? 50,
 			boundaryForceMultiplier: this.boidConfig.boundaryForceMultiplier?.default ?? 2.0,
-			boundaryForceRamp: this.boidConfig.boundaryForceRamp?.default ?? 2.5
+			boundaryForceRamp: this.boidConfig.boundaryForceRamp?.default ?? 2.5,
+			boundaryMode: (this.simulationConfig.boundaryMode?.default ?? 'collidable') as BoundaryMode,
+			boundaryStuckThreshold: this.simulationConfig.boundaryStuckThreshold?.default ?? 3000
 		};
 
 		// Create managers
@@ -182,7 +184,9 @@ export class Game extends Scene {
 			separationRadius: this.boidConfig.separationRadius?.default ?? 50,
 			boundaryMargin: this.boidConfig.boundaryMargin?.default ?? 50,
 			boundaryForceMultiplier: this.boidConfig.boundaryForceMultiplier?.default ?? 2.0,
-			boundaryForceRamp: this.boidConfig.boundaryForceRamp?.default ?? 2.5
+			boundaryForceRamp: this.boidConfig.boundaryForceRamp?.default ?? 2.5,
+			boundaryMode: (this.simulationConfig.boundaryMode?.default ?? 'collidable') as BoundaryMode,
+			boundaryStuckThreshold: this.simulationConfig.boundaryStuckThreshold?.default ?? 3000
 		};
 
 		// Create new flock

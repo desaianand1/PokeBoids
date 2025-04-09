@@ -47,6 +47,8 @@ export class FlockLogic {
       config.boundaryForceMultiplier,
       config.boundaryForceRamp,
       config.boundaryMargin,
+      config.boundaryMode,
+      config.boundaryStuckThreshold,
       eventBus
     );
     
