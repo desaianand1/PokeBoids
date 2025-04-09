@@ -25,6 +25,7 @@
 	import PlaybackControls from '$components/simulation/PlaybackControls.svelte';
 	import SpeedControls from '$components/simulation/SpeedControls.svelte';
 	import PopulationControls from '$components/simulation/PopulationControls.svelte';
+	import BoundaryModeControls from '$components/simulation/BoundaryModeControls.svelte';
 	import { Button } from '$ui/button';
 
 	// State
@@ -101,15 +102,31 @@
 			</div>
 		</div>
 
-		<!-- Population Controls -->
-		<PopulationControls
-			initialPreyCount={simulationConfig.initialPreyCount}
-			initialPredatorCount={simulationConfig.initialPredatorCount}
-			obstacleCount={simulationConfig.obstacleCount}
-			onUpdate={handleUpdateConfig}
-		/>
+		<div class="space-y-2">
+			<h3 class="mb-2 text-sm font-medium text-muted-foreground">Population Settings</h3>
+			<div class="px-4 py-2">
+				<PopulationControls
+					initialPreyCount={simulationConfig.initialPreyCount}
+					initialPredatorCount={simulationConfig.initialPredatorCount}
+					obstacleCount={simulationConfig.obstacleCount}
+					onUpdate={handleUpdateConfig}
+				/>
+			</div>
+		</div>
+		<Separator class="my-2" />
+		<!-- Boundary Controls Section -->
+		<div class="space-y-2">
+			<h3 class="mb-2 text-sm font-medium text-muted-foreground">Boundary Settings</h3>
+			<div class="px-4 py-2">
+				<BoundaryModeControls
+					boundaryMode={simulationConfig.boundaryMode}
+					boundaryStuckThreshold={simulationConfig.boundaryStuckThreshold}
+					onUpdate={handleUpdateConfig}
+				/>
+			</div>
+		</div>
 	</CardContent>
-	<CardFooter>
+	<CardFooter class="border-t border-border py-4">	
 		<div class="text-xs text-muted-foreground">
 			Changes to population counts and obstacles will apply on Reset
 		</div>
