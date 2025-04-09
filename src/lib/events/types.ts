@@ -1,6 +1,6 @@
 import type { Scene } from 'phaser';
 import type { IBoid } from '$interfaces/boid';
-import type { BoidConfig, SimulationConfig } from '$config/types';
+import type { BoidConfig, BoundaryMode, SimulationConfig } from '$config/types';
 import type { BoidStats, BoidVariant } from '$boid/types';
 import type { IEventSystem } from '$interfaces/events';
 
@@ -53,7 +53,13 @@ export type BoidEvents = {
 			stats: BoidStats;
 		};
 	};
-    'boundary-collision': { boid: IBoid; boundary: 'left' | 'right' | 'top' | 'bottom' };
+	'boundary-collision': { boid: IBoid; boundary: 'left' | 'right' | 'top' | 'bottom' };
+	'boundary-wrapped': { boid: IBoid; position: { x: number; y: number } };
+	'boid-unstuck': {
+		boid: IBoid;
+		boundary: 'left' | 'right' | 'top' | 'bottom';
+		stuckDuration: number;
+	};
 };
 /** Simulation state events */
 export type SimulationEvents = {
@@ -133,6 +139,8 @@ export type ConfigEvents = {
 	'obstacle-count-changed': { value: number };
 	'track-stats-changed': { value: boolean };
 	'simulation-config-changed': { config: SimulationConfig };
+	'boundary-mode-changed': { value: BoundaryMode };
+	'boundary-stuck-threshold-changed': { value: number };
 };
 /** Debug events for developer UX */
 export type DebugEvents = {
@@ -147,8 +155,7 @@ export type GameEvents = SceneEvents &
 	SimulationEvents &
 	FlockingEvents &
 	ConfigEvents &
-	DebugEvents &
-	{ [key: string]: unknown };
+	DebugEvents & { [key: string]: unknown };
 
 /**
  * Type for event bus that can emit GameEvents

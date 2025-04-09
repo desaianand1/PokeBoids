@@ -1,5 +1,5 @@
 import { EventBus } from '$events/event-bus';
-import type { BoidConfig, SimulationConfig } from '$config/types';
+import type { BoidConfig, BoundaryMode, SimulationConfig } from '$config/types';
 import { toast } from 'svelte-sonner';
 
 const simulationSpeeds = [0.2, 0.5, 1.0, 1.5, 2.0, 3.0] as const;
@@ -34,7 +34,9 @@ const DEFAULT_SIMULATION_CONFIG: SimulationConfig = {
 	initialPreyCount: { default: 100, min: 0, max: 500, step: 1 },
 	initialPredatorCount: { default: 5, min: 0, max: 500, step: 1 },
 	obstacleCount: { default: 0, min: 0, max: 20, step: 1 },
-	trackStats: { default: true }
+	trackStats: { default: true },
+	boundaryMode: { default: 'collidable' },
+	boundaryStuckThreshold: { default: 3000, min: 1000, max: 10000, step: 500 }
 };
 
 let boidConfig = $state<BoidConfig>({ ...DEFAULT_BOID_CONFIG });
@@ -72,7 +74,9 @@ const simConfigValues = $derived({
 	initialPreyCount: simulationConfig.initialPreyCount.default,
 	initialPredatorCount: simulationConfig.initialPredatorCount.default,
 	obstacleCount: simulationConfig.obstacleCount.default,
-	trackStats: simulationConfig.trackStats.default
+	trackStats: simulationConfig.trackStats.default,
+	boundaryMode: simulationConfig.boundaryMode.default,
+	boundaryStuckThreshold: simulationConfig.boundaryStuckThreshold.default
 });
 
 $effect.root(() => {
@@ -114,6 +118,8 @@ $effect.root(() => {
 		EventBus.emit('initial-predator-count-changed', { value: values.initialPredatorCount });
 		EventBus.emit('obstacle-count-changed', { value: values.obstacleCount });
 		EventBus.emit('track-stats-changed', { value: values.trackStats });
+		EventBus.emit('boundary-mode-changed', { value: values.boundaryMode as BoundaryMode });
+		EventBus.emit('boundary-stuck-threshold-changed', { value: values.boundaryStuckThreshold });
 
 		// Emit composite event
 		EventBus.emit('simulation-config-changed', { config: simulationConfig });
