@@ -104,7 +104,7 @@
 
 		<div class="space-y-2">
 			<h3 class="mb-2 text-sm font-medium text-muted-foreground">Population Settings</h3>
-			<div class="px-4 py-2">
+			<div class="p-2">
 				<PopulationControls
 					initialPreyCount={simulationConfig.initialPreyCount}
 					initialPredatorCount={simulationConfig.initialPredatorCount}
@@ -117,7 +117,7 @@
 		<!-- Boundary Controls Section -->
 		<div class="space-y-2">
 			<h3 class="mb-2 text-sm font-medium text-muted-foreground">Boundary Settings</h3>
-			<div class="px-4 py-2">
+			<div class="p-2">
 				<BoundaryModeControls
 					boundaryMode={simulationConfig.boundaryMode}
 					boundaryStuckThreshold={simulationConfig.boundaryStuckThreshold}

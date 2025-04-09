@@ -77,7 +77,7 @@
 	</div>
 
 	<footer
-		class="fixed bottom-0 flex w-full items-center justify-between border-t px-4 py-2 text-xs text-muted-foreground"
+		class="fixed bottom-0 start-0 flex w-full items-center justify-between border-t px-4 py-2 text-xs bg-background text-muted-foreground"
 	>
 		<span class="flex items-center justify-center gap-4 p-2">
 			<ThemeSwitcher variant="outline" size="icon" />
