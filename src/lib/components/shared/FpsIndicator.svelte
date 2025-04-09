@@ -12,17 +12,17 @@
   function getFpsIndicator(fps: number) {
     if (fps > 55) {
       return {
-        class: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-600/20 dark:border dark:border-emerald-600 dark:text-emerald-600',
+        class: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-600/20 dark:border dark:border-emerald-400 dark:text-emerald-400',
         text: 'Good'
       };
     } else if (fps > 30) {
       return {
-        class: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-600/20 dark:border dark:border-yellow-600 dark:text-yellow-600',
+        class: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-600/20 dark:border dark:border-yellow-400 dark:text-yellow-400',
         text: 'OK'
       };
     } else {
       return {
-        class: 'bg-rose-100 text-rose-800 dark:bg-rose-600/20 dark:border dark:border-rose-600 dark:text-rose-600',
+        class: 'bg-rose-100 text-rose-800 dark:bg-rose-600/20 dark:border dark:border-rose-400 dark:text-rose-400',
         text: 'Low'
       };
     }
@@ -35,7 +35,7 @@
     {fps}
     {#if fps > 0}
       {@const indicator = getFpsIndicator(fps)}
-      <span class={cn('ml-2 rounded-full px-1.5 py-0.5 text-xs', indicator.class)}>
+      <span class={cn('ml-2 rounded-full px-2 py-1 text-xs', indicator.class)}>
         {indicator.text}
       </span>
     {/if}
