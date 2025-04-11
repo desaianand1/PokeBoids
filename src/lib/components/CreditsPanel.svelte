@@ -9,15 +9,11 @@
 		Palette,
 		Code,
 		GraduationCap,
-		Users,
 		ExternalLink,
 		Youtube,
-
 		Store,
-
-		Clapperboard
-
-
+		Clapperboard,
+		Microscope
 	} from '@lucide/svelte';
 </script>
 
@@ -29,7 +25,7 @@
 		</CardTitle>
 	</CardHeader>
 	<CardContent>
-		<ScrollArea.Root class="h-[60vh] max-h-[70vh]">
+		<ScrollArea.Root class="h-[32vh] md:h-[40vh] xl:h-[60vh] max-h-[70vh]">
 			<div class="pr-4 space-y-6">
 				<!-- References Section -->
 				<div>
@@ -44,7 +40,7 @@
 						<Accordion.Item value="original-research" class="rounded-md border">
 							<Accordion.Trigger class="px-4">
 								<div class="flex items-center">
-									<Users class="mr-2 h-4 w-4" />
+									<Microscope class="mr-2 h-4 w-4" />
 									<span>Original Research</span>
 								</div>
 							</Accordion.Trigger>
