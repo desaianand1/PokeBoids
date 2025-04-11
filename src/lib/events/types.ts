@@ -4,6 +4,7 @@ import type { BoidConfig, BoundaryMode, SimulationConfig } from '$config/types';
 import type { BoidStats, BoidVariant } from '$boid/types';
 import type { IEventSystem } from '$interfaces/events';
 
+export type BoundaryDirection = 'left' | 'right' | 'top' | 'bottom';
 /**
  * Scene lifecycle events
  */
@@ -53,11 +54,11 @@ export type BoidEvents = {
 			stats: BoidStats;
 		};
 	};
-	'boundary-collision': { boid: IBoid; boundary: 'left' | 'right' | 'top' | 'bottom' };
+	'boundary-collision': { boid: IBoid; boundary: BoundaryDirection };
 	'boundary-wrapped': { boid: IBoid; position: { x: number; y: number } };
 	'boid-unstuck': {
 		boid: IBoid;
-		boundary: 'left' | 'right' | 'top' | 'bottom';
+		boundary: BoundaryDirection;
 		stuckDuration: number;
 	};
 };

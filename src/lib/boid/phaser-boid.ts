@@ -4,148 +4,161 @@ import type { IBoid, IBoidDependencies } from '$interfaces/boid';
 import type { IVector2 } from '$interfaces/vector';
 import { BoidVariant } from '$boid/types';
 import type { BoidStats } from '$boid/types';
+import type { BoundaryDirection } from '$events/types';
 
 /**
  * Phaser-specific boid implementation using composition
  */
 export class PhaserBoid extends Physics.Arcade.Sprite implements IBoid {
-  private behavior: BoidBehavior;
+	private behavior: BoidBehavior;
+	private originalSpriteTint: number;
 
-  constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    variant: BoidVariant,
-    deps: IBoidDependencies
-  ) {
-    // Initialize Phaser sprite with appropriate texture
-    const texture = variant === BoidVariant.PREDATOR ? 'predator' : 'prey';
-    super(scene, x, y, texture);
+	constructor(
+		scene: Phaser.Scene,
+		x: number,
+		y: number,
+		variant: BoidVariant,
+		deps: IBoidDependencies
+	) {
+		// Initialize Phaser sprite with appropriate texture
+		const texture = variant === BoidVariant.PREDATOR ? 'predator' : 'prey';
+		super(scene, x, y, texture);
 
-    // Add to physics system
-    scene.physics.add.existing(this);
+		// Add to physics system
+		scene.physics.add.existing(this);
+		// Create behavior instance
+		this.behavior = new BoidBehavior(deps, x, y, variant);
 
-    // Create behavior instance
-    this.behavior = new BoidBehavior(deps, x, y, variant);
+		// Set display properties
+		this.setupDisplay();
+		this.originalSpriteTint = this.tint;
+	}
 
-    // Set display properties
-    this.setupDisplay();
-  }
+	// Identity
+	getId(): string {
+		return this.behavior.getId();
+	}
 
-  // Identity
-  getId(): string {
-    return this.behavior.getId();
-  }
+	getVariant(): BoidVariant {
+		return this.behavior.getVariant();
+	}
 
-  getVariant(): BoidVariant {
-    return this.behavior.getVariant();
-  }
+	// Position and Movement
+	getBoidPosition(): IVector2 {
+		return this.behavior.getBoidPosition();
+	}
 
-  // Position and Movement
-  getBoidPosition(): IVector2 {
-    return this.behavior.getBoidPosition();
-  }
+	setBoidPosition(position: IVector2): void {
+		this.behavior.setBoidPosition(position);
+		super.setPosition(position.x, position.y);
+	}
 
-  setBoidPosition(position: IVector2): void {
-    this.behavior.setBoidPosition(position);
-    super.setPosition(position.x, position.y);
-  }
+	getBoidVelocity(): IVector2 {
+		return this.behavior.getBoidVelocity();
+	}
 
-  getBoidVelocity(): IVector2 {
-    return this.behavior.getBoidVelocity();
-  }
+	setBoidVelocity(velocity: IVector2): void {
+		this.behavior.setBoidVelocity(velocity);
+		super.setVelocity(velocity.x, velocity.y);
+	}
 
-  setBoidVelocity(velocity: IVector2): void {
-    this.behavior.setBoidVelocity(velocity);
-    super.setVelocity(velocity.x, velocity.y);
-  }
+	applyForce(force: IVector2): void {
+		this.behavior.applyForce(force);
+	}
 
-  applyForce(force: IVector2): void {
-    this.behavior.applyForce(force);
-  }
+	// Configuration
+	getMaxSpeed(): number {
+		return this.behavior.getMaxSpeed();
+	}
 
-  // Configuration
-  getMaxSpeed(): number {
-    return this.behavior.getMaxSpeed();
-  }
+	setMaxSpeed(speed: number): void {
+		this.behavior.setMaxSpeed(speed);
+	}
 
-  setMaxSpeed(speed: number): void {
-    this.behavior.setMaxSpeed(speed);
-  }
+	getMaxForce(): number {
+		return this.behavior.getMaxForce();
+	}
 
-  getMaxForce(): number {
-    return this.behavior.getMaxForce();
-  }
+	setMaxForce(force: number): void {
+		this.behavior.setMaxForce(force);
+	}
 
-  setMaxForce(force: number): void {
-    this.behavior.setMaxForce(force);
-  }
+	getPerceptionRadius(): number {
+		return this.behavior.getPerceptionRadius();
+	}
 
-  getPerceptionRadius(): number {
-    return this.behavior.getPerceptionRadius();
-  }
+	setPerceptionRadius(radius: number): void {
+		this.behavior.setPerceptionRadius(radius);
+	}
 
-  setPerceptionRadius(radius: number): void {
-    this.behavior.setPerceptionRadius(radius);
-  }
+	getFieldOfViewAngle(): number {
+		return this.behavior.getFieldOfViewAngle();
+	}
 
-  getFieldOfViewAngle(): number {
-    return this.behavior.getFieldOfViewAngle();
-  }
+	isInFieldOfView(other: IBoid): boolean {
+		return this.behavior.isInFieldOfView(other);
+	}
 
-  isInFieldOfView(other: IBoid): boolean {
-    return this.behavior.isInFieldOfView(other);
-  }
+	// Stats and State
+	getStats(): BoidStats {
+		return this.behavior.getStats();
+	}
 
-  // Stats and State
-  getStats(): BoidStats {
-    return this.behavior.getStats();
-  }
+	takeDamage(amount: number): boolean {
+		return this.behavior.takeDamage(amount);
+	}
 
-  takeDamage(amount: number): boolean {
-    return this.behavior.takeDamage(amount);
-  }
+	increaseReproduction(amount: number): boolean {
+		return this.behavior.increaseReproduction(amount);
+	}
 
-  increaseReproduction(amount: number): boolean {
-    return this.behavior.increaseReproduction(amount);
-  }
+	levelUp(): void {
+		this.behavior.levelUp();
+	}
 
-  levelUp(): void {
-    this.behavior.levelUp();
-  }
+	// Lifecycle
+	update(deltaTime: number): void {
+		// Update behavior only
+		this.behavior.update(deltaTime);
+	}
 
-  // Lifecycle
-  update(deltaTime: number): void {
-    // Update behavior only
-    this.behavior.update(deltaTime);
-  }
+	/**
+	 * Synchronize Phaser sprite properties with boid behavior state
+	 */
+	syncWithPhaser(): void {
+		// Sync position and rotation from behavior
+		const position = this.behavior.getBoidPosition();
+		const velocity = this.behavior.getBoidVelocity();
 
-  /**
-   * Synchronize Phaser sprite properties with boid behavior state
-   */
-  syncWithPhaser(): void {
-    // Sync position and rotation from behavior
-    const position = this.behavior.getBoidPosition();
-    const velocity = this.behavior.getBoidVelocity();
-    
-    this.setPosition(position.x, position.y);
-    this.rotation = Math.atan2(velocity.y, velocity.x) + Math.PI / 2;
-  }
+		this.setPosition(position.x, position.y);
+		this.rotation = Math.atan2(velocity.y, velocity.x) + Math.PI / 2;
+	}
 
-  destroy(fromScene?: boolean): void {
-    // Clean up behavior
-    this.behavior.destroy();
-    
-    // Call parent destroy
-    super.destroy(fromScene);
-  }
+	destroy(fromScene?: boolean): void {
+		// Clean up behavior
+		this.behavior.destroy();
 
-  private setupDisplay(): void {
-    // Set scale based on variant
-    this.setScale(this.getVariant() === BoidVariant.PREDATOR ? 0.75 : 0.5);
-    this.setOrigin(0.5, 0.5);
+		// Call parent destroy
+		super.destroy(fromScene);
+	}
 
-    // Set tint based on variant
-    this.setTint(this.getVariant() === BoidVariant.PREDATOR ? 0xff8c00 : 0x00ff7f);
-  }
+	private setupDisplay(): void {
+		// Set scale based on variant
+		this.setScale(this.getVariant() === BoidVariant.PREDATOR ? 0.75 : 0.5);
+		this.setOrigin(0.5, 0.5);
+
+		// Set tint based on variant
+		this.setTint(this.getVariant() === BoidVariant.PREDATOR ? 0xff8c00 : 0x00ff7f);
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	showCollisionEffect(boundary: BoundaryDirection): void {
+		this.setTint(0xffffff);
+
+		// Restore original tint after delay
+		this.scene.time.delayedCall(100, () => {
+			// Get the appropriate color based on variant
+			this.setTint(this.originalSpriteTint);
+		});
+	}
 }

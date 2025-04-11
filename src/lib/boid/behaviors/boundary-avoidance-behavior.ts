@@ -1,10 +1,10 @@
 import type { IFlockingBehavior } from '$interfaces/flocking';
 import type { IBoid } from '$interfaces/boid';
 import type { IVector2, IVectorFactory } from '$interfaces/vector';
-import type { IGameEventBus } from '$events/types';
+import type { BoundaryDirection, IGameEventBus } from '$events/types';
 import type { BoundaryMode } from '$config/types';
 
-type CollisionBoundary = 'left' | 'right' | 'top' | 'bottom' | null;
+type CollisionBoundary = BoundaryDirection | null;
 /**
  * Implements boundary avoidance behavior - boids steer away from world boundaries
  */

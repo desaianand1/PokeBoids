@@ -72,6 +72,11 @@ export class BoidBehavior {
 		this.setupEventListeners();
 	}
 
+	showCollisionEffect(): void {
+		// No visual effect in the behavior class
+		return;
+	}
+
 	// Identity
 	getId(): string {
 		return this.id;
