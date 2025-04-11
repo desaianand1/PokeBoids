@@ -2,7 +2,7 @@
 	import { Card, CardContent, CardHeader, CardTitle } from '$ui/card';
 	import { Button } from '$ui/button';
 	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$ui/tabs';
-	import { RotateCcw, SlidersVertical } from '@lucide/svelte';
+	import { History, SlidersVertical } from '@lucide/svelte';
 	import {
 		getBoidConfig,
 		updateBoidConfig,
@@ -43,8 +43,8 @@
 				onclick={resetToDefaults}
 				title="Reset to defaults"
 			>
-				<RotateCcw class="mr-1 h-3.5 w-3.5" />
-				Reset
+				<History class="mr-1 h-3.5 w-3.5" />
+				Defaults
 			</Button>
 		</div>
 	</CardHeader>
