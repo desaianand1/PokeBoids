@@ -29,6 +29,7 @@
 - [x] Basic control panel with shadcn-svelte
 - [x] Theme switching with day/night backgrounds
 - [x] Statistics display for boid metrics
+- [x] Credits & References panel with proper attributions
 - [ ] Advanced parameter controls for biological features
 - [ ] Debug visualization modes
 - [ ] Boid inspector tooltips
@@ -68,6 +69,11 @@
 - Real-time statistics display
 - Responsive layout with TailwindCSS
 - Atomic design component structure
+- Credits & References panel with:
+  - Organized reference categories
+  - Proper attribution for assets
+  - Accessibility features
+  - Security best practices
 
 ### 3. Infrastructure
 

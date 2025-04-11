@@ -13,6 +13,7 @@
 
 ### 2. UI Improvements
 
+- Added Credits & References panel with proper attributions
 - Refactoring control panel components to use Svelte 5 runes
 - Adding simulation parameters for biological features
 - Implementing responsive design with shadcn-svelte components
@@ -29,6 +30,10 @@
 
 ### 1. Codebase Updates
 
+- Added comprehensive Credits & References panel
+  - Organized references by category (research, implementations, academic)
+  - Added proper attribution for UI assets
+  - Implemented with accessibility and security best practices
 - Fixed bug with simulation reset not using default configuration values
 - Fully migrated to Svelte 5 runes syntax (no stores)
 - Implemented strict TypeScript types throughout
