@@ -1,16 +1,17 @@
 <script lang="ts">
 	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$ui/tabs';
 	import { Badge } from '$ui/badge';
-	import { Cpu, SlidersVertical, ChartColumn } from '@lucide/svelte';
+	import { Cpu, SlidersVertical, ChartColumn, BookText } from '@lucide/svelte';
 	import ThemeSwitcher from '$components/ThemeSwitcher.svelte';
 	import { formatVersion } from '$utils/version';
 
 	// Import components
-	import SimulationControls from '$components/simulation/SimulationControls.svelte';
+	import SimulationPanel from '$components/simulation/SimulationPanel.svelte';
 	import BoidConfigPanel from '$components/boid-config/BoidConfigPanel.svelte';
 	import StatsPanel from '$components/StatisticsPanel.svelte';
 	import EventDebugPanel from '$components/event-debug/EventDebugPanel.svelte';
 	import InfoCollapsible from '$components/shared/InfoCollapsible.svelte';
+	import CreditsPanel from '$components/CreditsPanel.svelte';
 
 	let activeTab = $state('controls');
 
@@ -21,7 +22,8 @@
 	const tabs = [
 		{ value: 'controls', icon: Cpu, label: 'Sim' },
 		{ value: 'config', icon: SlidersVertical, label: 'Config' },
-		{ value: 'stats', icon: ChartColumn, label: 'Stats' }
+		{ value: 'stats', icon: ChartColumn, label: 'Stats' },
+		{ value: 'credits', icon: BookText, label: 'Credits' }
 	] as const;
 </script>
 
@@ -40,7 +42,7 @@
 	<div class="flex-1 overflow-y-auto p-4">
 		<TabsContent value="controls" class="m-0 h-full">
 			<div class="flex h-full flex-col space-y-4">
-				<SimulationControls />
+				<SimulationPanel />
 				<InfoCollapsible title="Simulation Info" class="mt-auto">
 					<p>
 						The Boids simulation demonstrates emergent flocking behaviors with three simple rules:
@@ -74,16 +76,22 @@
 				<EventDebugPanel />
 			</div>
 		</TabsContent>
+
+		<TabsContent value="credits" class="m-0 h-full">
+			<div class="space-y-4">
+				<CreditsPanel />
+			</div>
+		</TabsContent>
 	</div>
 
 	<footer
-		class="fixed bottom-0 start-0 flex w-full items-center justify-between border-t px-4 py-2 text-xs bg-background text-muted-foreground"
+		class="fixed bottom-0 start-0 flex w-full items-center justify-between border-t bg-background px-4 py-2 text-xs text-muted-foreground"
 	>
 		<span class="flex items-center justify-center gap-4 p-2">
 			<ThemeSwitcher variant="outline" size="icon" />
 			<Badge variant="outline" class="py-2 font-mono text-xs">Boids Simulation</Badge>
 		</span>
-		<span class="text-secondary flex items-center gap-1">
+		<span class="flex items-center gap-1 text-secondary">
 			{formatVersion()}
 			{#if import.meta.env.DEV}
 				<Badge variant="outline" class="py-0 text-xs">dev</Badge>
