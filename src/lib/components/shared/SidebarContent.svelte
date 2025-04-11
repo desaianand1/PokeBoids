@@ -29,7 +29,7 @@
 
 <Tabs value={activeTab} class="flex flex-1 flex-col" onValueChange={handleTabChange}>
 	<div class="border-b px-4 py-2">
-		<TabsList class="grid w-full grid-cols-3">
+		<TabsList class="grid w-full grid-cols-4">
 			{#each tabs as { value, icon: Icon, label }}
 				<TabsTrigger {value}>
 					<Icon class="mr-2 h-4 w-4" />
