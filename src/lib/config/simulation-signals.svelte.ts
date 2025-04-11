@@ -1,6 +1,7 @@
 import { EventBus } from '$events/event-bus';
 import type { BoidConfig, BoundaryMode, SimulationConfig } from '$config/types';
 import { toast } from 'svelte-sonner';
+import { hasAngleChanged } from '$utils/angles';
 
 const simulationSpeeds = [0.2, 0.5, 1.0, 1.5, 2.0, 3.0] as const;
 export type SimulationSpeed = (typeof simulationSpeeds)[number];
@@ -12,9 +13,9 @@ const DEFAULT_BOID_CONFIG: BoidConfig = {
 	perceptionRadius: { default: 50, min: 20, max: 250, step: 5 },
 	separationRadius: { default: 35, min: 15, max: 100, step: 5 },
 	fieldOfViewAngle: {
-		default: Math.PI / 3,
-		min: Math.PI / 6, // 36 degrees
-		max: Math.PI * 1.5, // 270 degrees
+		default: Math.PI / 6,
+		min: Math.PI / 18,
+		max: Math.PI * 1.5,
 		step: Math.PI / 18
 	},
 	predatorFovMultiplier: { default: 0.7, min: 0.4, max: 1.5, step: 0.1 },
@@ -83,7 +84,6 @@ $effect.root(() => {
 	// Emit boid config events only when values change
 	$effect(() => {
 		const values = boidConfigValues;
-		console.debug('$effect triggered, fov is %f', values.fieldOfViewAngle);
 		// Emit individual events
 		EventBus.emit('alignment-weight-changed', { value: values.alignmentWeight });
 		EventBus.emit('cohesion-weight-changed', { value: values.cohesionWeight });
@@ -141,21 +141,23 @@ $effect.root(() => {
 	});
 });
 
-// Functions to update configuration
 function updateBoidConfig<K extends keyof BoidConfig>(key: K, value: BoidConfig[K]) {
 	// Skip update if no meaningful change
-	const currentValue = boidConfig[key];
-	console.debug('attempting boid config update: boiConfig[%s]=%o', key, value);
-	if ('default' in currentValue && 'default' in value) {
-		// Use appropriate threshold based on the parameter type
-		const threshold = key === 'fieldOfViewAngle' ? 0.005 : 0.0001;
-
-		// Only update if change exceeds threshold
-		if (Math.abs(currentValue.default - value.default) > threshold) {
-			// Update config with new value
-			boidConfig = { ...boidConfig, [key]: value };
-		}
-	}
+    const currentValue = boidConfig[key];
+    if ('default' in currentValue && 'default' in value) {
+        // Special handling for angle parameters
+        if (key === 'fieldOfViewAngle') {
+            if (hasAngleChanged(currentValue.default, value.default)) {
+                boidConfig = { ...boidConfig, [key]: value };
+            }
+        } else {
+            // For non-angle values, use small threshold epsilon
+            const threshold = 0.0001;
+            if (Math.abs(currentValue.default - value.default) > threshold) {
+                boidConfig = { ...boidConfig, [key]: value };
+            }
+        }
+    }
 }
 
 function getBoidConfig(): BoidConfig {

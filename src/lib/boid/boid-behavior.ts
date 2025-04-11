@@ -3,7 +3,7 @@ import type { IVector2 } from '$interfaces/vector';
 import { BoidVariant, isPredator, type BoidStats } from '$boid/types';
 import type { IBoid, IBoidDependencies } from '$interfaces/boid';
 import type { GameEvents } from '$events/types';
-import { clamp, normalizeAngle } from '$utils/angles';
+import { clamp, normalizeAngle, hasAngleChanged } from '$utils/angles';
 
 /**
  * Core boid behavior implementation independent of rendering framework
@@ -351,8 +351,7 @@ export class BoidBehavior {
 		this.deps.eventEmitter.on(
 			'field-of-view-angle-changed',
 			(data: GameEvents['field-of-view-angle-changed']) => {
-				// Use approximate equality check with a small epsilon
-				if (Math.abs(this.fieldOfViewAngle - data.value) > 0.0001) {
+				if (hasAngleChanged(this.fieldOfViewAngle, data.value)) {
 					this.fieldOfViewAngle = data.value;
 				}
 			},
