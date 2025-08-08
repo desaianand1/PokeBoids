@@ -10,6 +10,7 @@ import { clamp, normalizeAngle, hasAngleChanged } from '$utils/angles';
  */
 export class BoidBehavior {
 	private id: string;
+	private groupId: string;
 	private position: IVector2;
 	private velocity: IVector2;
 	private acceleration: IVector2;
@@ -37,6 +38,7 @@ export class BoidBehavior {
 		private variant: BoidVariant
 	) {
 		this.id = UUIDv4();
+		this.groupId = `behavior-${variant}-${UUIDv4().slice(0, 8)}`;
 
 		// Initialize vectors
 		this.position = deps.vectorFactory.create(x, y);
@@ -86,6 +88,10 @@ export class BoidBehavior {
 		return this.variant;
 	}
 
+	getGroupId(): string {
+		return this.groupId;
+	}
+
 	// Position and Movement
 	getBoidPosition(): IVector2 {
 		return this.position.clone();
@@ -101,6 +107,7 @@ export class BoidBehavior {
 
 	setBoidVelocity(velocity: IVector2): void {
 		this.velocity.copy(velocity);
+		this.updateDirection();
 	}
 
 	applyForce(force: IVector2): void {
