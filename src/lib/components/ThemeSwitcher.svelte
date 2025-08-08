@@ -11,7 +11,7 @@
 	}
 
 	let { variant = 'ghost', size = 'icon' }: ThemeSwitcherProps = $props();
-	const isDarkMode = $derived($mode === 'dark');
+	const isDarkMode = $derived(mode.current === 'dark');
 	const themes = [
 		{ name: 'Light', icon: Sun, action: () => setMode('light') },
 		{ name: 'Dark', icon: Moon, action: () => setMode('dark') },
@@ -20,11 +20,9 @@
 </script>
 
 <DropdownMenu.Root>
-	<DropdownMenu.Trigger
-		class={cn(buttonVariants({ variant, size }), 'rounded-lg')}
-	>
+	<DropdownMenu.Trigger class={cn(buttonVariants({ variant, size }), 'rounded-lg')}>
 		<div class="relative">
-			{#each [Sun, Moon] as Icon, index}
+			{#each [Sun, Moon] as Icon, index (Icon.name || index)}
 				<Icon
 					class={cn(
 						'h-12 w-12 transition-all duration-300 ease-in-out',
@@ -39,7 +37,7 @@
 		<span class="sr-only">Toggle theme</span>
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content align="center">
-		{#each themes as { name, icon: Icon, action }}
+		{#each themes as { name, icon: Icon, action } (name)}
 			<DropdownMenu.Item onclick={action}>
 				<span
 					class="flex w-full items-center justify-center gap-3 rounded-lg py-2 transition-colors duration-300 ease-in-out"

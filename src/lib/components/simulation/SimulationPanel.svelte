@@ -13,8 +13,7 @@
 		AlertDialogDescription,
 		AlertDialogFooter,
 		AlertDialogHeader,
-		AlertDialogTitle,
-		AlertDialogTrigger
+		AlertDialogTitle
 	} from '$ui/alert-dialog';
 
 	import {
@@ -38,9 +37,9 @@
 	import PopulationControls from '$components/simulation/PopulationControls.svelte';
 	import BoundaryModeControls from '$components/simulation/BoundaryModeControls.svelte';
 	import FlavorControls from '$components/simulation/FlavorControls.svelte';
+	import type { SimulationFlavor } from '$boid/animation/types';
 	import { Button } from '$ui/button';
 	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$ui/tabs';
-	import type { SimulationFlavor } from '$boid/animation/types';
 
 	// State
 	const { min: minSimSpeed, max: maxSimSpeed } = getSimulationSpeedRange();
@@ -109,7 +108,11 @@
 		<!-- Playback Controls -->
 		<div class="flex flex-col items-center gap-4 lg:flex-row">
 			<!-- Playback Group -->
-			<PlaybackControls {isPlaying} onTogglePlayPause={togglePlayPause} onReset={handleResetClick} />
+			<PlaybackControls
+				{isPlaying}
+				onTogglePlayPause={togglePlayPause}
+				onReset={handleResetClick}
+			/>
 
 			{#if isLargeScreen.current}
 				<Separator orientation="vertical" class="mx-0.5 h-8" />
@@ -161,8 +164,8 @@
 				<TabsTrigger value="general">General</TabsTrigger>
 				<TabsTrigger value="fun">Fun</TabsTrigger>
 			</TabsList>
-			
-			<TabsContent value="general" class="space-y-4 mt-4">
+
+			<TabsContent value="general" class="mt-4 space-y-4">
 				<!-- Population Settings -->
 				<div class="space-y-2">
 					<h3 class="mb-2 text-sm font-medium text-muted-foreground">Population Settings</h3>
@@ -175,9 +178,9 @@
 						/>
 					</div>
 				</div>
-				
+
 				<Separator class="my-2" />
-				
+
 				<!-- Boundary Controls Section -->
 				<div class="space-y-2">
 					<h3 class="mb-2 text-sm font-medium text-muted-foreground">Boundary Settings</h3>
@@ -190,14 +193,14 @@
 					</div>
 				</div>
 			</TabsContent>
-			
-			<TabsContent value="fun" class="space-y-4 mt-4">
+
+			<TabsContent value="fun" class="mt-4 space-y-4">
 				<!-- Environment Flavor Section -->
 				<div class="space-y-2">
 					<h3 class="mb-2 text-sm font-medium text-muted-foreground">Environment</h3>
 					<div class="p-2">
-						<FlavorControls 
-							currentFlavor={simulationConfig.simulationFlavor.default}
+						<FlavorControls
+							currentFlavor={simulationConfig.simulationFlavor.default as SimulationFlavor}
 							onFlavorChange={handleFlavorChange}
 						/>
 					</div>
@@ -205,7 +208,7 @@
 			</TabsContent>
 		</Tabs>
 	</CardContent>
-	<CardFooter class="border-t border-border py-4">	
+	<CardFooter class="border-t border-border py-4">
 		<div class="text-xs text-muted-foreground">
 			Changes to population counts, obstacles, and environment will apply on Reset
 		</div>
@@ -218,13 +221,15 @@
 		<AlertDialogHeader>
 			<AlertDialogTitle>Change Environment?</AlertDialogTitle>
 			<AlertDialogDescription>
-				Changing the environment will reset the simulation and switch to {pendingFlavor} sprites and background.
-				All current boids will be recreated. Continue?
+				Changing the environment will reset the simulation and switch to {pendingFlavor} sprites and
+				background. All current boids will be recreated. Continue?
 			</AlertDialogDescription>
 		</AlertDialogHeader>
 		<AlertDialogFooter>
 			<AlertDialogCancel onclick={() => (flavorDialogOpen = false)}>Cancel</AlertDialogCancel>
-			<AlertDialogAction class="bg-destructive" onclick={confirmFlavorChange}>Change Environment</AlertDialogAction>
+			<AlertDialogAction class="bg-destructive" onclick={confirmFlavorChange}
+				>Change Environment</AlertDialogAction
+			>
 		</AlertDialogFooter>
 	</AlertDialogContent>
 </AlertDialog>
@@ -234,7 +239,8 @@
 		<AlertDialogHeader>
 			<AlertDialogTitle>Reset Simulation?</AlertDialogTitle>
 			<AlertDialogDescription>
-				This will restart the simulation with current settings. All boids will be recreated and positioned randomly.
+				This will restart the simulation with current settings. All boids will be recreated and
+				positioned randomly.
 			</AlertDialogDescription>
 		</AlertDialogHeader>
 		<AlertDialogFooter>
@@ -254,7 +260,9 @@
 		</AlertDialogHeader>
 		<AlertDialogFooter>
 			<AlertDialogCancel onclick={() => (defaultsDialogOpen = false)}>Cancel</AlertDialogCancel>
-			<AlertDialogAction class="bg-destructive" onclick={confirmDefaults}>Reset to Defaults</AlertDialogAction>
+			<AlertDialogAction class="bg-destructive" onclick={confirmDefaults}
+				>Reset to Defaults</AlertDialogAction
+			>
 		</AlertDialogFooter>
 	</AlertDialogContent>
 </AlertDialog>

@@ -2,6 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { initialize, destroy, phaserGameRef } from '$game/phaser-signals.svelte';
 	import { EventBus } from '$events/event-bus';
+	import type Phaser from 'phaser';
 	import {
 		AlertDialog,
 		AlertDialogContent,
@@ -20,12 +21,7 @@
 		onGameReset?: () => void;
 	}
 
-	const { 
-		onSceneReady, 
-		onGameError, 
-		onGameStart, 
-		onGameReset 
-	}: PhaserGameProps = $props();
+	const { onSceneReady, onGameError, onGameReset }: PhaserGameProps = $props();
 
 	let gameContainer = $state<HTMLDivElement | null>(null);
 	let gameError = $derived(phaserGameRef.error);
@@ -46,10 +42,6 @@
 		if (onSceneReady) onSceneReady(scene);
 	}
 
-	function handleGameStart() {
-		if (onGameStart) onGameStart();
-	}
-
 	function handleGameReset() {
 		if (onGameReset) onGameReset();
 	}
@@ -57,10 +49,10 @@
 	// Initialize game
 	function initializeGame() {
 		if (!gameContainer) return;
-		
+
 		// Initialize the game using signals
 		initialize(gameContainer.id);
-		
+
 		// Set up error callback
 		$effect(() => {
 			if (gameError && onGameError) {

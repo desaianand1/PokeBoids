@@ -1,6 +1,7 @@
 <script lang="ts">
 	import PhaserGame from '$components/PhaserGame.svelte';
 	import SidebarLayout from '$components/SidebarLayout.svelte';
+	import type Phaser from 'phaser';
 
 	// Game event handlers
 	const gameHandlers = {

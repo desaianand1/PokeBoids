@@ -8,6 +8,7 @@
 	import { EventBus } from '$events/event-bus';
 	import type { GameEvents } from '$events/types';
 	import { onDestroy } from 'svelte';
+	import { SvelteMap } from 'svelte/reactivity';
 	import { toast } from 'svelte-sonner';
 
 	// Import subcomponents
@@ -24,12 +25,7 @@
 		EventDetails as EventDetailsType,
 		PendingEvent
 	} from '$utils/event-debug';
-	import {
-		EVENT_CONFIG,
-		getEventCategory,
-		safeStringify,
-		captureEventDetails
-	} from '$utils/event-debug';
+	import { EVENT_CONFIG, getEventCategory, captureEventDetails } from '$utils/event-debug';
 
 	// State variables
 	let isDebugEnabled = $state(false);
@@ -40,13 +36,13 @@
 	let selectedEventId = $state<string | null>(null);
 
 	// Event storage
-	let eventMap = $state<Map<string, EventSummary>>(new Map());
-	let eventDetails = $state<Map<string, EventDetailsType>>(new Map());
+	let eventMap: SvelteMap<string, EventSummary> = new SvelteMap();
+	let eventDetails: SvelteMap<string, EventDetailsType> = new SvelteMap();
 	let streamEvents = $state<StreamEvent[]>([]);
 
 	// Sampling and throttling state
-	let samplingCounters = new Map<string, number>();
-	let lastEventTimes = new Map<string, number>();
+	let samplingCounters = new SvelteMap<string, number>();
+	let lastEventTimes = new SvelteMap<string, number>();
 	let currentEventDetails = $state<EventDetailsType | null>(null);
 
 	// Batch processing state
@@ -118,7 +114,10 @@
 		}, 0);
 	}
 
-	function processEventImmediately(type: keyof GameEvents & string, data: GameEvents[keyof GameEvents]): void {
+	function processEventImmediately(
+		type: keyof GameEvents & string,
+		data: GameEvents[keyof GameEvents]
+	): void {
 		if (!isDebugEnabled || isPaused) return;
 
 		const now = Date.now();
@@ -166,12 +165,16 @@
 
 	// Helper functions
 	function updateEventMap(key: string, value: EventSummary): void {
-		const newMap = new Map(eventMap);
+		const newMap = new SvelteMap(eventMap);
 		newMap.set(key, value);
 		eventMap = newMap;
 	}
 
-	function addStreamEvent(type: keyof GameEvents & string, category: EventCategory, timestamp: number): void {
+	function addStreamEvent(
+		type: keyof GameEvents & string,
+		category: EventCategory,
+		timestamp: number
+	): void {
 		const streamEvent: StreamEvent = {
 			id: `${type}-${timestamp}`,
 			type,
@@ -195,11 +198,11 @@
 		});
 
 		if (oldestId) {
-			const newMap = new Map(eventMap);
+			const newMap = new SvelteMap(eventMap);
 			newMap.delete(oldestId);
 			eventMap = newMap;
 
-			const newDetails = new Map(eventDetails);
+			const newDetails = new SvelteMap(eventDetails);
 			newDetails.delete(oldestId);
 			eventDetails = newDetails;
 		}
@@ -246,8 +249,8 @@
 		const totalEvents = streamEvents.length;
 		const uniqueTypes = eventMap.size;
 
-		eventMap = new Map();
-		eventDetails = new Map();
+		eventMap = new SvelteMap();
+		eventDetails = new SvelteMap();
 		streamEvents = [];
 		selectedEventId = null;
 		currentEventDetails = null;
