@@ -143,15 +143,8 @@ jobs:
           path: build/
           retention-days: 1
 
-      - name: Upload build for pages
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: build/
-
   # Release - Only runs after ALL quality checks pass
-  # NOTE: Requires RELEASE_TOKEN secret (GitHub PAT) to trigger subsequent deploy job
-  # Default GITHUB_TOKEN cannot trigger workflows to prevent infinite loops
+  # NOTE: Uses RELEASE_TOKEN secret (GitHub PAT) for proper authentication
   release:
     name: Semantic Release
     needs: [lint, type-check, test, build]
@@ -194,17 +187,3 @@ jobs:
           GIT_COMMITTER_NAME: github-actions[bot]
           GIT_COMMITTER_EMAIL: github-actions[bot]@users.noreply.github.com
           HUSKY: 0
-
-  # Deploy - Only runs after successful release
-  deploy:
-    name: Deploy to GitHub Pages
-    needs: [release]
-    runs-on: ubuntu-latest
-    if: needs.release.outputs.new-release-published == 'true'
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
