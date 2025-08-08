@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/desaianand1/PokeBoids/compare/v1.1.2...v1.2.0) (2025-08-08)
+
+
+### Features
+
+* **ci:** implement separate GitHub Pages deployment workflow ([e88dbb3](https://github.com/desaianand1/PokeBoids/commit/e88dbb3950fe2c9415775b9217d2713deaa43195))
+
 ## [1.1.2](https://github.com/desaianand1/PokeBoids/compare/v1.1.1...v1.1.2) (2025-08-08)
 
 
