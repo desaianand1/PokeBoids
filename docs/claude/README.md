@@ -6,10 +6,11 @@ This directory contains documentation for working with Claude AI assistants on t
 
 ```
 docs/claude/
-├── README.md           # This file
-├── CLAUDE.md          # Main project context and instructions
-└── agents/            # Specialized agent instructions
-    └── PHASER_EXPERT.md   # Phaser.js game development expert
+├── README.md              # This file
+├── CLAUDE.md             # Main project context and instructions
+└── agents/               # Specialized agent instructions
+    ├── PHASER_EXPERT.md  # Phaser.js game development expert
+    └── CODE_MAINTAINER.md # Code quality and maintenance specialist
 ```
 
 ## Files
@@ -30,12 +31,22 @@ Specialized instructions for Phaser.js game development tasks including:
 - Animation and sprite management
 - Physics and collision handling
 
+### agents/CODE_MAINTAINER.md
+Code cleanup and maintenance specialist focusing on:
+- Modern Svelte 5 patterns and runes
+- Code quality without overengineering
+- PNPM package management
+- Behavior-focused testing strategies
+- CI/CD and developer experience
+- Project-specific patterns and paradigms
+
 ## Usage
 
 When working with Claude on this project:
 1. Claude automatically reads `CLAUDE.md` for project context
 2. For Phaser-specific tasks, reference the `agents/PHASER_EXPERT.md` instructions
-3. Additional specialized agents can be added to the `agents/` directory as needed
+3. For code quality and maintenance, use the `agents/CODE_MAINTAINER.md` guidelines
+4. Additional specialized agents can be added to the `agents/` directory as needed
 
 ## Adding New Agents
 
