@@ -32,8 +32,8 @@ const DEFAULT_BOID_CONFIG: BoidConfig = {
 };
 
 const DEFAULT_SIMULATION_CONFIG: SimulationConfig = {
-	initialPreyCount: { default: 100, min: 0, max: 500, step: 1 },
-	initialPredatorCount: { default: 5, min: 0, max: 500, step: 1 },
+	initialPreyCount: { default: 80, min: 0, max: 500, step: 1 },
+	initialPredatorCount: { default: 20, min: 0, max: 500, step: 1 },
 	obstacleCount: { default: 0, min: 0, max: 20, step: 1 },
 	simulationFlavor: { default: 'air' },
 	trackStats: { default: true },
@@ -146,21 +146,21 @@ $effect.root(() => {
 
 function updateBoidConfig<K extends keyof BoidConfig>(key: K, value: BoidConfig[K]) {
 	// Skip update if no meaningful change
-    const currentValue = boidConfig[key];
-    if ('default' in currentValue && 'default' in value) {
-        // Special handling for angle parameters
-        if (key === 'fieldOfViewAngle') {
-            if (hasAngleChanged(currentValue.default, value.default)) {
-                boidConfig = { ...boidConfig, [key]: value };
-            }
-        } else {
-            // For non-angle values, use small threshold epsilon
-            const threshold = 0.0001;
-            if (Math.abs(currentValue.default - value.default) > threshold) {
-                boidConfig = { ...boidConfig, [key]: value };
-            }
-        }
-    }
+	const currentValue = boidConfig[key];
+	if ('default' in currentValue && 'default' in value) {
+		// Special handling for angle parameters
+		if (key === 'fieldOfViewAngle') {
+			if (hasAngleChanged(currentValue.default, value.default)) {
+				boidConfig = { ...boidConfig, [key]: value };
+			}
+		} else {
+			// For non-angle values, use small threshold epsilon
+			const threshold = 0.0001;
+			if (Math.abs(currentValue.default - value.default) > threshold) {
+				boidConfig = { ...boidConfig, [key]: value };
+			}
+		}
+	}
 }
 
 function getBoidConfig(): BoidConfig {
