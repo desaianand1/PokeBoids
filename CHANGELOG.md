@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/desaianand1/PokeBoids/compare/v1.0.0...v1.0.1) (2025-08-08)
+
+
+### Bug Fixes
+
+* **assets:** migrate to SvelteKit asset processing pattern ([7b92a86](https://github.com/desaianand1/PokeBoids/commit/7b92a868cce6012c716dcc44c426784c0a12d399))
+
 # 1.0.0 (2025-08-08)
 
 
