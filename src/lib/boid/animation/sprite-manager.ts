@@ -36,7 +36,10 @@ export class BoidSpriteManager {
 	 */
 	initializeFromJSON(jsonData: SpriteDatabase): void {
 		this.spriteDatabase = jsonData;
-		console.log('Sprite database initialized with flavors:', Object.keys(this.spriteDatabase.sprites));
+		console.log(
+			'Sprite database initialized with flavors:',
+			Object.keys(this.spriteDatabase.sprites)
+		);
 	}
 
 	/**
@@ -49,14 +52,14 @@ export class BoidSpriteManager {
 		}
 
 		const flavorData = this.spriteDatabase.sprites[flavor];
-		
+
 		// Load predator sprites
-		flavorData.predator.forEach(sprite => {
+		flavorData.predator.forEach((sprite) => {
 			this.loadSpriteAnimations(loader, sprite);
 		});
-		
+
 		// Load prey sprites
-		flavorData.prey.forEach(sprite => {
+		flavorData.prey.forEach((sprite) => {
 			this.loadSpriteAnimations(loader, sprite);
 		});
 
@@ -87,7 +90,9 @@ export class BoidSpriteManager {
 					frameHeight: sprite.animations.walk.frameHeight
 				});
 				this.loadedSprites.add(walkKey);
-				console.debug(`[SpriteManager] Loaded walk animation for '${sprite.id}': ${sprite.animations.walk.frameWidth}x${sprite.animations.walk.frameHeight}`);
+				console.debug(
+					`[SpriteManager] Loaded walk animation for '${sprite.id}': ${sprite.animations.walk.frameWidth}x${sprite.animations.walk.frameHeight}`
+				);
 			} catch (error) {
 				console.error(`[SpriteManager] Failed to load walk animation for '${sprite.id}':`, error);
 			}
@@ -102,7 +107,9 @@ export class BoidSpriteManager {
 					frameHeight: sprite.animations.attack.frameHeight
 				});
 				this.loadedSprites.add(attackKey);
-				console.debug(`[SpriteManager] Loaded attack animation for '${sprite.id}': ${sprite.animations.attack.frameWidth}x${sprite.animations.attack.frameHeight}`);
+				console.debug(
+					`[SpriteManager] Loaded attack animation for '${sprite.id}': ${sprite.animations.attack.frameWidth}x${sprite.animations.attack.frameHeight}`
+				);
 			} catch (error) {
 				console.error(`[SpriteManager] Failed to load attack animation for '${sprite.id}':`, error);
 			}
@@ -117,7 +124,9 @@ export class BoidSpriteManager {
 					frameHeight: sprite.animations.hurt.frameHeight
 				});
 				this.loadedSprites.add(hurtKey);
-				console.debug(`[SpriteManager] Loaded hurt animation for '${sprite.id}': ${sprite.animations.hurt.frameWidth}x${sprite.animations.hurt.frameHeight}`);
+				console.debug(
+					`[SpriteManager] Loaded hurt animation for '${sprite.id}': ${sprite.animations.hurt.frameWidth}x${sprite.animations.hurt.frameHeight}`
+				);
 			} catch (error) {
 				console.error(`[SpriteManager] Failed to load hurt animation for '${sprite.id}':`, error);
 			}
@@ -129,20 +138,36 @@ export class BoidSpriteManager {
 	 */
 	getRandomSprite(variant: BoidVariant): BoidSpriteConfig | null {
 		if (!this.spriteDatabase) {
-			console.error('Sprite database not initialized');
+			console.warn(
+				'[SpriteManager] Sprite database not initialized, falling back to legacy sprites'
+			);
 			return null;
 		}
 
-		const variantKey = variant === BoidVariant.PREDATOR ? 'predator' : 'prey';
-		const sprites = this.spriteDatabase.sprites[this.currentFlavor][variantKey];
-		
-		if (sprites.length === 0) {
-			console.warn(`No sprites available for ${variantKey} in ${this.currentFlavor} flavor`);
+		try {
+			const variantKey = variant === BoidVariant.PREDATOR ? 'predator' : 'prey';
+			const flavorData = this.spriteDatabase.sprites[this.currentFlavor];
+
+			if (!flavorData) {
+				console.warn(`[SpriteManager] No data available for flavor: ${this.currentFlavor}`);
+				return null;
+			}
+
+			const sprites = flavorData[variantKey];
+
+			if (!sprites || sprites.length === 0) {
+				console.warn(
+					`[SpriteManager] No sprites available for ${variantKey} in ${this.currentFlavor} flavor`
+				);
+				return null;
+			}
+
+			const randomIndex = Math.floor(Math.random() * sprites.length);
+			return sprites[randomIndex];
+		} catch (error) {
+			console.error('[SpriteManager] Error getting random sprite:', error);
 			return null;
 		}
-
-		const randomIndex = Math.floor(Math.random() * sprites.length);
-		return sprites[randomIndex];
 	}
 
 	/**
@@ -153,8 +178,8 @@ export class BoidSpriteManager {
 
 		const variantKey = variant === BoidVariant.PREDATOR ? 'predator' : 'prey';
 		const sprites = this.spriteDatabase.sprites[this.currentFlavor][variantKey];
-		
-		return sprites.find(s => s.id === id) || null;
+
+		return sprites.find((s) => s.id === id) || null;
 	}
 
 	/**
@@ -204,7 +229,7 @@ export class BoidSpriteManager {
 	 */
 	hasSpritesForFlavor(flavor: SimulationFlavor): boolean {
 		if (!this.spriteDatabase) return false;
-		
+
 		const flavorData = this.spriteDatabase.sprites[flavor];
 		return flavorData.predator.length > 0 || flavorData.prey.length > 0;
 	}
@@ -217,10 +242,10 @@ export class BoidSpriteManager {
 
 		const groups: string[] = [];
 		const flavorData = this.spriteDatabase.sprites[this.currentFlavor];
-		
-		flavorData.predator.forEach(sprite => groups.push(sprite.groupId));
-		flavorData.prey.forEach(sprite => groups.push(sprite.groupId));
-		
+
+		flavorData.predator.forEach((sprite) => groups.push(sprite.groupId));
+		flavorData.prey.forEach((sprite) => groups.push(sprite.groupId));
+
 		return groups;
 	}
 
@@ -244,31 +269,41 @@ export class BoidSpriteManager {
 
 			// Validate frame dimensions
 			if (!anim.frameWidth || !anim.frameHeight || anim.frameWidth <= 0 || anim.frameHeight <= 0) {
-				console.error(`[SpriteManager] Invalid frame dimensions for ${animType} animation of sprite '${sprite.id}': ${anim.frameWidth}x${anim.frameHeight}`);
+				console.error(
+					`[SpriteManager] Invalid frame dimensions for ${animType} animation of sprite '${sprite.id}': ${anim.frameWidth}x${anim.frameHeight}`
+				);
 				return false;
 			}
 
 			// Validate sprite sheet path
 			if (!anim.spriteSheet || typeof anim.spriteSheet !== 'string') {
-				console.error(`[SpriteManager] Invalid sprite sheet path for ${animType} animation of sprite '${sprite.id}': ${anim.spriteSheet}`);
+				console.error(
+					`[SpriteManager] Invalid sprite sheet path for ${animType} animation of sprite '${sprite.id}': ${anim.spriteSheet}`
+				);
 				return false;
 			}
 
 			// Validate frame count
 			if (!anim.frameCount || anim.frameCount <= 0) {
-				console.error(`[SpriteManager] Invalid frame count for ${animType} animation of sprite '${sprite.id}': ${anim.frameCount}`);
+				console.error(
+					`[SpriteManager] Invalid frame count for ${animType} animation of sprite '${sprite.id}': ${anim.frameCount}`
+				);
 				return false;
 			}
 		}
 
 		// Validate sprite properties
 		if (!sprite.scale || sprite.scale <= 0) {
-			console.warn(`[SpriteManager] Invalid or missing scale for sprite '${sprite.id}', using default 1.0`);
+			console.warn(
+				`[SpriteManager] Invalid or missing scale for sprite '${sprite.id}', using default 1.0`
+			);
 			sprite.scale = 1.0;
 		}
 
 		if (!sprite.attackRadius || sprite.attackRadius <= 0) {
-			console.warn(`[SpriteManager] Invalid or missing attack radius for sprite '${sprite.id}', using default 30`);
+			console.warn(
+				`[SpriteManager] Invalid or missing attack radius for sprite '${sprite.id}', using default 30`
+			);
 			sprite.attackRadius = 30;
 		}
 
@@ -280,19 +315,19 @@ export class BoidSpriteManager {
 	 */
 	getGroupStats(): Map<string, { count: number; variant: BoidVariant }> {
 		const stats = new Map<string, { count: number; variant: BoidVariant }>();
-		
+
 		if (!this.spriteDatabase) return stats;
-		
+
 		const flavorData = this.spriteDatabase.sprites[this.currentFlavor];
-		
-		flavorData.predator.forEach(sprite => {
+
+		flavorData.predator.forEach((sprite) => {
 			stats.set(sprite.groupId, { count: 0, variant: BoidVariant.PREDATOR });
 		});
-		
-		flavorData.prey.forEach(sprite => {
+
+		flavorData.prey.forEach((sprite) => {
 			stats.set(sprite.groupId, { count: 0, variant: BoidVariant.PREY });
 		});
-		
+
 		return stats;
 	}
 }

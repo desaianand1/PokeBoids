@@ -1,6 +1,15 @@
 import { Scene } from 'phaser';
 import { BoidSpriteManager } from '$boid/animation/sprite-manager';
 import type { SpriteDatabase, BoidSpriteConfig, AnimationConfig } from '$boid/animation/types';
+import { base } from '$app/paths';
+import { browser } from '$app/environment';
+
+// Import assets statically for proper Vite processing
+import preySprite from '$assets/prey.png';
+import predatorSprite from '$assets/predator.png';
+import daySkyImage from '$assets/day-sky.jpg';
+import nightSkyImage from '$assets/night-sky.jpg';
+import spriteConfigData from '$assets/sprites/sprite-config.json';
 
 export class Preloader extends Scene {
 	constructor() {
@@ -27,46 +36,51 @@ export class Preloader extends Scene {
 	}
 
 	preload() {
-		this.load.setPath('src/assets');
+		console.log(`[Preloader] Loading assets with base path: ${base}`);
 
-		// Load legacy static sprites for fallback
-		this.load.image('prey', 'prey.png');
-		this.load.image('predator', 'predator.png');
+		// Load legacy static sprites for fallback using static imports (processed by Vite)
+		this.load.image('prey', preySprite);
+		this.load.image('predator', predatorSprite);
 
-		// Load background images for all environments (day/night variants)
-		this.load.image('air-day', 'day-sky.jpg');
-		this.load.image('air-night', 'night-sky.jpg');
+		// Load background images using static imports
+		this.load.image('air-day', daySkyImage);
+		this.load.image('air-night', nightSkyImage);
 		// Note: land and water backgrounds will be added when assets are available
-		// this.load.image('land-day', 'grassland-day.jpg');
-		// this.load.image('land-night', 'grassland-night.jpg');
-		// this.load.image('water-day', 'ocean-day.jpg');
-		// this.load.image('water-night', 'ocean-night.jpg');
 
-		// Stage 1: Load sprite configuration JSON only
-		const spriteManager = BoidSpriteManager.getInstance();
-		spriteManager.loadSpriteDatabase(this.load);
+		// Load sprite configuration using static import
+		// This ensures the JSON is processed by Vite and available in production
+		console.log('[Preloader] Loading sprite config from static import');
 
 		// Note: Sprite sheets will be loaded dynamically in create() after JSON is parsed
 	}
 
 	create() {
-		// Stage 2: Parse JSON config and load sprite sheets dynamically
+		// Stage 2: Use statically imported sprite config for proper Vite processing
 		const spriteManager = BoidSpriteManager.getInstance();
-		const spriteConfig = this.cache.json.get('sprite-config') as SpriteDatabase;
 
-		if (spriteConfig) {
-			console.log('Loading sprites dynamically from config...');
-			spriteManager.initializeFromJSON(spriteConfig);
+		try {
+			console.log('Loading sprites from static import...');
+			const spriteConfig = spriteConfigData as SpriteDatabase;
 
-			// Load sprite sheets for air environment (and others when available)
-			this.loadSpritesFromConfig(spriteConfig);
-		} else {
-			console.warn('Sprite configuration not found, using fallback sprites only');
+			if (spriteConfig && spriteConfig.sprites) {
+				spriteManager.initializeFromJSON(spriteConfig);
+
+				// Load sprite sheets for air environment (and others when available)
+				this.loadSpritesFromConfig(spriteConfig);
+			} else {
+				throw new Error('Invalid sprite configuration data');
+			}
+		} catch (error) {
+			console.error('[Preloader] Failed to load sprite configuration:', error);
+			console.warn('Using fallback sprites only');
 			this.startGame();
 		}
 	}
 
-	private hasSprites(flavorConfig: { predator: BoidSpriteConfig[]; prey: BoidSpriteConfig[] }): boolean {
+	private hasSprites(flavorConfig: {
+		predator: BoidSpriteConfig[];
+		prey: BoidSpriteConfig[];
+	}): boolean {
 		return flavorConfig.predator.length > 0 || flavorConfig.prey.length > 0;
 	}
 
@@ -139,14 +153,35 @@ export class Preloader extends Scene {
 				return;
 			}
 
-			// Load sprite sheet with validated dimensions
-			this.load.spritesheet(key, animConfig.spriteSheet, {
-				frameWidth: animConfig.frameWidth,
-				frameHeight: animConfig.frameHeight
-			});
+			try {
+				// Resolve sprite sheet path for proper asset loading in both dev and prod
+				// Use the base path to construct the correct URL for the sprite sheet
+				const spriteSheetPath = browser
+					? `${base}/_app/immutable/assets/${animConfig.spriteSheet.replace('sprites/', '')}`
+					: new URL(`../../assets/${animConfig.spriteSheet}`, import.meta.url).href;
 
-			// Add completion callback
-			this.load.once(`filecomplete-spritesheet-${key}`, onLoaded);
+				console.log(`[Preloader] Loading sprite sheet: ${key} from ${spriteSheetPath}`);
+
+				// Load sprite sheet with validated dimensions
+				this.load.spritesheet(key, spriteSheetPath, {
+					frameWidth: animConfig.frameWidth,
+					frameHeight: animConfig.frameHeight
+				});
+
+				// Add completion and error callbacks
+				this.load.once(`filecomplete-spritesheet-${key}`, () => {
+					console.log(`[Preloader] Successfully loaded sprite sheet: ${key}`);
+					onLoaded();
+				});
+
+				this.load.once(`fileerror-spritesheet-${key}`, (error: Error) => {
+					console.error(`[Preloader] Failed to load sprite sheet: ${key}`, error);
+					onLoaded(); // Still call onLoaded to prevent hanging
+				});
+			} catch (error) {
+				console.error(`[Preloader] Error setting up sprite sheet loading for ${key}:`, error);
+				onLoaded(); // Still call onLoaded to prevent hanging
+			}
 		});
 
 		// Start the loader for these files
@@ -156,7 +191,11 @@ export class Preloader extends Scene {
 	/**
 	 * Validate animation configuration with comprehensive checks
 	 */
-	private validateAnimationConfig(spriteId: string, animType: string, animConfig: AnimationConfig): boolean {
+	private validateAnimationConfig(
+		spriteId: string,
+		animType: string,
+		animConfig: AnimationConfig
+	): boolean {
 		if (!animConfig) {
 			console.error(`[Preloader] Missing animation config for ${spriteId}-${animType}`);
 			return false;
@@ -183,33 +222,45 @@ export class Preloader extends Scene {
 		}
 
 		if (typeof spriteSheet !== 'string' || spriteSheet.length === 0) {
-			console.error(`[Preloader] Invalid spriteSheet path for ${spriteId}-${animType}: ${spriteSheet}`);
+			console.error(
+				`[Preloader] Invalid spriteSheet path for ${spriteId}-${animType}: ${spriteSheet}`
+			);
 			return false;
 		}
 
 		// Validate frame durations array matches frame count
 		if (Array.isArray(frameDurations) && frameDurations.length !== frameCount) {
-			console.error(`[Preloader] Frame duration count (${frameDurations.length}) does not match frameCount (${frameCount}) for ${spriteId}-${animType}`);
+			console.error(
+				`[Preloader] Frame duration count (${frameDurations.length}) does not match frameCount (${frameCount}) for ${spriteId}-${animType}`
+			);
 			return false;
 		}
 
 		// Calculate expected sprite sheet dimensions (8 directions for PMD sprites)
 		const expectedWidth = frameWidth * frameCount;
 		const expectedHeight = frameHeight * 8; // 8 directions
-		console.debug(`[Preloader] Expected dimensions for ${spriteId}-${animType}: ${expectedWidth}x${expectedHeight} (${frameCount} frames x 8 directions)`);
+		console.debug(
+			`[Preloader] Expected dimensions for ${spriteId}-${animType}: ${expectedWidth}x${expectedHeight} (${frameCount} frames x 8 directions)`
+		);
 
 		// Warn about common dimension issues
 		if (frameWidth % 8 !== 0 || frameHeight % 8 !== 0) {
-			console.warn(`[Preloader] Frame dimensions not aligned to 8px grid for ${spriteId}-${animType}: ${frameWidth}x${frameHeight}`);
+			console.warn(
+				`[Preloader] Frame dimensions not aligned to 8px grid for ${spriteId}-${animType}: ${frameWidth}x${frameHeight}`
+			);
 		}
 
 		// Validate reasonable size bounds
 		if (frameWidth > 200 || frameHeight > 200) {
-			console.warn(`[Preloader] Unusually large frame dimensions for ${spriteId}-${animType}: ${frameWidth}x${frameHeight}`);
+			console.warn(
+				`[Preloader] Unusually large frame dimensions for ${spriteId}-${animType}: ${frameWidth}x${frameHeight}`
+			);
 		}
 
 		if (frameWidth < 8 || frameHeight < 8) {
-			console.warn(`[Preloader] Unusually small frame dimensions for ${spriteId}-${animType}: ${frameWidth}x${frameHeight}`);
+			console.warn(
+				`[Preloader] Unusually small frame dimensions for ${spriteId}-${animType}: ${frameWidth}x${frameHeight}`
+			);
 		}
 
 		return true;

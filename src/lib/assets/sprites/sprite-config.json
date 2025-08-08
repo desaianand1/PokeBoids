@@ -1,0 +1,95 @@
+{
+	"sprites": {
+		"air": {
+			"predator": [
+				{
+					"id": "crobat",
+					"name": "Crobat",
+					"groupId": "air-predator-crobat",
+					"animations": {
+						"walk": {
+							"spriteSheet": "sprites/air/predator/crobat/Walk-Anim.png",
+							"frameWidth": 40,
+							"frameHeight": 56,
+							"frameCount": 8,
+							"frameDurations": [6, 6, 6, 6, 6, 6, 6, 6],
+							"defaultFrameRate": 10
+						},
+						"attack": {
+							"spriteSheet": "sprites/air/predator/crobat/Attack-Anim.png",
+							"frameWidth": 72,
+							"frameHeight": 80,
+							"frameCount": 14,
+							"frameDurations": [2, 4, 1, 1, 1, 2, 2, 1, 2, 1, 2, 1, 2, 2],
+							"defaultFrameRate": 15,
+							"rushFrame": 1,
+							"hitFrame": 5,
+							"returnFrame": 7
+						},
+						"hurt": {
+							"spriteSheet": "sprites/air/predator/crobat/Hurt-Anim.png",
+							"frameWidth": 48,
+							"frameHeight": 72,
+							"frameCount": 2,
+							"frameDurations": [2, 8],
+							"defaultFrameRate": 10
+						}
+					},
+					"attackRadius": 40,
+					"scale": 2.0
+				}
+			],
+			"prey": [
+				{
+					"id": "zubat",
+					"name": "Zubat",
+					"groupId": "air-prey-zubat",
+					"animations": {
+						"walk": {
+							"spriteSheet": "sprites/air/prey/zubat/Walk-Anim.png",
+							"frameWidth": 32,
+							"frameHeight": 56,
+							"frameCount": 8,
+							"frameDurations": [6, 6, 6, 6, 6, 6, 6, 6],
+							"defaultFrameRate": 10
+						},
+						"attack": {
+							"spriteSheet": "sprites/air/prey/zubat/Attack-Anim.png",
+							"frameWidth": 72,
+							"frameHeight": 80,
+							"frameCount": 11,
+							"frameDurations": [2, 3, 4, 1, 1, 1, 2, 2, 2, 2, 2],
+							"defaultFrameRate": 15,
+							"rushFrame": 2,
+							"hitFrame": 4,
+							"returnFrame": 7
+						},
+						"hurt": {
+							"spriteSheet": "sprites/air/prey/zubat/Hurt-Anim.png",
+							"frameWidth": 40,
+							"frameHeight": 48,
+							"frameCount": 2,
+							"frameDurations": [2, 8],
+							"defaultFrameRate": 10
+						}
+					},
+					"attackRadius": 30,
+					"scale": 2.0
+				}
+			]
+		},
+		"land": {
+			"predator": [],
+			"prey": []
+		},
+		"water": {
+			"predator": [],
+			"prey": []
+		}
+	},
+	"backgrounds": {
+		"air": "day-sky.jpg",
+		"land": "grassland.jpg",
+		"water": "ocean.jpg"
+	}
+}
