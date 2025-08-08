@@ -32,22 +32,26 @@
 
 <ScrollArea.Root class="h-60 max-h-80">
 	{#if selectedEventId !== null && details}
-		<div class="mb-2 flex items-center justify-between">
-			<h3 class="font-semibold">
-				Event Details
-				<Badge variant="outline" class="ml-2">
+		<div class="mb-2">
+			<h3 class="mb-2 font-semibold">Event Details</h3>
+			<div class="mr-2 flex items-center justify-between gap-2">
+				<Badge
+					variant="outline"
+					class="max-w-32 truncate font-mono text-xs"
+					title={selectedEventId}
+				>
 					{selectedEventId}
 				</Badge>
-			</h3>
-			<Button
-				variant="ghost"
-				size="icon"
-				class="h-8 w-8"
-				onclick={copyToClipboard}
-				title="Copy data"
-			>
-				<Copy class="h-4 w-4" />
-			</Button>
+				<Button
+					variant="ghost"
+					size="icon"
+					class="h-8 w-8 shrink-0"
+					onclick={copyToClipboard}
+					title="Copy data"
+				>
+					<Copy class="h-4 w-4" />
+				</Button>
+			</div>
 		</div>
 		<pre
 			class="overflow-x-auto whitespace-pre-wrap rounded-md bg-muted/50 p-3 font-mono text-xs">{details.formattedData}</pre>
