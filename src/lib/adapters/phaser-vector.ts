@@ -106,7 +106,11 @@ export class PhaserVector implements IVector2 {
 		return this;
 	}
 
-	angle(other: IVector2): number {
+	angle(): number {
+		return Math.atan2(this.y, this.x);
+	}
+
+	angleTo(other: IVector2): number {
 		return Math.atan2(other.y - this.y, other.x - this.x);
 	}
 
