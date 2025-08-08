@@ -22,7 +22,7 @@
 <DropdownMenu.Root>
 	<DropdownMenu.Trigger class={cn(buttonVariants({ variant, size }), 'rounded-lg')}>
 		<div class="relative">
-			{#each [Sun, Moon] as Icon, index (Icon.name || index)}
+			{#each [Sun, Moon] as Icon, index (index)}
 				<Icon
 					class={cn(
 						'h-12 w-12 transition-all duration-300 ease-in-out',

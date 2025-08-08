@@ -1,4 +1,4 @@
-import { v4 as UUIDv4 } from 'uuid';
+import { generateId, generatePrefixedId } from '$utils/uuid';
 import type { IVector2 } from '$interfaces/vector';
 import { BoidVariant, isPredator, type BoidStats } from '$boid/types';
 import type { IBoid, IBoidDependencies } from '$interfaces/boid';
@@ -37,8 +37,8 @@ export class BoidBehavior {
 		y: number,
 		private variant: BoidVariant
 	) {
-		this.id = UUIDv4();
-		this.groupId = `behavior-${variant}-${UUIDv4().slice(0, 8)}`;
+		this.id = generateId();
+		this.groupId = generatePrefixedId(`behavior-${variant}`);
 
 		// Initialize vectors
 		this.position = deps.vectorFactory.create(x, y);

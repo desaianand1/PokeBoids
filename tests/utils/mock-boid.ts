@@ -4,6 +4,7 @@ import type { IVector2 } from '$interfaces/vector';
 import { TestVectorFactory } from '$tests/implementations/vector';
 import { TEST_BOID_CONFIG, TEST_PREDATOR_CONFIG, TEST_BOID_STATS } from '$tests/utils/constants';
 import { vi } from 'vitest';
+import { generatePrefixedId } from '$utils/uuid';
 
 /**
  * Creates a mock boid for testing
@@ -21,9 +22,9 @@ export function createMockBoid(x: number, y: number, variant: BoidVariant): IBoi
 		);
 
 	return {
-		getId: vi.fn().mockReturnValue(`mock-boid-${x}-${y}`),
+		getId: vi.fn().mockReturnValue(generatePrefixedId('mock-boid')),
 		getVariant: vi.fn().mockReturnValue(variant),
-		getGroupId: vi.fn().mockReturnValue(`mock-group-${variant}`),
+		getGroupId: vi.fn().mockReturnValue(generatePrefixedId(`mock-group-${variant}`)),
 
 		getBoidPosition: vi.fn().mockReturnValue(position),
 		setBoidPosition: vi.fn().mockImplementation((pos: IVector2) => {
