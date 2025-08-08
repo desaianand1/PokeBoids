@@ -27,7 +27,7 @@ export function createGame(containerId: string, options: GameOptions = {}): Boid
 		parent: containerId,
 		width: window.innerWidth,
 		height: window.innerHeight,
-		backgroundColor: '#80EF80',
+		backgroundColor: '#000',
 		physics: {
 			default: 'arcade',
 			arcade: {
