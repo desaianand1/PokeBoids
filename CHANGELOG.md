@@ -1,3 +1,15 @@
+# [1.1.0](https://github.com/desaianand1/PokeBoids/compare/v1.0.1...v1.1.0) (2025-08-08)
+
+
+### Bug Fixes
+
+* ammend bg preloader path ([c5a3844](https://github.com/desaianand1/PokeBoids/commit/c5a3844e1a7323ccb81e048c94af0232504e41ea))
+
+
+### Features
+
+* implement professional splash screen with real-time loading ([d02e188](https://github.com/desaianand1/PokeBoids/commit/d02e1888222bf05fa8490b17e0c9c30aa1559822))
+
 ## [1.0.1](https://github.com/desaianand1/PokeBoids/compare/v1.0.0...v1.0.1) (2025-08-08)
 
 
