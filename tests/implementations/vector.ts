@@ -109,6 +109,10 @@ export class TestVector implements IVector2 {
 	setLength(length: number): IVector2 {
 		return this.normalize().scale(length);
 	}
+
+	angle(): number {
+		return Math.atan2(this.y, this.x);
+	}
 }
 
 /**

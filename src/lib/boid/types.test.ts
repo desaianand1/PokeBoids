@@ -27,7 +27,9 @@ const createMockBoid = (variant: BoidVariant, stats: BoidStats): IBoid => ({
 	update: () => {},
 	destroy: () => {},
 	getFieldOfViewAngle: () => Math.PI / 3,
-	isInFieldOfView: () => false
+	isInFieldOfView: () => false,
+	getGroupId: () => 'test-group',
+	showCollisionEffect: () => {}
 });
 
 describe('Boid Types', () => {

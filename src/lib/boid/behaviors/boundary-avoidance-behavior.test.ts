@@ -20,6 +20,8 @@ describe('BoundaryAvoidanceBehavior', () => {
 			TEST_BOID_CONFIG.boundaryForceMultiplier.default,
 			TEST_BOID_CONFIG.boundaryForceRamp.default,
 			TEST_BOID_CONFIG.boundaryMargin.default,
+			'collidable',
+			3000,
 			eventBus
 		);
 	});
