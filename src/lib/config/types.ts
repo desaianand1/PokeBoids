@@ -43,6 +43,7 @@ interface SimulationConfigValues {
 
 	// Environment settings
 	obstacleCount: number;
+	simulationFlavor: string; // 'air' | 'land' | 'water'
 
 	// Statistics tracking
 	trackStats: boolean;

@@ -35,6 +35,7 @@ const DEFAULT_SIMULATION_CONFIG: SimulationConfig = {
 	initialPreyCount: { default: 100, min: 0, max: 500, step: 1 },
 	initialPredatorCount: { default: 5, min: 0, max: 500, step: 1 },
 	obstacleCount: { default: 0, min: 0, max: 20, step: 1 },
+	simulationFlavor: { default: 'air' },
 	trackStats: { default: true },
 	boundaryMode: { default: 'collidable' },
 	boundaryStuckThreshold: { default: 3000, min: 1000, max: 10000, step: 500 }
@@ -75,6 +76,7 @@ const simConfigValues = $derived({
 	initialPreyCount: simulationConfig.initialPreyCount.default,
 	initialPredatorCount: simulationConfig.initialPredatorCount.default,
 	obstacleCount: simulationConfig.obstacleCount.default,
+	simulationFlavor: simulationConfig.simulationFlavor.default,
 	trackStats: simulationConfig.trackStats.default,
 	boundaryMode: simulationConfig.boundaryMode.default,
 	boundaryStuckThreshold: simulationConfig.boundaryStuckThreshold.default
@@ -117,6 +119,7 @@ $effect.root(() => {
 		EventBus.emit('initial-prey-count-changed', { value: values.initialPreyCount });
 		EventBus.emit('initial-predator-count-changed', { value: values.initialPredatorCount });
 		EventBus.emit('obstacle-count-changed', { value: values.obstacleCount });
+		EventBus.emit('simulation-flavor-changed', { flavor: values.simulationFlavor });
 		EventBus.emit('track-stats-changed', { value: values.trackStats });
 		EventBus.emit('boundary-mode-changed', { value: values.boundaryMode as BoundaryMode });
 		EventBus.emit('boundary-stuck-threshold-changed', { value: values.boundaryStuckThreshold });
