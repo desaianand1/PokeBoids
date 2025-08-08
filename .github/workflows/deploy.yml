@@ -1,7 +1,9 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
+  workflow_run:
+    workflows: ['CI/CD Pipeline']
+    types: [completed]
     branches: [main]
 
 permissions:
@@ -21,38 +23,61 @@ jobs:
   deploy:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.message, 'chore(release):')
+    if: github.event.workflow_run.conclusion == 'success'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Check if release was created
+        id: check_release
+        run: |
+          # Get the latest commit message from main branch
+          LATEST_COMMIT_MSG=$(git log -1 --pretty=format:"%s")
+          echo "Latest commit: $LATEST_COMMIT_MSG"
+
+          if [[ $LATEST_COMMIT_MSG == chore\(release\):* ]]; then
+            echo "release_created=true" >> $GITHUB_OUTPUT
+            echo "Release commit detected - proceeding with deployment"
+          else
+            echo "release_created=false" >> $GITHUB_OUTPUT  
+            echo "No release commit found - skipping deployment"
+          fi
 
       - name: Setup pnpm
+        if: steps.check_release.outputs.release_created == 'true'
         uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
+        if: steps.check_release.outputs.release_created == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
 
       - name: Install dependencies
+        if: steps.check_release.outputs.release_created == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Build application
+        if: steps.check_release.outputs.release_created == 'true'
         run: pnpm build
         env:
           BASE_PATH: '/PokeBoids'
 
       - name: Upload pages artifact
+        if: steps.check_release.outputs.release_created == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: build/
 
       - name: Deploy to GitHub Pages
+        if: steps.check_release.outputs.release_created == 'true'
         id: deployment
         uses: actions/deploy-pages@v4
