@@ -1,7 +1,6 @@
 # PokéBoids
 
-[![CI](https://github.com/desaianand1/PokeBoids/actions/workflows/ci.yml/badge.svg)](https://github.com/desaianand1/PokeBoids/actions/workflows/ci.yml)
-[![Deploy](https://github.com/desaianand1/PokeBoids/actions/workflows/deploy.yml/badge.svg)](https://github.com/desaianand1/PokeBoids/actions/workflows/deploy.yml)
+[![CI](https://github.com/desaianand1/PokeBoids/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/desaianand1/PokeBoids/actions/workflows/ci-cd.yml)
 [![Svelte](https://img.shields.io/badge/Svelte-%23f1413d.svg?logo=svelte&logoColor=white)](https://svelte.dev)
 [![Phaser](https://img.shields.io/badge/Phaser.js-000?logo=gamemaker&logoColor=fff)](https://phaser.io)
 
