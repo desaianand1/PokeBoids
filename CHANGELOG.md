@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/desaianand1/PokeBoids/compare/v1.1.1...v1.1.2) (2025-08-08)
+
+
+### Bug Fixes
+
+* **ci:** remove persist-credentials false to enable PAT authentication ([b9b6ff3](https://github.com/desaianand1/PokeBoids/commit/b9b6ff300b660bae0184b377085814a22cb4ad5c))
+
 ## [1.1.1](https://github.com/desaianand1/PokeBoids/compare/v1.1.0...v1.1.1) (2025-08-08)
 
 
