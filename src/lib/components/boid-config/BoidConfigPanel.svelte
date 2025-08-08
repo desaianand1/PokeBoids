@@ -119,12 +119,16 @@
 		<AlertDialogHeader>
 			<AlertDialogTitle>Reset Boid Parameters?</AlertDialogTitle>
 			<AlertDialogDescription>
-				This will reset all boid behavior parameters to their default values. Changes will apply immediately to all existing boids.
+				This will reset all boid behavior parameters to their default values. Changes will apply
+				immediately to all existing boids.
 			</AlertDialogDescription>
 		</AlertDialogHeader>
 		<AlertDialogFooter>
 			<AlertDialogCancel onclick={() => (defaultsDialogOpen = false)}>Cancel</AlertDialogCancel>
-			<AlertDialogAction class="bg-destructive" onclick={confirmDefaults}>Reset to Defaults</AlertDialogAction>
+			<AlertDialogAction
+				class="bg-destructive transition-colors duration-300 ease-in-out hover:bg-red-400 dark:hover:bg-red-700"
+				onclick={confirmDefaults}>Reset to Defaults</AlertDialogAction
+			>
 		</AlertDialogFooter>
 	</AlertDialogContent>
 </AlertDialog>

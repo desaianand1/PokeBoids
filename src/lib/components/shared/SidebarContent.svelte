@@ -89,7 +89,7 @@
 	>
 		<span class="flex items-center justify-center gap-4 p-2">
 			<ThemeSwitcher variant="outline" size="icon" />
-			<Badge variant="outline" class="py-2 font-mono text-xs">Boids Simulation</Badge>
+			<Badge variant="outline" class="py-2 font-mono text-xs">&copy; 2025 Anand Desai</Badge>
 		</span>
 		<span class="flex items-center gap-1 text-secondary">
 			{formatVersion()}

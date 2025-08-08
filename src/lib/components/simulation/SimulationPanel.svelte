@@ -197,7 +197,7 @@
 			<TabsContent value="fun" class="mt-4 space-y-4">
 				<!-- Environment Flavor Section -->
 				<div class="space-y-2">
-					<h3 class="mb-2 text-sm font-medium text-muted-foreground">Environment</h3>
+					<h3 class="mb-2 text-sm font-medium text-muted-foreground">Environment Flavor</h3>
 					<div class="p-2">
 						<FlavorControls
 							currentFlavor={simulationConfig.simulationFlavor.default as SimulationFlavor}
@@ -221,14 +221,17 @@
 		<AlertDialogHeader>
 			<AlertDialogTitle>Change Environment?</AlertDialogTitle>
 			<AlertDialogDescription>
-				Changing the environment will reset the simulation and switch to {pendingFlavor} sprites and
-				background. All current boids will be recreated. Continue?
+				This will <span class="font-semibold text-destructive">restart the simulation</span> and
+				switch to <span class="font-semibold uppercase text-primary">{pendingFlavor}</span> themed sprites
+				and background. All current boids will be recreated. Continue?
 			</AlertDialogDescription>
 		</AlertDialogHeader>
 		<AlertDialogFooter>
 			<AlertDialogCancel onclick={() => (flavorDialogOpen = false)}>Cancel</AlertDialogCancel>
-			<AlertDialogAction class="bg-destructive" onclick={confirmFlavorChange}
-				>Change Environment</AlertDialogAction
+			<AlertDialogAction
+				class="bg-destructive transition-colors duration-300 ease-in-out hover:bg-red-400 dark:hover:bg-red-700"
+				onclick={confirmFlavorChange}
+				>Change to<span class="capitalize">{pendingFlavor}</span></AlertDialogAction
 			>
 		</AlertDialogFooter>
 	</AlertDialogContent>
@@ -237,15 +240,18 @@
 <AlertDialog bind:open={resetDialogOpen}>
 	<AlertDialogContent>
 		<AlertDialogHeader>
-			<AlertDialogTitle>Reset Simulation?</AlertDialogTitle>
+			<AlertDialogTitle>Restart Simulation?</AlertDialogTitle>
 			<AlertDialogDescription>
-				This will restart the simulation with current settings. All boids will be recreated and
-				positioned randomly.
+				This will <span class="font-semibold text-destructive">restart the simulation</span> with current
+				settings. All boids will be recreated and positioned randomly.
 			</AlertDialogDescription>
 		</AlertDialogHeader>
 		<AlertDialogFooter>
 			<AlertDialogCancel onclick={() => (resetDialogOpen = false)}>Cancel</AlertDialogCancel>
-			<AlertDialogAction class="bg-destructive" onclick={confirmReset}>Reset</AlertDialogAction>
+			<AlertDialogAction
+				class="bg-destructive transition-colors duration-300 ease-in-out hover:bg-red-400 dark:hover:bg-red-700"
+				onclick={confirmReset}>Reset</AlertDialogAction
+			>
 		</AlertDialogFooter>
 	</AlertDialogContent>
 </AlertDialog>
@@ -255,13 +261,15 @@
 		<AlertDialogHeader>
 			<AlertDialogTitle>Reset to Defaults?</AlertDialogTitle>
 			<AlertDialogDescription>
-				This will reset all simulation settings to their default values and restart the simulation.
+				This will <span class="font-semibold text-destructive">reset ALL simulation settings</span> to
+				their default values AND restart the simulation.
 			</AlertDialogDescription>
 		</AlertDialogHeader>
 		<AlertDialogFooter>
 			<AlertDialogCancel onclick={() => (defaultsDialogOpen = false)}>Cancel</AlertDialogCancel>
-			<AlertDialogAction class="bg-destructive" onclick={confirmDefaults}
-				>Reset to Defaults</AlertDialogAction
+			<AlertDialogAction
+				class="bg-destructive transition-colors duration-300 ease-in-out hover:bg-red-400 dark:hover:bg-red-700"
+				onclick={confirmDefaults}>Reset to Defaults</AlertDialogAction
 			>
 		</AlertDialogFooter>
 	</AlertDialogContent>

@@ -29,7 +29,9 @@
 					{/if}
 				</Button>
 			</TooltipTrigger>
-			<TooltipContent class="bg-background text-foreground border border-muted">{isPlaying ? 'Pause' : 'Resume'}</TooltipContent>
+			<TooltipContent class="border border-muted bg-background text-foreground"
+				>{isPlaying ? 'Pause' : 'Resume'}</TooltipContent
+			>
 		</Tooltip>
 		<Tooltip>
 			<TooltipTrigger>
@@ -37,7 +39,8 @@
 					<RotateCcw class="h-6 w-6" />
 				</Button>
 			</TooltipTrigger>
-			<TooltipContent class="bg-destructive text-destructive-foreground"
+			<TooltipContent
+				class="bg-destructive text-destructive-foreground transition-colors duration-300 ease-in-out hover:bg-red-400 dark:hover:bg-red-700"
 				>Reset Simulation</TooltipContent
 			>
 		</Tooltip>
