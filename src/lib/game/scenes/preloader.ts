@@ -7,12 +7,7 @@ export class Preloader extends Scene {
 	}
 
 	init() {
-		const [x, y, barWidth, barHeight] = [
-			this.scale.width / 2,
-			this.scale.height / 2,
-			512,
-			32
-		];
+		const [x, y, barWidth, barHeight] = [this.scale.width / 2, this.scale.height / 2, 512, 32];
 
 		// Calculate the left edge of the progress bar
 		const barX = x - barWidth / 2;
@@ -21,8 +16,7 @@ export class Preloader extends Scene {
 		this.add.rectangle(x, y, barWidth, barHeight).setStrokeStyle(1, 0xffffff);
 
 		// This is the progress bar itself, positioned at the left edge
-		const bar = this.add.rectangle(barX, y, 0, barHeight - 4, 0xffffff)
-			.setOrigin(0, 0.5); // Set origin to left-center
+		const bar = this.add.rectangle(barX, y, 0, barHeight - 4, 0xffffff).setOrigin(0, 0.5); // Set origin to left-center
 
 		// Use the 'progress' event emitted by the LoaderPlugin to update the loading bar
 		this.load.on('progress', (progress: number) => {
@@ -50,7 +44,7 @@ export class Preloader extends Scene {
 		// Stage 1: Load sprite configuration JSON only
 		const spriteManager = BoidSpriteManager.getInstance();
 		spriteManager.loadSpriteDatabase(this.load);
-		
+
 		// Note: Sprite sheets will be loaded dynamically in create() after JSON is parsed
 	}
 
@@ -58,11 +52,11 @@ export class Preloader extends Scene {
 		// Stage 2: Parse JSON config and load sprite sheets dynamically
 		const spriteManager = BoidSpriteManager.getInstance();
 		const spriteConfig = this.cache.json.get('sprite-config');
-		
+
 		if (spriteConfig) {
 			console.log('Loading sprites dynamically from config...');
 			spriteManager.initializeFromJSON(spriteConfig);
-			
+
 			// Load sprite sheets for air environment (and others when available)
 			this.loadSpritesFromConfig(spriteConfig);
 		} else {
@@ -71,18 +65,20 @@ export class Preloader extends Scene {
 		}
 	}
 
-	private hasSprites(flavorConfig: any): boolean {
+	private hasSprites(flavorConfig: { predator: unknown[]; prey: unknown[] }): boolean {
 		return flavorConfig.predator.length > 0 || flavorConfig.prey.length > 0;
 	}
 
-	private loadSpritesFromConfig(config: any) {
+	private loadSpritesFromConfig(config: {
+		sprites: Record<string, { predator: unknown[]; prey: unknown[] }>;
+	}) {
 		// Track number of sprites to load
 		let spritesToLoad = 0;
 		let spritesLoaded = 0;
 
 		// Count sprites to load from all environments
 		const environments = ['air', 'land', 'water'] as const;
-		environments.forEach(env => {
+		environments.forEach((env) => {
 			if (config.sprites[env] && this.hasSprites(config.sprites[env])) {
 				spritesToLoad += config.sprites[env].predator.length + config.sprites[env].prey.length;
 			}
@@ -101,7 +97,7 @@ export class Preloader extends Scene {
 		};
 
 		// Load sprites for all available environments
-		environments.forEach(env => {
+		environments.forEach((env) => {
 			if (config.sprites[env] && this.hasSprites(config.sprites[env])) {
 				console.log(`Loading sprites for ${env} environment`);
 				this.loadFlavorSprites(config.sprites[env], onSpriteLoaded);
@@ -115,24 +111,25 @@ export class Preloader extends Scene {
 		}
 	}
 
-	private loadFlavorSprites(flavorConfig: any, onLoaded: () => void) {
-		const spriteManager = BoidSpriteManager.getInstance();
-
+	private loadFlavorSprites(
+		flavorConfig: { predator: unknown[]; prey: unknown[] },
+		onLoaded: () => void
+	) {
 		// Load predator sprites
-		flavorConfig.predator.forEach((sprite: any) => {
+		flavorConfig.predator.forEach((sprite: unknown) => {
 			this.loadSpriteAnimations(sprite, onLoaded);
 		});
 
 		// Load prey sprites
-		flavorConfig.prey.forEach((sprite: any) => {
+		flavorConfig.prey.forEach((sprite: unknown) => {
 			this.loadSpriteAnimations(sprite, onLoaded);
 		});
 	}
 
-	private loadSpriteAnimations(sprite: any, onLoaded: () => void) {
+	private loadSpriteAnimations(sprite: unknown, onLoaded: () => void) {
 		const animations = ['walk', 'attack', 'hurt'];
 
-		animations.forEach(animType => {
+		animations.forEach((animType) => {
 			const animConfig = sprite.animations[animType];
 			const key = `${sprite.id}-${animType}`;
 
@@ -150,24 +147,24 @@ export class Preloader extends Scene {
 		this.load.start();
 	}
 
-	private createAnimationsFromConfig(config: any) {
+	private createAnimationsFromConfig(config: unknown) {
 		// Create animations for all loaded environments
 		const environments = ['air', 'land', 'water'] as const;
-		environments.forEach(env => {
+		environments.forEach((env) => {
 			if (config.sprites[env] && this.hasSprites(config.sprites[env])) {
 				console.log(`Creating animations for ${env} environment`);
-				[...config.sprites[env].predator, ...config.sprites[env].prey].forEach(sprite => {
+				[...config.sprites[env].predator, ...config.sprites[env].prey].forEach((sprite) => {
 					this.createSpriteAnimations(sprite);
 				});
 			}
 		});
 	}
 
-	private createSpriteAnimations(spriteConfig: any) {
+	private createSpriteAnimations(spriteConfig: unknown) {
 		const animations = ['walk', 'attack', 'hurt'];
 		console.log(`Creating animations for ${spriteConfig.id}...`);
 
-		animations.forEach(animType => {
+		animations.forEach((animType) => {
 			const animConfig = spriteConfig.animations[animType];
 
 			for (let direction = 0; direction < 8; direction++) {
@@ -179,19 +176,21 @@ export class Preloader extends Scene {
 					// PMD sprites: each row is a direction, each column is a frame
 					// Total columns in sprite sheet = frameCount (frames per direction)
 					const totalColumns = animConfig.frameCount;
-					
+
 					// For each direction row, select all frames in that row
 					const startFrame = direction * totalColumns;
 					const endFrame = startFrame + (totalColumns - 1);
 
-					console.log(`Creating animation ${key}: frames ${startFrame}-${endFrame} (direction ${direction}, ${totalColumns} frames per direction)`);
+					console.log(
+						`Creating animation ${key}: frames ${startFrame}-${endFrame} (direction ${direction}, ${totalColumns} frames per direction)`
+					);
 
 					this.anims.create({
 						key,
-						frames: this.anims.generateFrameNumbers(
-							`${spriteConfig.id}-${animType}`,
-							{ start: startFrame, end: endFrame }
-						),
+						frames: this.anims.generateFrameNumbers(`${spriteConfig.id}-${animType}`, {
+							start: startFrame,
+							end: endFrame
+						}),
 						frameRate: animConfig.defaultFrameRate,
 						repeat: animType === 'walk' ? -1 : 0
 					});

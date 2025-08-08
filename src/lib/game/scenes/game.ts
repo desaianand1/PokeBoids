@@ -8,6 +8,7 @@ import { DebugManager } from '$game/managers/debug-manager';
 import { EffectsManager } from '$game/managers/effects-manager';
 import { getBoidConfig, getSimulationConfig } from '$config/simulation-signals.svelte';
 import { createCompleteDependencies } from '$adapters';
+import type { SimulationFlavor } from '$boid/animation/types';
 import { EventBus } from '$events/event-bus';
 import type { BoidConfig, BoundaryMode, SimulationConfig } from '$config/types';
 import type { IFlockingConfig } from '$interfaces/flocking';
@@ -104,19 +105,19 @@ export class Game extends Scene {
 		this.eventEmitter.on('simulation-config-changed', ({ config }) => {
 			this.simulationConfig = config;
 			this.obstacleManager.updateObstacles(config.obstacleCount.default);
-			
+
 			// Update background when flavor changes
 			if (config.simulationFlavor) {
-				this.backgroundManager.updateFlavor(config.simulationFlavor.default);
+				this.backgroundManager.updateFlavor(config.simulationFlavor.default as SimulationFlavor);
 			}
 		});
 
 		// Debug events
 		this.eventEmitter.on('debug-toggle', ({ enabled }) => this.debugManager.setEnabled(enabled));
-		
+
 		// Theme change events (connect to mode-watcher if needed)
-		this.eventEmitter.on('theme-changed', ({ isDark }) => {
-			this.backgroundManager.updateTheme(isDark);
+		this.eventEmitter.on('theme-changed', (data: { isDark: boolean }) => {
+			this.backgroundManager.updateTheme(data.isDark);
 		});
 
 		// Collision events

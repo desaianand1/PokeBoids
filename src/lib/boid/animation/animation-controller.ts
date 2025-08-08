@@ -27,9 +27,9 @@ export class BoidAnimationController {
 	 */
 	private cacheAnimationKeys(): void {
 		const animTypes: AnimationType[] = ['walk', 'attack', 'hurt'];
-		
+
 		// For each animation type and direction, create a key
-		animTypes.forEach(animType => {
+		animTypes.forEach((animType) => {
 			for (let dir = 0; dir < 8; dir++) {
 				const key = `${this.config.id}-${animType}-${dir}`;
 				this.animationKeys.set(`${animType}-${dir}`, key);
@@ -37,21 +37,20 @@ export class BoidAnimationController {
 		});
 	}
 
-
 	/**
 	 * Update animation based on velocity vector
 	 */
 	updateDirection(velocity: IVector2): void {
 		// Calculate direction from velocity vector
 		const angle = Math.atan2(velocity.y, velocity.x);
-		
+
 		// PMD sprite direction order (rows 0-7): down, down-right, right, up-right, up, up-left, left, down-left
 		// Map angles directly to these directions
 		let direction: number;
-		
+
 		// Convert angle to degrees for easier calculation
-		const degrees = (angle * 180 / Math.PI + 360) % 360;
-		
+		const degrees = ((angle * 180) / Math.PI + 360) % 360;
+
 		// Map angle ranges to PMD sprite directions
 		if (degrees >= 337.5 || degrees < 22.5) {
 			direction = 2; // right
@@ -67,12 +66,13 @@ export class BoidAnimationController {
 			direction = 5; // up-left
 		} else if (degrees >= 247.5 && degrees < 292.5) {
 			direction = 4; // up
-		} else { // 292.5 to 337.5
+		} else {
+			// 292.5 to 337.5
 			direction = 3; // up-right
 		}
-		
+
 		this.currentDirection = direction;
-		
+
 		// Always update direction immediately to match velocity
 		// Only animation TYPE (walk/attack/hurt) should respect interruptibility, not direction
 		this.playAnimation(this.animationState.current);
@@ -94,13 +94,11 @@ export class BoidAnimationController {
 		// Only play if not already playing this exact animation
 		if (this.sprite.anims.currentAnim?.key !== animKey) {
 			try {
-				// Store current position and scale before changing animation
-				const currentX = this.sprite.x;
-				const currentY = this.sprite.y;
+				// Store current scale before changing animation
 				const currentScale = this.sprite.scale;
-				
+
 				this.sprite.play(animKey);
-				
+
 				// Ensure consistent origin and scale after animation change
 				this.sprite.setOrigin(0, 0);
 				this.sprite.setScale(currentScale);
@@ -140,7 +138,7 @@ export class BoidAnimationController {
 			current: 'attack',
 			isInterruptible: false
 		};
-		
+
 		const animKey = this.animationKeys.get(`attack-${this.currentDirection}`);
 		if (!animKey || !this.sprite.scene.anims.exists(animKey)) {
 			console.warn(`Attack animation ${animKey} not available`);
@@ -151,7 +149,7 @@ export class BoidAnimationController {
 
 		try {
 			this.sprite.play(animKey);
-			
+
 			// Set up completion handler
 			this.sprite.once('animationcomplete', () => {
 				if (onComplete) onComplete();
@@ -173,7 +171,7 @@ export class BoidAnimationController {
 			current: 'hurt',
 			isInterruptible: false
 		};
-		
+
 		const animKey = this.animationKeys.get(`hurt-${this.currentDirection}`);
 		if (!animKey || !this.sprite.scene.anims.exists(animKey)) {
 			console.warn(`Hurt animation ${animKey} not available`);
@@ -184,7 +182,7 @@ export class BoidAnimationController {
 
 		try {
 			this.sprite.play(animKey);
-			
+
 			// Set up completion handler
 			this.sprite.once('animationcomplete', () => {
 				if (onComplete) onComplete();
@@ -205,7 +203,7 @@ export class BoidAnimationController {
 		if (this.animationState.queuedAnimation) {
 			const queued = this.animationState.queuedAnimation;
 			this.animationState.queuedAnimation = undefined;
-			
+
 			if (queued === 'walk') {
 				this.playWalk();
 			}
@@ -227,10 +225,10 @@ export class BoidAnimationController {
 	 */
 	isAtHitFrame(): boolean {
 		if (this.animationState.current !== 'attack') return false;
-		
+
 		const currentFrame = this.sprite.anims.currentFrame;
 		if (!currentFrame) return false;
-		
+
 		const hitFrame = this.config.animations.attack.hitFrame;
 		return hitFrame !== undefined && currentFrame.index === hitFrame;
 	}

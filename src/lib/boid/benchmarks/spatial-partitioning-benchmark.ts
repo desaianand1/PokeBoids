@@ -20,7 +20,9 @@ export function runBenchmark(): void {
 		separationRadius: 50,
 		boundaryMargin: 50,
 		boundaryForceMultiplier: 2.0,
-		boundaryForceRamp: 2.5
+		boundaryForceRamp: 2.5,
+		boundaryMode: 'collidable' as const,
+		boundaryStuckThreshold: 3000
 	};
 
 	// Create flock logic
@@ -78,7 +80,9 @@ export function getBenchmarkResults(): {
 		separationRadius: 50,
 		boundaryMargin: 50,
 		boundaryForceMultiplier: 2.0,
-		boundaryForceRamp: 2.5
+		boundaryForceRamp: 2.5,
+		boundaryMode: 'collidable' as const,
+		boundaryStuckThreshold: 3000
 	};
 
 	const flockLogic = new FlockLogic(vectorFactory, eventBus, config);
