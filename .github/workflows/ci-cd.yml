@@ -150,6 +150,8 @@ jobs:
           path: build/
 
   # Release - Only runs after ALL quality checks pass
+  # NOTE: Requires RELEASE_TOKEN secret (GitHub PAT) to trigger subsequent deploy job
+  # Default GITHUB_TOKEN cannot trigger workflows to prevent infinite loops
   release:
     name: Semantic Release
     needs: [lint, type-check, test, build]
@@ -178,11 +180,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Requires RELEASE_TOKEN secret: GitHub Personal Access Token with permissions:
+      # - contents: write (to create releases)
+      # - metadata: read (to read repository metadata)
+      # - pull-requests: write (to comment on PRs)
+      # - issues: write (to create/update issues)
       - name: Semantic Release
         id: semantic-release
         uses: cycjimmy/semantic-release-action@v4
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
           GIT_AUTHOR_NAME: github-actions[bot]
           GIT_AUTHOR_EMAIL: github-actions[bot]@users.noreply.github.com
           GIT_COMMITTER_NAME: github-actions[bot]
