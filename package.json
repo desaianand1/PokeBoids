@@ -15,7 +15,7 @@
 		"version:minor": "pnpm version minor",
 		"version:major": "pnpm version major",
 		"postversion": "pnpm exec node scripts/update-version.js",
-		"prepare": "svelte-kit sync && husky || echo 'Husky not installed'",
+		"prepare": "svelte-kit sync && node .husky/install.mjs",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"type-check": "svelte-check --tsconfig ./tsconfig.json",
