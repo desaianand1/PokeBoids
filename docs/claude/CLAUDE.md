@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 PokéBoids is an educational artificial life simulation implementing Craig Reynolds' classic boids algorithm with enhanced biological characteristics and predator-prey dynamics. Built with SvelteKit and Phaser 3, it visualizes emergent flocking behaviors using Pokémon sprites, serving as both an interactive learning tool for AI/ML concepts and a platform for behavioral experimentation.
 
 ### Key Goals
+
 - Demonstrate emergent behaviors in complex systems through interactive visualization
 - Model biological systems with realistic predator-prey dynamics
 - Provide educational value for students learning about AI and complex systems
@@ -15,6 +16,7 @@ PokéBoids is an educational artificial life simulation implementing Craig Reyno
 ## Development Commands
 
 ### Essential Commands
+
 - `pnpm dev` - Start development server with hot module replacement
 - `pnpm build` - Build production bundle
 - `pnpm preview` - Preview production build locally
@@ -25,14 +27,16 @@ PokéBoids is an educational artificial life simulation implementing Craig Reyno
 - `pnpm check` - Run SvelteKit sync and type checking
 
 ### Version Management
+
 - `pnpm version:patch` - Bump patch version
-- `pnpm version:minor` - Bump minor version  
+- `pnpm version:minor` - Bump minor version
 - `pnpm version:major` - Bump major version
 - After version bump, `scripts/update-version.js` auto-updates version across the codebase
 
 ## Architecture
 
 ### Design Philosophy
+
 The codebase follows a **separation of concerns** principle with framework-agnostic core logic. This allows the simulation algorithms to be independent of rendering frameworks, making the code more testable and maintainable.
 
 ### Core Systems
@@ -43,7 +47,7 @@ The codebase follows a **separation of concerns** principle with framework-agnos
    - `PhaserBoid` - Individual boid implementation with animation support and group IDs
    - Behaviors (`behaviors/`) - Modular behavior system using Strategy pattern:
      - `AlignmentBehavior` - Align velocity with neighbors
-     - `CohesionBehavior` - Move toward center of neighbors  
+     - `CohesionBehavior` - Move toward center of neighbors
      - `SeparationBehavior` - Avoid crowding
      - `BoundaryAvoidanceBehavior` - Handle world boundaries (supports multiple modes)
      - `CompositeBehavior` - Combines all behaviors with configurable weights
@@ -83,6 +87,7 @@ The codebase follows a **separation of concerns** principle with framework-agnos
 ### Adapter Pattern
 
 The project uses dependency injection via adapters (`src/lib/adapters/`) to decouple core logic from Phaser:
+
 - `phaser-vector.ts` - Vector math implementation
 - `phaser-system.ts` - System services (random, time, physics)
 - `phaser-events.ts` - Event emitter wrapper
@@ -97,11 +102,13 @@ The project uses dependency injection via adapters (`src/lib/adapters/`) to deco
 ## Testing Strategy
 
 Tests use Vitest with JSDOM environment. Key patterns:
+
 - Mock implementations in `tests/implementations/` for framework-agnostic testing
 - Unit tests alongside source files (`*.test.ts`)
 - Test utilities in `tests/utils/` for common setup
 
 Run specific test:
+
 ```bash
 pnpm test -- alignment-behavior
 ```
@@ -109,6 +116,7 @@ pnpm test -- alignment-behavior
 ## Path Aliases
 
 The project uses path aliases for clean imports:
+
 - `$components` → `src/lib/components`
 - `$boid` → `src/lib/boid`
 - `$game` → `src/lib/game`
@@ -123,6 +131,7 @@ The project uses path aliases for clean imports:
 ## Key Implementation Details
 
 ### Boid Behavior Flow
+
 1. `PhaserFlock.update()` called each frame
 2. `FlockLogic.update()` processes all boids:
    - Updates spatial partitioning (QuadTree)
@@ -132,20 +141,25 @@ The project uses path aliases for clean imports:
 3. `PhaserBoid.syncWithPhaser()` updates sprite positions and animations
 
 ### Field of View System
+
 The simulation implements biologically-inspired vision patterns:
+
 - **Predators**: Narrow FoV (70% of base) with extended perception range (130%)
 - **Prey**: Wide FoV (130% of base) with reduced perception range (80%)
 - Visual debugging available with FoV cone visualization
 - Configurable base FoV angle via UI controls
 
 ### Event-Driven Architecture
+
 - UI controls emit events → Game scene listens and updates
 - Game state changes emit events → UI components react
 - Decouples UI from game logic for maintainability
 - Type-safe event definitions prevent runtime errors
 
 ### Animation System
+
 The boids support 8-directional sprite animations with multiple states:
+
 - **Animation Controller**: Manages direction mapping from velocity vectors
 - **Sprite States**: walk (idle), attack, hurt with proper state machine
 - **Group-based Flocking**: Boids only flock with same-group members
@@ -153,6 +167,7 @@ The boids support 8-directional sprite animations with multiple states:
 - **Flavor Support**: Air, land, water environments with different sprite sets
 
 ### Performance Optimizations
+
 - QuadTree spatial partitioning for efficient neighbor queries (O(n log n) vs O(n²))
 - Animation key caching to avoid string concatenation in update loops
 - Group-based neighbor filtering reduces flocking calculations
@@ -162,6 +177,7 @@ The boids support 8-directional sprite animations with multiple states:
 ## Current Development Status
 
 ### Completed Features
+
 - Core flocking behaviors (alignment, cohesion, separation)
 - Framework-agnostic architecture with adapter pattern
 - Spatial partitioning for performance
@@ -177,6 +193,7 @@ The boids support 8-directional sprite animations with multiple states:
 - Semantic versioning system
 
 ### In Progress
+
 - Performance optimization for 60 FPS target
 - Attack/hurt animation triggers in predator-prey interactions
 - Advanced predator-prey dynamics with animation integration
@@ -184,6 +201,7 @@ The boids support 8-directional sprite animations with multiple states:
 - Leveling system implementation
 
 ### Known Issues
+
 - Frame rate drops with very large boid populations
 - Memory usage spikes during reproduction events
 - Some boundary collision edge cases
@@ -206,3 +224,8 @@ The boids support 8-directional sprite animations with multiple states:
    - Comprehensive test coverage
    - Clean separation of concerns
    - Type-safe event system
+
+4. **Commit Guidelines**
+   - NEVER add Claude as a contributor to commits
+   - NO mentions of Claude in commit messages or footers
+   - Use clean, conventional commit format only
