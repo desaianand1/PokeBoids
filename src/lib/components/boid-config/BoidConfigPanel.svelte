@@ -4,6 +4,16 @@
 	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$ui/tabs';
 	import { History, SlidersVertical } from '@lucide/svelte';
 	import {
+		AlertDialog,
+		AlertDialogAction,
+		AlertDialogCancel,
+		AlertDialogContent,
+		AlertDialogDescription,
+		AlertDialogFooter,
+		AlertDialogHeader,
+		AlertDialogTitle
+	} from '$ui/alert-dialog';
+	import {
 		getBoidConfig,
 		updateBoidConfig,
 		resetToDefaults
@@ -17,11 +27,21 @@
 
 	// State
 	let activeTab = $state('flocking');
+	let defaultsDialogOpen = $state(false);
 	const boidConfig = $derived(getBoidConfig());
 
 	// Helper function to create parameter update handler
 	function handleUpdate<K extends keyof BoidConfig>(key: K, value: BoidConfig[K]): void {
 		updateBoidConfig(key, value);
+	}
+
+	function handleDefaultsClick(): void {
+		defaultsDialogOpen = true;
+	}
+
+	function confirmDefaults(): void {
+		resetToDefaults();
+		defaultsDialogOpen = false;
 	}
 
 	function handleTabChange(value: string): void {
@@ -40,7 +60,7 @@
 				variant="destructive"
 				size="sm"
 				class="h-8 px-2 text-xs"
-				onclick={resetToDefaults}
+				onclick={handleDefaultsClick}
 				title="Reset to defaults"
 			>
 				<History class="mr-1 h-3.5 w-3.5" />
@@ -92,3 +112,19 @@
 		</Tabs>
 	</CardContent>
 </Card>
+
+<!-- Confirmation Dialog -->
+<AlertDialog bind:open={defaultsDialogOpen}>
+	<AlertDialogContent>
+		<AlertDialogHeader>
+			<AlertDialogTitle>Reset Boid Parameters?</AlertDialogTitle>
+			<AlertDialogDescription>
+				This will reset all boid behavior parameters to their default values. Changes will apply immediately to all existing boids.
+			</AlertDialogDescription>
+		</AlertDialogHeader>
+		<AlertDialogFooter>
+			<AlertDialogCancel onclick={() => (defaultsDialogOpen = false)}>Cancel</AlertDialogCancel>
+			<AlertDialogAction class="bg-destructive" onclick={confirmDefaults}>Reset to Defaults</AlertDialogAction>
+		</AlertDialogFooter>
+	</AlertDialogContent>
+</AlertDialog>

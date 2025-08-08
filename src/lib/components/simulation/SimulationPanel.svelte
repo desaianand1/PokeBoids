@@ -5,6 +5,17 @@
 	import { Switch } from '$ui/switch';
 	import { Cpu, History } from '@lucide/svelte';
 	import { MediaQuery } from 'svelte/reactivity';
+	import {
+		AlertDialog,
+		AlertDialogAction,
+		AlertDialogCancel,
+		AlertDialogContent,
+		AlertDialogDescription,
+		AlertDialogFooter,
+		AlertDialogHeader,
+		AlertDialogTitle,
+		AlertDialogTrigger
+	} from '$ui/alert-dialog';
 
 	import {
 		isSimulationPlaying,
@@ -26,7 +37,10 @@
 	import SpeedControls from '$components/simulation/SpeedControls.svelte';
 	import PopulationControls from '$components/simulation/PopulationControls.svelte';
 	import BoundaryModeControls from '$components/simulation/BoundaryModeControls.svelte';
+	import FlavorControls from '$components/simulation/FlavorControls.svelte';
 	import { Button } from '$ui/button';
+	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$ui/tabs';
+	import type { SimulationFlavor } from '$boid/animation/types';
 
 	// State
 	const { min: minSimSpeed, max: maxSimSpeed } = getSimulationSpeedRange();
@@ -43,6 +57,45 @@
 	): void {
 		updateSimulationConfig(key, value);
 	}
+
+	// Dialog state
+	let flavorDialogOpen = $state(false);
+	let resetDialogOpen = $state(false);
+	let defaultsDialogOpen = $state(false);
+	let pendingFlavor: SimulationFlavor | null = $state(null);
+
+	function handleFlavorChange(flavor: SimulationFlavor): void {
+		if (flavor !== simulationConfig.simulationFlavor.default) {
+			pendingFlavor = flavor;
+			flavorDialogOpen = true;
+		}
+	}
+
+	function confirmFlavorChange(): void {
+		if (pendingFlavor) {
+			updateSimulationConfig('simulationFlavor', { default: pendingFlavor });
+			pendingFlavor = null;
+		}
+		flavorDialogOpen = false;
+	}
+
+	function handleResetClick(): void {
+		resetDialogOpen = true;
+	}
+
+	function confirmReset(): void {
+		resetSimulation();
+		resetDialogOpen = false;
+	}
+
+	function handleDefaultsClick(): void {
+		defaultsDialogOpen = true;
+	}
+
+	function confirmDefaults(): void {
+		resetToDefaults();
+		defaultsDialogOpen = false;
+	}
 </script>
 
 <Card class="w-full shadow-md">
@@ -56,7 +109,7 @@
 		<!-- Playback Controls -->
 		<div class="flex flex-col items-center gap-4 lg:flex-row">
 			<!-- Playback Group -->
-			<PlaybackControls {isPlaying} onTogglePlayPause={togglePlayPause} onReset={resetSimulation} />
+			<PlaybackControls {isPlaying} onTogglePlayPause={togglePlayPause} onReset={handleResetClick} />
 
 			{#if isLargeScreen.current}
 				<Separator orientation="vertical" class="mx-0.5 h-8" />
@@ -93,7 +146,7 @@
 					variant="destructive"
 					size="sm"
 					class="h-8 px-2 text-xs"
-					onclick={resetToDefaults}
+					onclick={handleDefaultsClick}
 					title="Reset to defaults"
 				>
 					<History class="mr-1 h-3.5 w-3.5" />
@@ -102,33 +155,106 @@
 			</div>
 		</div>
 
-		<div class="space-y-2">
-			<h3 class="mb-2 text-sm font-medium text-muted-foreground">Population Settings</h3>
-			<div class="p-2">
-				<PopulationControls
-					initialPreyCount={simulationConfig.initialPreyCount}
-					initialPredatorCount={simulationConfig.initialPredatorCount}
-					obstacleCount={simulationConfig.obstacleCount}
-					onUpdate={handleUpdateConfig}
-				/>
-			</div>
-		</div>
-		<Separator class="my-2" />
-		<!-- Boundary Controls Section -->
-		<div class="space-y-2">
-			<h3 class="mb-2 text-sm font-medium text-muted-foreground">Boundary Settings</h3>
-			<div class="p-2">
-				<BoundaryModeControls
-					boundaryMode={simulationConfig.boundaryMode}
-					boundaryStuckThreshold={simulationConfig.boundaryStuckThreshold}
-					onUpdate={handleUpdateConfig}
-				/>
-			</div>
-		</div>
+		<!-- Tabbed Settings Interface -->
+		<Tabs value="general" class="w-full">
+			<TabsList class="grid w-full grid-cols-2">
+				<TabsTrigger value="general">General</TabsTrigger>
+				<TabsTrigger value="fun">Fun</TabsTrigger>
+			</TabsList>
+			
+			<TabsContent value="general" class="space-y-4 mt-4">
+				<!-- Population Settings -->
+				<div class="space-y-2">
+					<h3 class="mb-2 text-sm font-medium text-muted-foreground">Population Settings</h3>
+					<div class="p-2">
+						<PopulationControls
+							initialPreyCount={simulationConfig.initialPreyCount}
+							initialPredatorCount={simulationConfig.initialPredatorCount}
+							obstacleCount={simulationConfig.obstacleCount}
+							onUpdate={handleUpdateConfig}
+						/>
+					</div>
+				</div>
+				
+				<Separator class="my-2" />
+				
+				<!-- Boundary Controls Section -->
+				<div class="space-y-2">
+					<h3 class="mb-2 text-sm font-medium text-muted-foreground">Boundary Settings</h3>
+					<div class="p-2">
+						<BoundaryModeControls
+							boundaryMode={simulationConfig.boundaryMode}
+							boundaryStuckThreshold={simulationConfig.boundaryStuckThreshold}
+							onUpdate={handleUpdateConfig}
+						/>
+					</div>
+				</div>
+			</TabsContent>
+			
+			<TabsContent value="fun" class="space-y-4 mt-4">
+				<!-- Environment Flavor Section -->
+				<div class="space-y-2">
+					<h3 class="mb-2 text-sm font-medium text-muted-foreground">Environment</h3>
+					<div class="p-2">
+						<FlavorControls 
+							currentFlavor={simulationConfig.simulationFlavor.default}
+							onFlavorChange={handleFlavorChange}
+						/>
+					</div>
+				</div>
+			</TabsContent>
+		</Tabs>
 	</CardContent>
 	<CardFooter class="border-t border-border py-4">	
 		<div class="text-xs text-muted-foreground">
-			Changes to population counts and obstacles will apply on Reset
+			Changes to population counts, obstacles, and environment will apply on Reset
 		</div>
 	</CardFooter>
 </Card>
+
+<!-- Confirmation Dialogs -->
+<AlertDialog bind:open={flavorDialogOpen}>
+	<AlertDialogContent>
+		<AlertDialogHeader>
+			<AlertDialogTitle>Change Environment?</AlertDialogTitle>
+			<AlertDialogDescription>
+				Changing the environment will reset the simulation and switch to {pendingFlavor} sprites and background.
+				All current boids will be recreated. Continue?
+			</AlertDialogDescription>
+		</AlertDialogHeader>
+		<AlertDialogFooter>
+			<AlertDialogCancel onclick={() => (flavorDialogOpen = false)}>Cancel</AlertDialogCancel>
+			<AlertDialogAction class="bg-destructive" onclick={confirmFlavorChange}>Change Environment</AlertDialogAction>
+		</AlertDialogFooter>
+	</AlertDialogContent>
+</AlertDialog>
+
+<AlertDialog bind:open={resetDialogOpen}>
+	<AlertDialogContent>
+		<AlertDialogHeader>
+			<AlertDialogTitle>Reset Simulation?</AlertDialogTitle>
+			<AlertDialogDescription>
+				This will restart the simulation with current settings. All boids will be recreated and positioned randomly.
+			</AlertDialogDescription>
+		</AlertDialogHeader>
+		<AlertDialogFooter>
+			<AlertDialogCancel onclick={() => (resetDialogOpen = false)}>Cancel</AlertDialogCancel>
+			<AlertDialogAction class="bg-destructive" onclick={confirmReset}>Reset</AlertDialogAction>
+		</AlertDialogFooter>
+	</AlertDialogContent>
+</AlertDialog>
+
+<AlertDialog bind:open={defaultsDialogOpen}>
+	<AlertDialogContent>
+		<AlertDialogHeader>
+			<AlertDialogTitle>Reset to Defaults?</AlertDialogTitle>
+			<AlertDialogDescription>
+				This will reset all simulation settings to their default values and restart the simulation.
+			</AlertDialogDescription>
+		</AlertDialogHeader>
+		<AlertDialogFooter>
+			<AlertDialogCancel onclick={() => (defaultsDialogOpen = false)}>Cancel</AlertDialogCancel>
+			<AlertDialogAction class="bg-destructive" onclick={confirmDefaults}>Reset to Defaults</AlertDialogAction>
+		</AlertDialogFooter>
+	</AlertDialogContent>
+</AlertDialog>
