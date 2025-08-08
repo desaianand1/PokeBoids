@@ -41,7 +41,7 @@
 			</TooltipTrigger>
 			<TooltipContent
 				class="bg-destructive text-destructive-foreground transition-colors duration-300 ease-in-out hover:bg-red-400 dark:hover:bg-red-700"
-				>Reset Simulation</TooltipContent
+				>Restart Simulation</TooltipContent
 			>
 		</Tooltip>
 	</TooltipProvider>
