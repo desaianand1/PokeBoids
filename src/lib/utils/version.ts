@@ -1,10 +1,10 @@
 // This file is automatically updated by pnpm version commands
-export const gameVersion = '0.5.0';
+export const gameVersion = '1.0.0';
 
 // Parse version components for programmatic use
 export const versionParts = {
-  major: 0,
-  minor: 5,
+  major: 1,
+  minor: 0,
   patch: 0
 };
 
