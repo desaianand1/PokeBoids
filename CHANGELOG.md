@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/desaianand1/PokeBoids/compare/v1.2.0...v1.2.1) (2025-08-08)
+
+
+### Bug Fixes
+
+* **ci:** change deploy trigger to push with release detection ([e3270f4](https://github.com/desaianand1/PokeBoids/commit/e3270f41179cb5ada6a3012d53f017cfc31526f2))
+
 # [1.2.0](https://github.com/desaianand1/PokeBoids/compare/v1.1.2...v1.2.0) (2025-08-08)
 
 
