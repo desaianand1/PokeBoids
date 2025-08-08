@@ -34,8 +34,8 @@ export class BoidSpriteManager {
 	/**
 	 * Initialize from loaded JSON data
 	 */
-	initializeFromJSON(jsonData: unknown): void {
-		this.spriteDatabase = jsonData as SpriteDatabase;
+	initializeFromJSON(jsonData: SpriteDatabase): void {
+		this.spriteDatabase = jsonData;
 		console.log('Sprite database initialized with flavors:', Object.keys(this.spriteDatabase.sprites));
 	}
 
@@ -69,37 +69,58 @@ export class BoidSpriteManager {
 	}
 
 	/**
-	 * Load all animations for a sprite
+	 * Load all animations for a sprite with comprehensive validation
 	 */
 	private loadSpriteAnimations(loader: Loader.LoaderPlugin, sprite: BoidSpriteConfig): void {
+		// Validate sprite config before loading
+		if (!this.validateSpriteConfig(sprite)) {
+			console.error(`[SpriteManager] Invalid sprite config for '${sprite.id}', skipping load`);
+			return;
+		}
+
 		// Load walk animation
 		const walkKey = `${sprite.id}-walk`;
 		if (!this.loadedSprites.has(walkKey)) {
-			loader.spritesheet(walkKey, sprite.animations.walk.spriteSheet, {
-				frameWidth: sprite.animations.walk.frameWidth,
-				frameHeight: sprite.animations.walk.frameHeight
-			});
-			this.loadedSprites.add(walkKey);
+			try {
+				loader.spritesheet(walkKey, sprite.animations.walk.spriteSheet, {
+					frameWidth: sprite.animations.walk.frameWidth,
+					frameHeight: sprite.animations.walk.frameHeight
+				});
+				this.loadedSprites.add(walkKey);
+				console.debug(`[SpriteManager] Loaded walk animation for '${sprite.id}': ${sprite.animations.walk.frameWidth}x${sprite.animations.walk.frameHeight}`);
+			} catch (error) {
+				console.error(`[SpriteManager] Failed to load walk animation for '${sprite.id}':`, error);
+			}
 		}
 
 		// Load attack animation
 		const attackKey = `${sprite.id}-attack`;
 		if (!this.loadedSprites.has(attackKey)) {
-			loader.spritesheet(attackKey, sprite.animations.attack.spriteSheet, {
-				frameWidth: sprite.animations.attack.frameWidth,
-				frameHeight: sprite.animations.attack.frameHeight
-			});
-			this.loadedSprites.add(attackKey);
+			try {
+				loader.spritesheet(attackKey, sprite.animations.attack.spriteSheet, {
+					frameWidth: sprite.animations.attack.frameWidth,
+					frameHeight: sprite.animations.attack.frameHeight
+				});
+				this.loadedSprites.add(attackKey);
+				console.debug(`[SpriteManager] Loaded attack animation for '${sprite.id}': ${sprite.animations.attack.frameWidth}x${sprite.animations.attack.frameHeight}`);
+			} catch (error) {
+				console.error(`[SpriteManager] Failed to load attack animation for '${sprite.id}':`, error);
+			}
 		}
 
 		// Load hurt animation
 		const hurtKey = `${sprite.id}-hurt`;
 		if (!this.loadedSprites.has(hurtKey)) {
-			loader.spritesheet(hurtKey, sprite.animations.hurt.spriteSheet, {
-				frameWidth: sprite.animations.hurt.frameWidth,
-				frameHeight: sprite.animations.hurt.frameHeight
-			});
-			this.loadedSprites.add(hurtKey);
+			try {
+				loader.spritesheet(hurtKey, sprite.animations.hurt.spriteSheet, {
+					frameWidth: sprite.animations.hurt.frameWidth,
+					frameHeight: sprite.animations.hurt.frameHeight
+				});
+				this.loadedSprites.add(hurtKey);
+				console.debug(`[SpriteManager] Loaded hurt animation for '${sprite.id}': ${sprite.animations.hurt.frameWidth}x${sprite.animations.hurt.frameHeight}`);
+			} catch (error) {
+				console.error(`[SpriteManager] Failed to load hurt animation for '${sprite.id}':`, error);
+			}
 		}
 	}
 
@@ -201,6 +222,57 @@ export class BoidSpriteManager {
 		flavorData.prey.forEach(sprite => groups.push(sprite.groupId));
 		
 		return groups;
+	}
+
+	/**
+	 * Validate sprite configuration for common issues
+	 */
+	private validateSpriteConfig(sprite: BoidSpriteConfig): boolean {
+		if (!sprite || !sprite.id || !sprite.animations) {
+			console.error(`[SpriteManager] Missing basic sprite config properties`);
+			return false;
+		}
+
+		// Check required animations
+		const requiredAnimations: (keyof BoidSpriteConfig['animations'])[] = ['walk', 'attack', 'hurt'];
+		for (const animType of requiredAnimations) {
+			const anim = sprite.animations[animType];
+			if (!anim) {
+				console.error(`[SpriteManager] Missing ${animType} animation for sprite '${sprite.id}'`);
+				return false;
+			}
+
+			// Validate frame dimensions
+			if (!anim.frameWidth || !anim.frameHeight || anim.frameWidth <= 0 || anim.frameHeight <= 0) {
+				console.error(`[SpriteManager] Invalid frame dimensions for ${animType} animation of sprite '${sprite.id}': ${anim.frameWidth}x${anim.frameHeight}`);
+				return false;
+			}
+
+			// Validate sprite sheet path
+			if (!anim.spriteSheet || typeof anim.spriteSheet !== 'string') {
+				console.error(`[SpriteManager] Invalid sprite sheet path for ${animType} animation of sprite '${sprite.id}': ${anim.spriteSheet}`);
+				return false;
+			}
+
+			// Validate frame count
+			if (!anim.frameCount || anim.frameCount <= 0) {
+				console.error(`[SpriteManager] Invalid frame count for ${animType} animation of sprite '${sprite.id}': ${anim.frameCount}`);
+				return false;
+			}
+		}
+
+		// Validate sprite properties
+		if (!sprite.scale || sprite.scale <= 0) {
+			console.warn(`[SpriteManager] Invalid or missing scale for sprite '${sprite.id}', using default 1.0`);
+			sprite.scale = 1.0;
+		}
+
+		if (!sprite.attackRadius || sprite.attackRadius <= 0) {
+			console.warn(`[SpriteManager] Invalid or missing attack radius for sprite '${sprite.id}', using default 30`);
+			sprite.attackRadius = 30;
+		}
+
+		return true;
 	}
 
 	/**

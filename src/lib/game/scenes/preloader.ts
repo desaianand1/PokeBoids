@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
 import { BoidSpriteManager } from '$boid/animation/sprite-manager';
+import type { SpriteDatabase, BoidSpriteConfig, AnimationConfig } from '$boid/animation/types';
 
 export class Preloader extends Scene {
 	constructor() {
@@ -51,7 +52,7 @@ export class Preloader extends Scene {
 	create() {
 		// Stage 2: Parse JSON config and load sprite sheets dynamically
 		const spriteManager = BoidSpriteManager.getInstance();
-		const spriteConfig = this.cache.json.get('sprite-config');
+		const spriteConfig = this.cache.json.get('sprite-config') as SpriteDatabase;
 
 		if (spriteConfig) {
 			console.log('Loading sprites dynamically from config...');
@@ -65,13 +66,11 @@ export class Preloader extends Scene {
 		}
 	}
 
-	private hasSprites(flavorConfig: { predator: unknown[]; prey: unknown[] }): boolean {
+	private hasSprites(flavorConfig: { predator: BoidSpriteConfig[]; prey: BoidSpriteConfig[] }): boolean {
 		return flavorConfig.predator.length > 0 || flavorConfig.prey.length > 0;
 	}
 
-	private loadSpritesFromConfig(config: {
-		sprites: Record<string, { predator: unknown[]; prey: unknown[] }>;
-	}) {
+	private loadSpritesFromConfig(config: SpriteDatabase) {
 		// Track number of sprites to load
 		let spritesToLoad = 0;
 		let spritesLoaded = 0;
@@ -112,22 +111,22 @@ export class Preloader extends Scene {
 	}
 
 	private loadFlavorSprites(
-		flavorConfig: { predator: unknown[]; prey: unknown[] },
+		flavorConfig: { predator: BoidSpriteConfig[]; prey: BoidSpriteConfig[] },
 		onLoaded: () => void
 	) {
 		// Load predator sprites
-		flavorConfig.predator.forEach((sprite: unknown) => {
+		flavorConfig.predator.forEach((sprite: BoidSpriteConfig) => {
 			this.loadSpriteAnimations(sprite, onLoaded);
 		});
 
 		// Load prey sprites
-		flavorConfig.prey.forEach((sprite: unknown) => {
+		flavorConfig.prey.forEach((sprite: BoidSpriteConfig) => {
 			this.loadSpriteAnimations(sprite, onLoaded);
 		});
 	}
 
-	private loadSpriteAnimations(sprite: unknown, onLoaded: () => void) {
-		const animations = ['walk', 'attack', 'hurt'];
+	private loadSpriteAnimations(sprite: BoidSpriteConfig, onLoaded: () => void) {
+		const animations: (keyof BoidSpriteConfig['animations'])[] = ['walk', 'attack', 'hurt'];
 
 		animations.forEach((animType) => {
 			const animConfig = sprite.animations[animType];
@@ -155,46 +154,68 @@ export class Preloader extends Scene {
 	}
 
 	/**
-	 * Validate animation configuration
+	 * Validate animation configuration with comprehensive checks
 	 */
-	private validateAnimationConfig(spriteId: string, animType: string, animConfig: unknown): boolean {
+	private validateAnimationConfig(spriteId: string, animType: string, animConfig: AnimationConfig): boolean {
 		if (!animConfig) {
-			console.error(`Missing animation config for ${spriteId}-${animType}`);
+			console.error(`[Preloader] Missing animation config for ${spriteId}-${animType}`);
 			return false;
 		}
 
-		const { frameWidth, frameHeight, frameCount, spriteSheet } = animConfig;
+		const { frameWidth, frameHeight, frameCount, spriteSheet, frameDurations } = animConfig;
 
 		// Check required properties
 		if (typeof frameWidth !== 'number' || frameWidth <= 0) {
-			console.error(`Invalid frameWidth for ${spriteId}-${animType}: ${frameWidth}`);
+			console.error(`[Preloader] Invalid frameWidth for ${spriteId}-${animType}: ${frameWidth}`);
+			console.error(`[Preloader] Full config:`, animConfig);
 			return false;
 		}
 
 		if (typeof frameHeight !== 'number' || frameHeight <= 0) {
-			console.error(`Invalid frameHeight for ${spriteId}-${animType}: ${frameHeight}`);
+			console.error(`[Preloader] Invalid frameHeight for ${spriteId}-${animType}: ${frameHeight}`);
+			console.error(`[Preloader] Full config:`, animConfig);
 			return false;
 		}
 
 		if (typeof frameCount !== 'number' || frameCount <= 0) {
-			console.error(`Invalid frameCount for ${spriteId}-${animType}: ${frameCount}`);
+			console.error(`[Preloader] Invalid frameCount for ${spriteId}-${animType}: ${frameCount}`);
 			return false;
 		}
 
 		if (typeof spriteSheet !== 'string' || spriteSheet.length === 0) {
-			console.error(`Invalid spriteSheet path for ${spriteId}-${animType}: ${spriteSheet}`);
+			console.error(`[Preloader] Invalid spriteSheet path for ${spriteId}-${animType}: ${spriteSheet}`);
 			return false;
 		}
 
+		// Validate frame durations array matches frame count
+		if (Array.isArray(frameDurations) && frameDurations.length !== frameCount) {
+			console.error(`[Preloader] Frame duration count (${frameDurations.length}) does not match frameCount (${frameCount}) for ${spriteId}-${animType}`);
+			return false;
+		}
+
+		// Calculate expected sprite sheet dimensions (8 directions for PMD sprites)
+		const expectedWidth = frameWidth * frameCount;
+		const expectedHeight = frameHeight * 8; // 8 directions
+		console.debug(`[Preloader] Expected dimensions for ${spriteId}-${animType}: ${expectedWidth}x${expectedHeight} (${frameCount} frames x 8 directions)`);
+
 		// Warn about common dimension issues
 		if (frameWidth % 8 !== 0 || frameHeight % 8 !== 0) {
-			console.warn(`Frame dimensions not aligned to 8px grid for ${spriteId}-${animType}: ${frameWidth}x${frameHeight}`);
+			console.warn(`[Preloader] Frame dimensions not aligned to 8px grid for ${spriteId}-${animType}: ${frameWidth}x${frameHeight}`);
+		}
+
+		// Validate reasonable size bounds
+		if (frameWidth > 200 || frameHeight > 200) {
+			console.warn(`[Preloader] Unusually large frame dimensions for ${spriteId}-${animType}: ${frameWidth}x${frameHeight}`);
+		}
+
+		if (frameWidth < 8 || frameHeight < 8) {
+			console.warn(`[Preloader] Unusually small frame dimensions for ${spriteId}-${animType}: ${frameWidth}x${frameHeight}`);
 		}
 
 		return true;
 	}
 
-	private createAnimationsFromConfig(config: unknown) {
+	private createAnimationsFromConfig(config: SpriteDatabase) {
 		// Create animations for all loaded environments
 		const environments = ['air', 'land', 'water'] as const;
 		environments.forEach((env) => {
@@ -207,8 +228,8 @@ export class Preloader extends Scene {
 		});
 	}
 
-	private createSpriteAnimations(spriteConfig: unknown) {
-		const animations = ['walk', 'attack', 'hurt'];
+	private createSpriteAnimations(spriteConfig: BoidSpriteConfig) {
+		const animations: (keyof BoidSpriteConfig['animations'])[] = ['walk', 'attack', 'hurt'];
 		console.log(`Creating animations for ${spriteConfig.id}...`);
 
 		animations.forEach((animType) => {
