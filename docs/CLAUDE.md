@@ -38,9 +38,9 @@ The codebase follows a **separation of concerns** principle with framework-agnos
 ### Core Systems
 
 1. **Boid System** (`src/lib/boid/`)
-   - `FlockLogic` - Framework-agnostic core flocking implementation
+   - `FlockLogic` - Framework-agnostic core flocking implementation with group-based filtering
    - `PhaserFlock` - Phaser-specific wrapper managing boid lifecycle
-   - `PhaserBoid` - Individual boid implementation with Phaser sprite
+   - `PhaserBoid` - Individual boid implementation with animation support and group IDs
    - Behaviors (`behaviors/`) - Modular behavior system using Strategy pattern:
      - `AlignmentBehavior` - Align velocity with neighbors
      - `CohesionBehavior` - Move toward center of neighbors  
@@ -48,11 +48,18 @@ The codebase follows a **separation of concerns** principle with framework-agnos
      - `BoundaryAvoidanceBehavior` - Handle world boundaries (supports multiple modes)
      - `CompositeBehavior` - Combines all behaviors with configurable weights
 
-2. **Spatial Partitioning** (`src/lib/boid/spatial/`)
+2. **Animation System** (`src/lib/boid/animation/`)
+   - `BoidAnimationController` - 8-directional sprite animation management
+   - `BoidSpriteManager` - Singleton for sprite database and flavor management
+   - `types.ts` - TypeScript interfaces for animation configuration
+   - JSON-based sprite configuration (`src/assets/sprites/sprite-config.json`)
+   - Support for 3 animation states: walk (idle), attack, hurt
+
+3. **Spatial Partitioning** (`src/lib/boid/spatial/`)
    - `QuadTreePartitioning` - Efficient neighbor queries for O(n log n) performance
    - Critical for maintaining 60 FPS with large boid populations
 
-3. **Game Management** (`src/lib/game/`)
+4. **Game Management** (`src/lib/game/`)
    - `scenes/game.ts` - Main game scene coordinating all managers
    - Managers:
      - `BackgroundManager` - Day/night cycle and backgrounds
@@ -60,15 +67,16 @@ The codebase follows a **separation of concerns** principle with framework-agnos
      - `EffectsManager` - Visual effects (collision flashes, etc.)
      - `ObstacleManager` - World boundary management
 
-4. **Event System** (`src/lib/events/`)
+5. **Event System** (`src/lib/events/`)
    - `EventBus` - Central event bus for decoupled communication
-   - Type-safe events for simulation control, boid updates, and UI interactions
+   - Type-safe events for simulation control, boid updates, flavor changes, and UI interactions
    - Enables loose coupling between UI and game logic
 
-5. **UI Components** (`src/lib/components/`)
+6. **UI Components** (`src/lib/components/`)
    - `PhaserGame.svelte` - Phaser canvas wrapper
    - `SidebarLayout.svelte` - Collapsible sidebar system
    - Config panels for real-time parameter adjustment
+   - `FlavorControls.svelte` - Environment flavor switching using shadcn ToggleGroup
    - Event debug panel for monitoring system events
    - Credits panel with proper attributions
 
@@ -118,10 +126,10 @@ The project uses path aliases for clean imports:
 1. `PhaserFlock.update()` called each frame
 2. `FlockLogic.update()` processes all boids:
    - Updates spatial partitioning (QuadTree)
-   - Finds neighbors for each boid (considering field of view)
+   - Finds neighbors for each boid (considering field of view and group IDs)
    - Calculates forces via `CompositeBehavior`
    - Applies forces to boids
-3. `PhaserBoid.syncWithPhaser()` updates sprite positions
+3. `PhaserBoid.syncWithPhaser()` updates sprite positions and animations
 
 ### Field of View System
 The simulation implements biologically-inspired vision patterns:
@@ -136,9 +144,18 @@ The simulation implements biologically-inspired vision patterns:
 - Decouples UI from game logic for maintainability
 - Type-safe event definitions prevent runtime errors
 
+### Animation System
+The boids support 8-directional sprite animations with multiple states:
+- **Animation Controller**: Manages direction mapping from velocity vectors
+- **Sprite States**: walk (idle), attack, hurt with proper state machine
+- **Group-based Flocking**: Boids only flock with same-group members
+- **JSON Configuration**: Sprite sheets and timing data in `src/assets/sprites/sprite-config.json`
+- **Flavor Support**: Air, land, water environments with different sprite sets
+
 ### Performance Optimizations
 - QuadTree spatial partitioning for efficient neighbor queries (O(n log n) vs O(n²))
-- Object pooling potential for boid creation/destruction
+- Animation key caching to avoid string concatenation in update loops
+- Group-based neighbor filtering reduces flocking calculations
 - Configurable perception/separation radii to limit calculations
 - GPU-accelerated rendering via Phaser 3
 
@@ -149,6 +166,10 @@ The simulation implements biologically-inspired vision patterns:
 - Framework-agnostic architecture with adapter pattern
 - Spatial partitioning for performance
 - Field of view perception system
+- **Animation system with 8-directional sprite support**
+- **Group-based flocking with auto-generated group IDs**
+- **Environment flavor system (air/land/water) with UI controls**
+- **JSON-based sprite configuration system**
 - Event-driven state management
 - UI with real-time parameter controls
 - Theme switching with day/night backgrounds
@@ -157,7 +178,8 @@ The simulation implements biologically-inspired vision patterns:
 
 ### In Progress
 - Performance optimization for 60 FPS target
-- Advanced predator-prey dynamics
+- Attack/hurt animation triggers in predator-prey interactions
+- Advanced predator-prey dynamics with animation integration
 - Biological features (health, stamina, reproduction)
 - Leveling system implementation
 
