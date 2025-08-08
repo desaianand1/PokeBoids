@@ -41,12 +41,12 @@ export class Preloader extends Scene {
 		this.load.image('predator', 'default-predator.png');
 
 		// Load background images for all environments (day/night variants)
-		this.load.image('air-day', `${airPath}bg-light.png`);
-		this.load.image('air-night', `${airPath}bg-dark.png`);
-		this.load.image('land-day', `${landPath}bg-light.png`);
-		this.load.image('land-night', `${landPath}bg-dark.png`);
-		this.load.image('water-day', `${waterPath}bg-light.png`);
-		this.load.image('water-night', `${waterPath}bg-dark.png`);
+		this.load.image('air-day', `${airPath}background/bg-light.png`);
+		this.load.image('air-night', `${airPath}background/bg-dark.png`);
+		this.load.image('land-day', `${landPath}background/bg-light.png`);
+		this.load.image('land-night', `${landPath}background/bg-dark.png`);
+		this.load.image('water-day', `${waterPath}background/bg-light.png`);
+		this.load.image('water-night', `${waterPath}background/bg-dark.png`);
 
 		// Load sprite configuration JSON
 		this.load.json('sprite-config', `${spritesPath}/sprite-config.json`);
