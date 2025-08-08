@@ -1,6 +1,7 @@
 import type { IVector2 } from '$interfaces/vector';
 import type { BoidVariant, BoidStats, PreyStats, PredatorStats } from '$boid/types';
 import type { BoundaryDirection, IGameEventBus } from '$events/types';
+import type { BoidAnimationController } from '$boid/animation/animation-controller';
 
 /**
  * Core boid behavior interface independent of rendering/physics framework
@@ -40,6 +41,24 @@ export interface IBoid {
 
 	// Visualization
 	showCollisionEffect(boundary: BoundaryDirection): void;
+}
+
+/**
+ * Interface for sprite animation capabilities that can be composed with boids
+ */
+export interface ISpriteAnimatable {
+	getAnimationController(): BoidAnimationController | undefined;
+	getSpriteScale(): number;
+	validateAndFixSpriteProperties(): void;
+}
+
+/**
+ * Type guard to check if a boid has sprite animation capabilities
+ */
+export function hasSpriteAnimation(boid: IBoid): boid is IBoid & ISpriteAnimatable {
+	return 'getAnimationController' in boid && 
+	       'getSpriteScale' in boid && 
+	       'validateAndFixSpriteProperties' in boid;
 }
 
 /**

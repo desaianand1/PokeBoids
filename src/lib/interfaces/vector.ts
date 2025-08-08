@@ -30,7 +30,8 @@ export interface IVector2 {
 	distanceToSquared(other: IVector2): number;
 
 	// Optional angle methods
-	angle?(other: IVector2): number;
+	angle?(): number; // Get angle of this vector from origin
+	angleTo?(other: IVector2): number; // Get angle to another vector
 	rotate?(angle: number): IVector2;
 }
 
