@@ -85,7 +85,16 @@ export class FlockLogic {
     // Use spatial partitioning to efficiently find nearby boids
     return this.spatialPartitioning.findNearby(position, radius)
       .filter(other => other !== boid) // Filter out the boid itself
-      .filter(other => boid.isInFieldOfView(other)); // Filter based on field of view
+      .filter(other => boid.isInFieldOfView(other)) // Filter based on field of view
+      .filter(other => {
+        // Group-based filtering for flocking behaviors
+        // Same-variant boids must be in the same group to flock together
+        if (boid.getVariant() === other.getVariant()) {
+          return boid.getGroupId() === other.getGroupId();
+        }
+        // Predator-prey interactions ignore group restrictions
+        return true;
+      });
   }
   
   destroy(): void {

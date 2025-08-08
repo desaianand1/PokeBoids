@@ -9,6 +9,7 @@ export interface IBoid {
 	// Identity
 	getId(): string;
 	getVariant(): BoidVariant;
+	getGroupId(): string;
 
 	// Position and Movement
 	getBoidPosition(): IVector2;

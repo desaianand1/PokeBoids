@@ -73,6 +73,9 @@ export class PhaserFlock {
 		// Use core logic to update boids
 		this.logic.update(this.boids);
 
+		// Check for predator-prey collisions and attacks
+		this.checkPredatorPreyInteractions();
+
 		// Sync Phaser-specific properties
 		for (const boid of this.boids) {
 			boid.syncWithPhaser();
@@ -89,6 +92,68 @@ export class PhaserFlock {
 
 	getPredatorCount(): number {
 		return this.predatorCount;
+	}
+
+	/**
+	 * Check for predator-prey interactions and trigger attacks/hurt animations
+	 */
+	private checkPredatorPreyInteractions(): void {
+		// Get predators and prey
+		const predators = this.boids.filter(b => b.getVariant() === BoidVariant.PREDATOR);
+		const prey = this.boids.filter(b => b.getVariant() === BoidVariant.PREY);
+
+		for (const predator of predators) {
+			const predatorPos = predator.getBoidPosition();
+			const attackRadius = predator.getAttackRadius();
+			
+			// Check if predator can attack (not already attacking and has cooldown)
+			if (!predator.canAttack()) continue;
+
+			for (const preyBoid of prey) {
+				const preyPos = preyBoid.getBoidPosition();
+				const distance = Math.sqrt(
+					Math.pow(predatorPos.x - preyPos.x, 2) + 
+					Math.pow(predatorPos.y - preyPos.y, 2)
+				);
+
+				// If prey is within attack range, trigger attack
+				if (distance <= attackRadius) {
+					this.triggerPredatorAttack(predator, preyBoid);
+					break; // Attack only one prey per frame
+				}
+			}
+		}
+	}
+
+	/**
+	 * Trigger predator attack on prey
+	 */
+	private triggerPredatorAttack(predator: PhaserBoid, prey: PhaserBoid): void {
+		// Trigger predator attack animation
+		predator.playAttack(() => {
+			// Check if hit frame was reached and prey is still in range
+			if (predator.isAtHitFrame()) {
+				const predatorPos = predator.getBoidPosition();
+				const preyPos = prey.getBoidPosition();
+				const distance = Math.sqrt(
+					Math.pow(predatorPos.x - preyPos.x, 2) + 
+					Math.pow(predatorPos.y - preyPos.y, 2)
+				);
+
+				// If still in range, deal damage and trigger hurt animation
+				if (distance <= predator.getAttackRadius()) {
+					const wasKilled = prey.takeDamage(1); // Deal 1 damage
+					
+					// Trigger prey hurt animation
+					prey.playHurt();
+					
+					// If prey was killed, remove it (will be handled by existing death system)
+					if (wasKilled) {
+						console.log('Prey killed by predator attack!');
+					}
+				}
+			}
+		});
 	}
 
 	clear(): void {

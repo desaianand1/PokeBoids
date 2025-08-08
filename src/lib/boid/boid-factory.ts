@@ -2,6 +2,7 @@ import type { Scene } from 'phaser';
 import { PhaserBoid } from '$boid/phaser-boid';
 import type { IBoidDependencies, IBoidConfig } from '$interfaces/boid';
 import { BoidVariant } from '$boid/types';
+import { BoidSpriteManager } from '$boid/animation/sprite-manager';
 
 /**
  * Factory for creating boids with consistent configuration
@@ -21,7 +22,11 @@ export class BoidFactory {
     variant: BoidVariant,
     config?: IBoidConfig
   ): PhaserBoid {
-    // Create a new boid with provided configuration
+    // Try to get sprite configuration for current flavor
+    const spriteManager = BoidSpriteManager.getInstance();
+    const spriteConfig = spriteManager.getRandomSprite(variant);
+    
+    // Create a new boid with provided configuration and sprite config
     const boid = new PhaserBoid(
       this.scene,
       x,
@@ -30,7 +35,8 @@ export class BoidFactory {
       {
         ...this.deps,
         config
-      }
+      },
+      spriteConfig || undefined // Pass sprite config if available
     );
 
     // Add to scene
