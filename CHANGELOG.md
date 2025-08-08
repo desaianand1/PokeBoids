@@ -1,3 +1,15 @@
+# [1.3.0](https://github.com/desaianand1/PokeBoids/compare/v1.2.2...v1.3.0) (2025-08-08)
+
+
+### Bug Fixes
+
+* exclude svelte.ts files from pre-commit ESLint to match CI configuration ([ac6f3c1](https://github.com/desaianand1/PokeBoids/commit/ac6f3c1310f759538927c1ffbb47b576ef3a0c9e))
+
+
+### Features
+
+* implement automatic theme-responsive backgrounds ([45e34c1](https://github.com/desaianand1/PokeBoids/commit/45e34c1ed95b3a132942109173843a7c27a9ab38))
+
 ## [1.2.2](https://github.com/desaianand1/PokeBoids/compare/v1.2.1...v1.2.2) (2025-08-08)
 
 
