@@ -39,3 +39,4 @@ vite.config.ts.timestamp-*
 /documentation/types.js
 
 coverage/
+coverage/*
