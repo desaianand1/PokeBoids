@@ -1,33 +1,29 @@
 {
-  "branches": ["main"],
-  "plugins": [
-    "@semantic-release/commit-analyzer",
-    "@semantic-release/release-notes-generator",
-    "@semantic-release/changelog",
-    [
-      "@semantic-release/npm",
-      {
-        "npmPublish": false
-      }
-    ],
-    [
-      "@semantic-release/exec",
-      {
-        "prepareCmd": "pnpm exec node scripts/update-version.js"
-      }
-    ],
-    [
-      "@semantic-release/git",
-      {
-        "assets": [
-          "package.json",
-          "pnpm-lock.yaml",
-          "CHANGELOG.md",
-          "src/lib/utils/version.ts"
-        ],
-        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-      }
-    ],
-    "@semantic-release/github"
-  ]
+	"branches": ["main"],
+	"plugins": [
+		"@semantic-release/commit-analyzer",
+		"@semantic-release/release-notes-generator",
+		"@semantic-release/changelog",
+		[
+			"@semantic-release/npm",
+			{
+				"npmPublish": false
+			}
+		],
+		[
+			"@semantic-release/exec",
+			{
+				"prepareCmd": "pnpm exec node scripts/update-version.js"
+			}
+		],
+		[
+			"@semantic-release/git",
+			{
+				"assets": ["package.json", "pnpm-lock.yaml", "CHANGELOG.md", "src/lib/utils/version.ts"],
+				"message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}",
+				"commitCmd": "git commit --no-verify -m '${message}'"
+			}
+		],
+		"@semantic-release/github"
+	]
 }
