@@ -12,6 +12,7 @@
 	import EventDebugPanel from '$components/event-debug/EventDebugPanel.svelte';
 	import CreditsPanel from '$components/CreditsPanel.svelte';
 	import TabInfoPopover from '$components/shared/TabInfoPopover.svelte';
+	import { Separator } from '$components/ui/separator';
 
 	let activeTab = $state('controls');
 
@@ -75,10 +76,13 @@
 				<ThemeSwitcher variant="outline" size="icon" />
 				<TabInfoPopover {activeTab} />
 			</div>
-			
+
 			<!-- Metadata Group -->
-			<div class="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
+			<div
+				class="flex flex-row justify-between gap-2 px-2 md:items-center md:justify-normal md:px-0"
+			>
 				<p class="font-mono text-muted-foreground">&copy; 2025 Anand Desai</p>
+				<Separator class="h-4" orientation="vertical" />
 				<div class="flex items-center gap-2 text-secondary">
 					{formatVersion()}
 					{#if import.meta.env.DEV}
