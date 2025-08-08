@@ -3,6 +3,7 @@
 	import { Label } from '$ui/label';
 	import { Switch } from '$ui/switch';
 	import { Badge } from '$ui/badge';
+	import { generateId } from '$utils/uuid';
 	import * as Tabs from '$ui/tabs';
 	import { Bug, Clock, Rows3 } from '@lucide/svelte';
 	import { EventBus } from '$events/event-bus';
@@ -22,8 +23,7 @@
 		EventSummary,
 		StreamEvent,
 		EventCategory,
-		EventDetails as EventDetailsType,
-		PendingEvent
+		EventDetails as EventDetailsType
 	} from '$utils/event-debug';
 	import { EVENT_CONFIG, getEventCategory, captureEventDetails } from '$utils/event-debug';
 
@@ -35,27 +35,32 @@
 	let activeTab = $state<'aggregate' | 'stream'>('aggregate');
 	let selectedEventId = $state<string | null>(null);
 
-	// Event storage
-	let eventMap: SvelteMap<string, EventSummary> = new SvelteMap();
-	let eventDetails: SvelteMap<string, EventDetailsType> = new SvelteMap();
+	// Event storage - using SvelteMap directly for proper reactivity
+	let eventMap = new SvelteMap<string, EventSummary>();
+	let eventDetails = new SvelteMap<string, EventDetailsType>();
 	let streamEvents = $state<StreamEvent[]>([]);
 
-	// Sampling and throttling state
+	// Reactive trigger to force $derived recalculation when maps change
+	let eventMapTrigger = $state(0);
+
+	// Sampling and throttling state - using SvelteMap for reactivity
 	let samplingCounters = new SvelteMap<string, number>();
 	let lastEventTimes = new SvelteMap<string, number>();
 	let currentEventDetails = $state<EventDetailsType | null>(null);
 
-	// Batch processing state
-	let pendingEvents: PendingEvent[] = [];
-	let processingBatch = false;
+	// Batch processing state (legacy - no longer used)
 	let batchProcessTimeout: number | null = null;
 
-	// Derived state
+	// Derived state - using trigger to force reactivity
 	const filteredEvents = $derived(
-		Array.from(eventMap.values())
-			.filter((e) => selectedCategory === 'all' || e.category === selectedCategory)
-			.filter((e) => !searchQuery || e.type.toLowerCase().includes(searchQuery.toLowerCase()))
-			.sort((a, b) => b.lastSeen - a.lastSeen)
+		(() => {
+			// Include the trigger to force reactivity when eventMap changes
+			eventMapTrigger; // eslint-disable-line @typescript-eslint/no-unused-expressions
+			return Array.from(eventMap.values())
+				.filter((e) => selectedCategory === 'all' || e.category === selectedCategory)
+				.filter((e) => !searchQuery || e.type.toLowerCase().includes(searchQuery.toLowerCase()))
+				.sort((a, b) => b.lastSeen - a.lastSeen);
+		})()
 	);
 
 	const filteredStreamEvents = $derived(
@@ -68,50 +73,8 @@
 	function processEvent(type: keyof GameEvents & string, data: GameEvents[keyof GameEvents]): void {
 		if (!isDebugEnabled || isPaused) return;
 
-		pendingEvents.push({ type, data });
-
-		if (!eventMap.has(type)) {
-			const event = pendingEvents.find((e) => e.type === type);
-			if (event) {
-				processEventImmediately(event.type, event.data);
-				pendingEvents = pendingEvents.filter((e) => e.type !== type);
-			}
-		}
-
-		if (pendingEvents.length >= EVENT_CONFIG.BATCH_SIZE) {
-			processBatch();
-		} else if (batchProcessTimeout === null) {
-			batchProcessTimeout = setTimeout(() => {
-				batchProcessTimeout = null;
-				processBatch();
-			}, 100) as unknown as number;
-		}
-	}
-
-	function processBatch() {
-		if (processingBatch || pendingEvents.length === 0) return;
-
-		processingBatch = true;
-
-		setTimeout(() => {
-			const eventsToProcess = [...pendingEvents];
-			pendingEvents = [];
-
-			eventsToProcess.forEach((event) => {
-				processEventImmediately(event.type, event.data);
-			});
-
-			processingBatch = false;
-
-			if (pendingEvents.length >= EVENT_CONFIG.BATCH_SIZE) {
-				processBatch();
-			} else if (pendingEvents.length > 0 && batchProcessTimeout === null) {
-				batchProcessTimeout = setTimeout(() => {
-					batchProcessTimeout = null;
-					processBatch();
-				}, 100) as unknown as number;
-			}
-		}, 0);
+		// Process events immediately with sampling and throttling
+		processEventImmediately(type, data);
 	}
 
 	function processEventImmediately(
@@ -124,16 +87,23 @@
 		const category = getEventCategory(type);
 
 		const counter = (samplingCounters.get(type) || 0) + 1;
+		const lastTime = lastEventTimes.get(type) || 0;
 		samplingCounters.set(type, counter);
 
+		// Stream events - sample more frequently for real-time view
 		if (counter % Math.max(1, Math.floor(EVENT_CONFIG.SAMPLING_RATE / 5)) === 0) {
 			addStreamEvent(type, category, now);
 		}
 
-		if (counter % EVENT_CONFIG.SAMPLING_RATE !== 0) return;
+		// Aggregate events - sample based on configured rate and throttle
+		if (counter % EVENT_CONFIG.SAMPLING_RATE !== 0) {
+			return;
+		}
 
-		const lastTime = lastEventTimes.get(type) || 0;
-		if (now - lastTime < EVENT_CONFIG.THROTTLE_INTERVAL) return;
+		if (now - lastTime < EVENT_CONFIG.THROTTLE_INTERVAL) {
+			return;
+		}
+
 		lastEventTimes.set(type, now);
 
 		const eventId = type;
@@ -165,9 +135,9 @@
 
 	// Helper functions
 	function updateEventMap(key: string, value: EventSummary): void {
-		const newMap = new SvelteMap(eventMap);
-		newMap.set(key, value);
-		eventMap = newMap;
+		eventMap.set(key, value);
+		// Increment trigger to force $derived recalculation
+		eventMapTrigger++;
 	}
 
 	function addStreamEvent(
@@ -176,7 +146,7 @@
 		timestamp: number
 	): void {
 		const streamEvent: StreamEvent = {
-			id: `${type}-${timestamp}`,
+			id: generateId(),
 			type,
 			category,
 			timestamp,
@@ -198,13 +168,10 @@
 		});
 
 		if (oldestId) {
-			const newMap = new SvelteMap(eventMap);
-			newMap.delete(oldestId);
-			eventMap = newMap;
-
-			const newDetails = new SvelteMap(eventDetails);
-			newDetails.delete(oldestId);
-			eventDetails = newDetails;
+			eventMap.delete(oldestId);
+			eventDetails.delete(oldestId);
+			// Increment trigger when deleting
+			eventMapTrigger++;
 		}
 	}
 
@@ -249,14 +216,16 @@
 		const totalEvents = streamEvents.length;
 		const uniqueTypes = eventMap.size;
 
-		eventMap = new SvelteMap();
-		eventDetails = new SvelteMap();
+		eventMap.clear();
+		eventDetails.clear();
 		streamEvents = [];
 		selectedEventId = null;
 		currentEventDetails = null;
 		samplingCounters.clear();
 		lastEventTimes.clear();
-		pendingEvents = [];
+
+		// Increment trigger when clearing
+		eventMapTrigger++;
 
 		if (batchProcessTimeout !== null) {
 			clearTimeout(batchProcessTimeout);
@@ -276,7 +245,18 @@
 		}
 
 		selectedEventId = eventId;
-		const details = eventDetails.get(eventId);
+
+		// For stream events, we need to look up details by detailsId (event type)
+		// For aggregate events, eventId IS the event type
+		let detailsKey = eventId;
+
+		// Check if this is a stream event (has UUID format)
+		const streamEvent = streamEvents.find((e) => e.id === eventId);
+		if (streamEvent) {
+			detailsKey = streamEvent.detailsId; // Use event type for details lookup
+		}
+
+		const details = eventDetails.get(detailsKey);
 
 		if (details) {
 			currentEventDetails = details;
@@ -301,7 +281,10 @@
 		};
 
 		EventBus.onAny(handler as (type: string, data: unknown) => void);
-		return () => EventBus.offAny(handler as (type: string, data: unknown) => void);
+
+		return () => {
+			EventBus.offAny(handler as (type: string, data: unknown) => void);
+		};
 	});
 
 	// Cleanup

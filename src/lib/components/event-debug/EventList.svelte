@@ -32,7 +32,7 @@
 	);
 
 	function getEventId(event: EventSummary | StreamEvent): string {
-		return viewType === 'aggregate' ? event.id : (event as StreamEvent).detailsId;
+		return event.id; // Use the actual unique ID for both view types
 	}
 
 	function getEventTimestamp(event: EventSummary | StreamEvent): number {
