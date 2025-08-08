@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/desaianand1/PokeBoids/compare/v1.2.1...v1.2.2) (2025-08-08)
+
+
+### Bug Fixes
+
+* **ci:** implement workflow_run trigger for GitHub Pages deployment ([fd28546](https://github.com/desaianand1/PokeBoids/commit/fd285465afef2c5e05d6b3c1f7e53cd011dcc58c))
+
 ## [1.2.1](https://github.com/desaianand1/PokeBoids/compare/v1.2.0...v1.2.1) (2025-08-08)
 
 
