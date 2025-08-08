@@ -1,20 +1,62 @@
 import type { Scene } from 'phaser';
+import type { SimulationFlavor } from '$boid/animation/types';
 
 /**
- * Manages game background setup and resizing
+ * Manages game background setup and resizing with environment/theme support
  */
 export class BackgroundManager {
   private background: Phaser.GameObjects.Image;
+  private currentFlavor: SimulationFlavor = 'air';
+  private isDarkMode: boolean = false;
 
   constructor(private scene: Scene) {
-    // Create background
-    this.background = scene.add.image(0, 0, 'day-sky').setOrigin(0.5, 0.5);
+    // Create background with initial texture
+    this.background = scene.add.image(0, 0, this.getBackgroundTexture()).setOrigin(0.5, 0.5);
     
     // Setup resize handling
     scene.scale.on('resize', this.handleResize, this);
     
     // Initial resize
     this.handleResize();
+  }
+
+  /**
+   * Update environment flavor (triggers background change)
+   */
+  updateFlavor(flavor: SimulationFlavor): void {
+    this.currentFlavor = flavor;
+    this.updateBackground();
+  }
+
+  /**
+   * Update theme mode (triggers background change)
+   */
+  updateTheme(isDark: boolean): void {
+    this.isDarkMode = isDark;
+    this.updateBackground();
+  }
+
+  /**
+   * Get the appropriate background texture key
+   */
+  private getBackgroundTexture(): string {
+    const timeOfDay = this.isDarkMode ? 'night' : 'day';
+    const textureKey = `${this.currentFlavor}-${timeOfDay}`;
+    
+    // Fallback to air backgrounds if specific environment not available
+    if (!this.scene.textures.exists(textureKey)) {
+      return `air-${timeOfDay}`;
+    }
+    
+    return textureKey;
+  }
+
+  /**
+   * Update the background texture
+   */
+  private updateBackground(): void {
+    const newTexture = this.getBackgroundTexture();
+    this.background.setTexture(newTexture);
   }
 
   /**

@@ -104,10 +104,20 @@ export class Game extends Scene {
 		this.eventEmitter.on('simulation-config-changed', ({ config }) => {
 			this.simulationConfig = config;
 			this.obstacleManager.updateObstacles(config.obstacleCount.default);
+			
+			// Update background when flavor changes
+			if (config.simulationFlavor) {
+				this.backgroundManager.updateFlavor(config.simulationFlavor.default);
+			}
 		});
 
 		// Debug events
 		this.eventEmitter.on('debug-toggle', ({ enabled }) => this.debugManager.setEnabled(enabled));
+		
+		// Theme change events (connect to mode-watcher if needed)
+		this.eventEmitter.on('theme-changed', ({ isDark }) => {
+			this.backgroundManager.updateTheme(isDark);
+		});
 
 		// Collision events
 		this.eventEmitter.on('boundary-collision', ({ boid, boundary }) => {
