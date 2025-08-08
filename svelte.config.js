@@ -30,7 +30,6 @@ const config = {
 			$adapters: 'src/lib/adapters',
 			$interfaces: 'src/lib/interfaces',
 			$scenes: 'src/lib/game/scenes',
-			$assets: 'src/lib/assets',
 			$tests: 'tests'
 		}
 	}

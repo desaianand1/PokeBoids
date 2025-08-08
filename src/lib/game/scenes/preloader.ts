@@ -2,14 +2,6 @@ import { Scene } from 'phaser';
 import { BoidSpriteManager } from '$boid/animation/sprite-manager';
 import type { SpriteDatabase, BoidSpriteConfig, AnimationConfig } from '$boid/animation/types';
 import { base } from '$app/paths';
-import { browser } from '$app/environment';
-
-// Import assets statically for proper Vite processing
-import preySprite from '$assets/prey.png';
-import predatorSprite from '$assets/predator.png';
-import daySkyImage from '$assets/day-sky.jpg';
-import nightSkyImage from '$assets/night-sky.jpg';
-import spriteConfigData from '$assets/sprites/sprite-config.json';
 
 export class Preloader extends Scene {
 	constructor() {
@@ -36,43 +28,38 @@ export class Preloader extends Scene {
 	}
 
 	preload() {
-		console.log(`[Preloader] Loading assets with base path: ${base}`);
+		// Set base path for all assets - Phaser will handle the rest automatically
+		this.load.setPath(`${base}/assets/`);
+		console.log(`[Preloader] Loading assets from: ${base}/assets/`);
 
-		// Load legacy static sprites for fallback using static imports (processed by Vite)
-		this.load.image('prey', preySprite);
-		this.load.image('predator', predatorSprite);
+		// Load legacy static sprites for fallback
+		this.load.image('prey', 'prey.png');
+		this.load.image('predator', 'predator.png');
 
-		// Load background images using static imports
-		this.load.image('air-day', daySkyImage);
-		this.load.image('air-night', nightSkyImage);
+		// Load background images for all environments (day/night variants)
+		this.load.image('air-day', 'day-sky.jpg');
+		this.load.image('air-night', 'night-sky.jpg');
 		// Note: land and water backgrounds will be added when assets are available
 
-		// Load sprite configuration using static import
-		// This ensures the JSON is processed by Vite and available in production
-		console.log('[Preloader] Loading sprite config from static import');
+		// Load sprite configuration JSON
+		this.load.json('sprite-config', 'sprites/sprite-config.json');
 
 		// Note: Sprite sheets will be loaded dynamically in create() after JSON is parsed
 	}
 
 	create() {
-		// Stage 2: Use statically imported sprite config for proper Vite processing
+		// Stage 2: Parse JSON config and load sprite sheets dynamically
 		const spriteManager = BoidSpriteManager.getInstance();
+		const spriteConfig = this.cache.json.get('sprite-config') as SpriteDatabase;
 
-		try {
-			console.log('Loading sprites from static import...');
-			const spriteConfig = spriteConfigData as SpriteDatabase;
+		if (spriteConfig && spriteConfig.sprites) {
+			console.log('Loading sprites dynamically from config...');
+			spriteManager.initializeFromJSON(spriteConfig);
 
-			if (spriteConfig && spriteConfig.sprites) {
-				spriteManager.initializeFromJSON(spriteConfig);
-
-				// Load sprite sheets for air environment (and others when available)
-				this.loadSpritesFromConfig(spriteConfig);
-			} else {
-				throw new Error('Invalid sprite configuration data');
-			}
-		} catch (error) {
-			console.error('[Preloader] Failed to load sprite configuration:', error);
-			console.warn('Using fallback sprites only');
+			// Load sprite sheets for air environment (and others when available)
+			this.loadSpritesFromConfig(spriteConfig);
+		} else {
+			console.warn('Sprite configuration not found, using fallback sprites only');
 			this.startGame();
 		}
 	}
@@ -154,16 +141,12 @@ export class Preloader extends Scene {
 			}
 
 			try {
-				// Resolve sprite sheet path for proper asset loading in both dev and prod
-				// Use the base path to construct the correct URL for the sprite sheet
-				const spriteSheetPath = browser
-					? `${base}/_app/immutable/assets/${animConfig.spriteSheet.replace('sprites/', '')}`
-					: new URL(`../../assets/${animConfig.spriteSheet}`, import.meta.url).href;
-
-				console.log(`[Preloader] Loading sprite sheet: ${key} from ${spriteSheetPath}`);
+				// Phaser automatically uses setPath base + relative path
+				// No complex path resolution needed!
+				console.log(`[Preloader] Loading sprite sheet: ${key} from ${animConfig.spriteSheet}`);
 
 				// Load sprite sheet with validated dimensions
-				this.load.spritesheet(key, spriteSheetPath, {
+				this.load.spritesheet(key, animConfig.spriteSheet, {
 					frameWidth: animConfig.frameWidth,
 					frameHeight: animConfig.frameHeight
 				});
