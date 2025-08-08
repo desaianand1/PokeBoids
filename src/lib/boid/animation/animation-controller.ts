@@ -94,14 +94,17 @@ export class BoidAnimationController {
 		// Only play if not already playing this exact animation
 		if (this.sprite.anims.currentAnim?.key !== animKey) {
 			try {
-				// Store current scale before changing animation
+				// Store current scale and position before changing animation
 				const currentScale = this.sprite.scale;
+				const currentX = this.sprite.x;
+				const currentY = this.sprite.y;
 
 				this.sprite.play(animKey);
 
-				// Ensure consistent origin and scale after animation change
-				this.sprite.setOrigin(0, 0);
+				// Ensure consistent origin, scale, and position after animation change
+				this.sprite.setOrigin(0.5, 0.5);
 				this.sprite.setScale(currentScale);
+				this.sprite.setPosition(currentX, currentY);
 			} catch (error) {
 				console.warn(`Failed to play animation ${animKey}:`, error);
 			}
@@ -199,6 +202,9 @@ export class BoidAnimationController {
 	 * Handle animation completion
 	 */
 	private handleAnimationComplete(): void {
+		// Reset to interruptible state first
+		this.animationState.isInterruptible = true;
+		
 		// Check if there's a queued animation
 		if (this.animationState.queuedAnimation) {
 			const queued = this.animationState.queuedAnimation;
@@ -239,6 +245,29 @@ export class BoidAnimationController {
 	getCurrentFrameDimensions(): { width: number; height: number } {
 		const currentAnim = this.animationState.current;
 		const animConfig = this.config.animations[currentAnim];
+		
+		// Validate that animation config exists
+		if (!animConfig) {
+			console.error(`Animation config not found for '${currentAnim}' on sprite '${this.config.id}'`);
+			// Return walk animation dimensions as fallback
+			const walkConfig = this.config.animations.walk;
+			return {
+				width: walkConfig.frameWidth,
+				height: walkConfig.frameHeight
+			};
+		}
+		
+		// Validate frame dimensions
+		if (animConfig.frameWidth <= 0 || animConfig.frameHeight <= 0) {
+			console.error(`Invalid frame dimensions for '${currentAnim}' on sprite '${this.config.id}': ${animConfig.frameWidth}x${animConfig.frameHeight}`);
+			// Return walk animation dimensions as fallback
+			const walkConfig = this.config.animations.walk;
+			return {
+				width: walkConfig.frameWidth,
+				height: walkConfig.frameHeight
+			};
+		}
+		
 		return {
 			width: animConfig.frameWidth,
 			height: animConfig.frameHeight

@@ -40,9 +40,9 @@ export class PhaserBoid extends Physics.Arcade.Sprite implements IBoid {
 			// Create animation controller
 			this.animationController = new BoidAnimationController(scene, this, spriteConfig);
 			
-			// Set scale and origin to top-left to prevent clipping between animation frames
+			// Set scale and origin to center for proper positioning
 			this.setScale(spriteConfig.scale);
-			this.setOrigin(0, 0);
+			this.setOrigin(0.5, 0.5);
 		} else {
 			// Fallback to static sprites
 			const texture = variant === BoidVariant.PREDATOR ? 'predator' : 'prey';
@@ -168,15 +168,8 @@ export class PhaserBoid extends Physics.Arcade.Sprite implements IBoid {
 		const position = this.behavior.getBoidPosition();
 		const velocity = this.behavior.getBoidVelocity();
 
-		// Apply centering offset since origin is (0,0) but we want sprite centered on logical position
-		if (this.animationController && this.spriteConfig) {
-			const frameDims = this.animationController.getCurrentFrameDimensions();
-			const offsetX = (frameDims.width * this.spriteConfig.scale) / 2;
-			const offsetY = (frameDims.height * this.spriteConfig.scale) / 2;
-			this.setPosition(position.x - offsetX, position.y - offsetY);
-		} else {
-			this.setPosition(position.x, position.y);
-		}
+		// Set position directly since origin is now centered
+		this.setPosition(position.x, position.y);
 
 		// Update animation based on velocity if we have an animation controller
 		if (this.animationController) {
@@ -293,5 +286,19 @@ export class PhaserBoid extends Physics.Arcade.Sprite implements IBoid {
 			// Get the appropriate color based on variant
 			this.setTint(this.originalSpriteTint);
 		});
+	}
+
+	/**
+	 * Get animation controller for debug visualization
+	 */
+	getAnimationController(): BoidAnimationController | undefined {
+		return this.animationController;
+	}
+
+	/**
+	 * Get sprite scale for debug calculations
+	 */
+	getSpriteScale(): number {
+		return this.spriteConfig?.scale || 1.0;
 	}
 }

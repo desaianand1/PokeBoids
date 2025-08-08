@@ -75,7 +75,7 @@
             "walk": {
               "spriteSheet": "sprites/air/prey/zubat/Walk-Anim.png",
               "frameWidth": 32,
-              "frameHeight": 40,
+              "frameHeight": 56,
               "frameCount": 8,
               "frameDurations": [
                 6,
@@ -91,34 +91,31 @@
             },
             "attack": {
               "spriteSheet": "sprites/air/prey/zubat/Attack-Anim.png",
-              "frameWidth": 56,
-              "frameHeight": 64,
-              "frameCount": 14,
+              "frameWidth": 72,
+              "frameHeight": 80,
+              "frameCount": 11,
               "frameDurations": [
                 2,
                 3,
+                4,
                 1,
                 1,
                 1,
                 2,
                 2,
-                1,
                 2,
-                1,
-                2,
-                1,
                 2,
                 2
               ],
               "defaultFrameRate": 15,
-              "rushFrame": 1,
+              "rushFrame": 2,
               "hitFrame": 4,
-              "returnFrame": 6
+              "returnFrame": 7
             },
             "hurt": {
               "spriteSheet": "sprites/air/prey/zubat/Hurt-Anim.png",
               "frameWidth": 40,
-              "frameHeight": 56,
+              "frameHeight": 48,
               "frameCount": 2,
               "frameDurations": [
                 2,

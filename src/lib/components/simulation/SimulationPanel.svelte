@@ -62,10 +62,12 @@
 	let resetDialogOpen = $state(false);
 	let defaultsDialogOpen = $state(false);
 	let pendingFlavor: SimulationFlavor | null = $state(null);
+	let pendingFlavorCancelCallback: (() => void) | undefined = $state(undefined);
 
-	function handleFlavorChange(flavor: SimulationFlavor): void {
+	function handleFlavorChange(flavor: SimulationFlavor, onCancel?: () => void): void {
 		if (flavor !== simulationConfig.simulationFlavor.default) {
 			pendingFlavor = flavor;
+			pendingFlavorCancelCallback = onCancel;
 			flavorDialogOpen = true;
 		}
 	}
@@ -75,6 +77,7 @@
 			updateSimulationConfig('simulationFlavor', { default: pendingFlavor });
 			pendingFlavor = null;
 		}
+		pendingFlavorCancelCallback = undefined;
 		flavorDialogOpen = false;
 	}
 
@@ -227,7 +230,14 @@
 			</AlertDialogDescription>
 		</AlertDialogHeader>
 		<AlertDialogFooter>
-			<AlertDialogCancel onclick={() => (flavorDialogOpen = false)}>Cancel</AlertDialogCancel>
+			<AlertDialogCancel onclick={() => {
+				if (pendingFlavorCancelCallback) {
+					pendingFlavorCancelCallback();
+				}
+				pendingFlavor = null;
+				pendingFlavorCancelCallback = undefined;
+				flavorDialogOpen = false;
+			}}>Cancel</AlertDialogCancel>
 			<AlertDialogAction
 				class="bg-destructive transition-colors duration-300 ease-in-out hover:bg-red-400 dark:hover:bg-red-700"
 				onclick={confirmFlavorChange}

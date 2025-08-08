@@ -133,7 +133,14 @@ export class Preloader extends Scene {
 			const animConfig = sprite.animations[animType];
 			const key = `${sprite.id}-${animType}`;
 
-			// Load sprite sheet
+			// Validate animation config before loading
+			if (!this.validateAnimationConfig(sprite.id, animType, animConfig)) {
+				console.error(`Skipping invalid animation config: ${key}`);
+				onLoaded(); // Still call onLoaded to prevent hanging
+				return;
+			}
+
+			// Load sprite sheet with validated dimensions
 			this.load.spritesheet(key, animConfig.spriteSheet, {
 				frameWidth: animConfig.frameWidth,
 				frameHeight: animConfig.frameHeight
@@ -145,6 +152,46 @@ export class Preloader extends Scene {
 
 		// Start the loader for these files
 		this.load.start();
+	}
+
+	/**
+	 * Validate animation configuration
+	 */
+	private validateAnimationConfig(spriteId: string, animType: string, animConfig: unknown): boolean {
+		if (!animConfig) {
+			console.error(`Missing animation config for ${spriteId}-${animType}`);
+			return false;
+		}
+
+		const { frameWidth, frameHeight, frameCount, spriteSheet } = animConfig;
+
+		// Check required properties
+		if (typeof frameWidth !== 'number' || frameWidth <= 0) {
+			console.error(`Invalid frameWidth for ${spriteId}-${animType}: ${frameWidth}`);
+			return false;
+		}
+
+		if (typeof frameHeight !== 'number' || frameHeight <= 0) {
+			console.error(`Invalid frameHeight for ${spriteId}-${animType}: ${frameHeight}`);
+			return false;
+		}
+
+		if (typeof frameCount !== 'number' || frameCount <= 0) {
+			console.error(`Invalid frameCount for ${spriteId}-${animType}: ${frameCount}`);
+			return false;
+		}
+
+		if (typeof spriteSheet !== 'string' || spriteSheet.length === 0) {
+			console.error(`Invalid spriteSheet path for ${spriteId}-${animType}: ${spriteSheet}`);
+			return false;
+		}
+
+		// Warn about common dimension issues
+		if (frameWidth % 8 !== 0 || frameHeight % 8 !== 0) {
+			console.warn(`Frame dimensions not aligned to 8px grid for ${spriteId}-${animType}: ${frameWidth}x${frameHeight}`);
+		}
+
+		return true;
 	}
 
 	private createAnimationsFromConfig(config: unknown) {

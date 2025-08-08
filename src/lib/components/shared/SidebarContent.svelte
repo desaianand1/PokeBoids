@@ -10,8 +10,8 @@
 	import BoidConfigPanel from '$components/boid-config/BoidConfigPanel.svelte';
 	import StatsPanel from '$components/StatisticsPanel.svelte';
 	import EventDebugPanel from '$components/event-debug/EventDebugPanel.svelte';
-	import InfoCollapsible from '$components/shared/InfoCollapsible.svelte';
 	import CreditsPanel from '$components/CreditsPanel.svelte';
+	import TabInfoPopover from '$components/shared/TabInfoPopover.svelte';
 
 	let activeTab = $state('controls');
 
@@ -41,32 +41,14 @@
 
 	<div class="flex-1 overflow-y-auto p-4">
 		<TabsContent value="controls" class="m-0 h-full">
-			<div class="flex h-full flex-col space-y-4">
+			<div class="space-y-4">
 				<SimulationPanel />
-				<InfoCollapsible title="Simulation Info" class="mt-auto">
-					<p>
-						The Boids simulation demonstrates emergent flocking behaviors with three simple rules:
-					</p>
-					<ul class="ml-4 mt-2 list-disc space-y-1">
-						<li>Separation: Avoid crowding neighbors</li>
-						<li>Alignment: Steer towards average heading</li>
-						<li>Cohesion: Steer towards average position</li>
-					</ul>
-				</InfoCollapsible>
 			</div>
 		</TabsContent>
 
 		<TabsContent value="config" class="m-0 h-full">
 			<div class="space-y-4">
 				<BoidConfigPanel />
-				<InfoCollapsible title="Performance Tips">
-					<p>For better performance:</p>
-					<ul class="ml-4 mt-2 list-disc space-y-1">
-						<li>Reduce boid count if FPS drops below 30</li>
-						<li>Lower perception radius for large flocks</li>
-						<li>Disable debug mode when not needed</li>
-					</ul>
-				</InfoCollapsible>
 			</div>
 		</TabsContent>
 
@@ -89,9 +71,10 @@
 	>
 		<span class="flex items-center justify-center gap-4 p-2">
 			<ThemeSwitcher variant="outline" size="icon" />
-			<Badge variant="outline" class="py-2 font-mono text-xs">&copy; 2025 Anand Desai</Badge>
+			<TabInfoPopover {activeTab} />
+			<p class="py-2 font-mono text-xs text-muted-foreground">&copy; 2025 Anand Desai</p>
 		</span>
-		<span class="flex items-center gap-1 text-secondary">
+		<span class="flex items-center gap-2 text-secondary">
 			{formatVersion()}
 			{#if import.meta.env.DEV}
 				<Badge variant="outline" class="py-0 text-xs">dev</Badge>
