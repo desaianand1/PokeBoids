@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/desaianand1/PokeBoids/compare/v1.1.0...v1.1.1) (2025-08-08)
+
+
+### Bug Fixes
+
+* **ci:** use PAT for semantic-release to enable GitHub Pages deployment ([3a06a9e](https://github.com/desaianand1/PokeBoids/commit/3a06a9e130464655ce87b93100610023605c9857))
+
 # [1.1.0](https://github.com/desaianand1/PokeBoids/compare/v1.0.1...v1.1.0) (2025-08-08)
 
 
