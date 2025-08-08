@@ -67,18 +67,25 @@
 	</div>
 
 	<footer
-		class="fixed bottom-0 start-0 flex w-full items-center justify-between border-t bg-background px-4 py-2 text-xs text-muted-foreground"
+		class="fixed bottom-0 start-0 w-full border-t bg-background px-4 py-2 text-xs text-muted-foreground"
 	>
-		<span class="flex items-center justify-center gap-4 p-2">
-			<ThemeSwitcher variant="outline" size="icon" />
-			<TabInfoPopover {activeTab} />
-			<p class="py-2 font-mono text-xs text-muted-foreground">&copy; 2025 Anand Desai</p>
-		</span>
-		<span class="flex items-center gap-2 text-secondary">
-			{formatVersion()}
-			{#if import.meta.env.DEV}
-				<Badge variant="outline" class="py-0 text-xs">dev</Badge>
-			{/if}
-		</span>
+		<div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-4">
+			<!-- Interactive Controls Group -->
+			<div class="flex items-center gap-4 p-2">
+				<ThemeSwitcher variant="outline" size="icon" />
+				<TabInfoPopover {activeTab} />
+			</div>
+			
+			<!-- Metadata Group -->
+			<div class="flex flex-col gap-1 md:flex-row md:items-center md:gap-2">
+				<p class="font-mono text-muted-foreground">&copy; 2025 Anand Desai</p>
+				<div class="flex items-center gap-2 text-secondary">
+					{formatVersion()}
+					{#if import.meta.env.DEV}
+						<Badge variant="outline" class="py-0 text-xs">dev</Badge>
+					{/if}
+				</div>
+			</div>
+		</div>
 	</footer>
 </Tabs>
