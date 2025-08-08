@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { Boot } from '$scenes/boot';
-import { Preloader } from '$scenes/preloader';
+import { Splash } from '$scenes/splash';
 import { Game as MainGame } from '$scenes/game';
 import { EventBus } from '$events/event-bus';
 
@@ -35,7 +35,7 @@ export function createGame(containerId: string, options: GameOptions = {}): Boid
 				gravity: { x: 0, y: 0 }
 			}
 		},
-		scene: [Boot, Preloader, MainGame]
+		scene: [Boot, Splash, MainGame]
 	};
 
 	return new BoidsGame(config);

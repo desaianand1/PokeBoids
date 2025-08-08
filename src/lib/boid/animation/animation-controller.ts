@@ -19,7 +19,7 @@ export class BoidAnimationController {
 		this.sprite = sprite;
 		this.config = config;
 		this.cacheAnimationKeys();
-		// Note: Animations are created in the Preloader, not here
+		// Note: Animations are created in the Splash scene, not here
 	}
 
 	/**
@@ -84,13 +84,17 @@ export class BoidAnimationController {
 	private playAnimation(animType: AnimationType): void {
 		const animKey = this.animationKeys.get(`${animType}-${this.currentDirection}`);
 		if (!animKey) {
-			console.error(`[AnimationController] Animation key not found for ${animType}-${this.currentDirection} on sprite '${this.config.id}'`);
+			console.error(
+				`[AnimationController] Animation key not found for ${animType}-${this.currentDirection} on sprite '${this.config.id}'`
+			);
 			return;
 		}
 
 		// Check if animation exists before trying to play
 		if (!this.sprite.scene.anims.exists(animKey)) {
-			console.error(`[AnimationController] Animation '${animKey}' does not exist in Phaser animation manager`);
+			console.error(
+				`[AnimationController] Animation '${animKey}' does not exist in Phaser animation manager`
+			);
 			// Note: Cannot access protected anims.entries property for debugging
 			return;
 		}
@@ -106,7 +110,9 @@ export class BoidAnimationController {
 				// Validate frame dimensions before playing
 				const frameDimensions = this.getCurrentFrameDimensions();
 				if (frameDimensions.width <= 0 || frameDimensions.height <= 0) {
-					console.error(`[AnimationController] Cannot play animation with invalid dimensions: ${frameDimensions.width}x${frameDimensions.height}`);
+					console.error(
+						`[AnimationController] Cannot play animation with invalid dimensions: ${frameDimensions.width}x${frameDimensions.height}`
+					);
 					return;
 				}
 
@@ -118,7 +124,9 @@ export class BoidAnimationController {
 				this.sprite.setPosition(currentX, currentY);
 
 				// Debug logging for animation switches
-				console.debug(`[AnimationController] Playing ${animKey} for sprite '${this.config.id}' at direction ${this.currentDirection}`);
+				console.debug(
+					`[AnimationController] Playing ${animKey} for sprite '${this.config.id}' at direction ${this.currentDirection}`
+				);
 			} catch (error) {
 				console.error(`[AnimationController] Failed to play animation ${animKey}:`, error);
 				console.error(`[AnimationController] Sprite config:`, this.config);
@@ -219,7 +227,7 @@ export class BoidAnimationController {
 	private handleAnimationComplete(): void {
 		// Reset to interruptible state first
 		this.animationState.isInterruptible = true;
-		
+
 		// Check if there's a queued animation
 		if (this.animationState.queuedAnimation) {
 			const queued = this.animationState.queuedAnimation;
@@ -260,15 +268,22 @@ export class BoidAnimationController {
 	getCurrentFrameDimensions(): { width: number; height: number } {
 		const currentAnim = this.animationState.current;
 		const animConfig = this.config.animations[currentAnim];
-		
+
 		// Validate that animation config exists
 		if (!animConfig) {
-			console.error(`[AnimationController] Animation config not found for '${currentAnim}' on sprite '${this.config.id}'`);
-			console.error(`[AnimationController] Available animations:`, Object.keys(this.config.animations));
+			console.error(
+				`[AnimationController] Animation config not found for '${currentAnim}' on sprite '${this.config.id}'`
+			);
+			console.error(
+				`[AnimationController] Available animations:`,
+				Object.keys(this.config.animations)
+			);
 			// Return walk animation dimensions as fallback
 			const walkConfig = this.config.animations.walk;
 			if (!walkConfig) {
-				console.error(`[AnimationController] Critical: Walk animation config missing for sprite '${this.config.id}'`);
+				console.error(
+					`[AnimationController] Critical: Walk animation config missing for sprite '${this.config.id}'`
+				);
 				return { width: 32, height: 32 }; // Emergency fallback
 			}
 			return {
@@ -276,10 +291,12 @@ export class BoidAnimationController {
 				height: walkConfig.frameHeight
 			};
 		}
-		
+
 		// Validate frame dimensions
 		if (animConfig.frameWidth <= 0 || animConfig.frameHeight <= 0) {
-			console.error(`[AnimationController] Invalid frame dimensions for '${currentAnim}' on sprite '${this.config.id}': ${animConfig.frameWidth}x${animConfig.frameHeight}`);
+			console.error(
+				`[AnimationController] Invalid frame dimensions for '${currentAnim}' on sprite '${this.config.id}': ${animConfig.frameWidth}x${animConfig.frameHeight}`
+			);
 			console.error(`[AnimationController] Full animation config:`, animConfig);
 			// Return walk animation dimensions as fallback
 			const walkConfig = this.config.animations.walk;
@@ -288,7 +305,7 @@ export class BoidAnimationController {
 				height: walkConfig.frameHeight
 			};
 		}
-		
+
 		return {
 			width: animConfig.frameWidth,
 			height: animConfig.frameHeight
