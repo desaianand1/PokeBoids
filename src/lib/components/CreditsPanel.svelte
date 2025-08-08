@@ -186,20 +186,41 @@
 
 					<Separator class="mb-4" />
 					
-					<div class="px-4">
-						<div class="flex flex-col space-y-1">
-							<h5 class="font-medium">UI Elements</h5>
-							<p class="text-sm opacity-90">Crusenho's Complete UI Essentials Pack</p>
-							<a
-								href="https://crusenho.itch.io/complete-ui-essential-pack"
-								target="_blank"
-								rel="noopener noreferrer"
-								class="mt-1 flex items-center text-xs text-blue-500 hover:underline"
-								aria-label="Visit Crusenho's UI Essentials Pack on itch.io"
-							>
-								<Store class="mr-1 h-3 w-3" aria-hidden="true" />
-								<span>View Store</span>
-							</a>
+					<div class="space-y-4">
+						<div class="px-4">
+							<div class="flex flex-col space-y-1">
+								<h5 class="font-medium">UI Elements</h5>
+								<p class="text-sm opacity-90">Crusenho's Complete UI Essentials Pack</p>
+								<a
+									href="https://crusenho.itch.io/complete-ui-essential-pack"
+									target="_blank"
+									rel="noopener noreferrer"
+									class="mt-1 flex items-center text-xs text-blue-500 hover:underline"
+									aria-label="Visit Crusenho's UI Essentials Pack on itch.io"
+								>
+									<Store class="mr-1 h-3 w-3" aria-hidden="true" />
+									<span>View Store</span>
+								</a>
+							</div>
+						</div>
+						
+						<div class="px-4">
+							<div class="flex flex-col space-y-1">
+								<h5 class="font-medium">Pokémon Sprites</h5>
+								<p class="text-sm opacity-90">
+									PMD Sprite Collab - Community project by Marco Köpcke, audinowho and contributors
+								</p>
+								<a
+									href="https://github.com/PMDCollab/SpriteCollab"
+									target="_blank"
+									rel="noopener noreferrer"
+									class="mt-1 flex items-center text-xs text-blue-500 hover:underline"
+									aria-label="Visit PMD Sprite Collab repository on GitHub"
+								>
+									<ExternalLink class="mr-1 h-3 w-3" aria-hidden="true" />
+									<span>View Repository</span>
+								</a>
+							</div>
 						</div>
 					</div>
 				</div>
