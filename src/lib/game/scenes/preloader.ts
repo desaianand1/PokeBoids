@@ -1,7 +1,12 @@
 import { Scene } from 'phaser';
 import { BoidSpriteManager } from '$boid/animation/sprite-manager';
 import type { SpriteDatabase, BoidSpriteConfig, AnimationConfig } from '$boid/animation/types';
-import { base } from '$app/paths';
+
+const assetsPath = 'assets/';
+const spritesPath = 'sprites/';
+const airPath = `${spritesPath}air/`;
+const landPath = `${spritesPath}land/`;
+const waterPath = `${spritesPath}water/`;
 
 export class Preloader extends Scene {
 	constructor() {
@@ -28,21 +33,23 @@ export class Preloader extends Scene {
 	}
 
 	preload() {
-		// Set base path for all assets - Phaser will handle the rest automatically
-		this.load.setPath(`${base}/assets/`);
-		console.log(`[Preloader] Loading assets from: ${base}/assets/`);
+		this.load.setPath(assetsPath);
+		console.log(`[Preloader] Loading assets from: ${assetsPath}`);
 
 		// Load legacy static sprites for fallback
-		this.load.image('prey', 'prey.png');
-		this.load.image('predator', 'predator.png');
+		this.load.image('prey', 'default-prey.png');
+		this.load.image('predator', 'default-predator.png');
 
 		// Load background images for all environments (day/night variants)
-		this.load.image('air-day', 'day-sky.jpg');
-		this.load.image('air-night', 'night-sky.jpg');
-		// Note: land and water backgrounds will be added when assets are available
+		this.load.image('air-day', `${airPath}bg-light.png`);
+		this.load.image('air-night', `${airPath}bg-dark.png`);
+		this.load.image('land-day', `${landPath}bg-light.png`);
+		this.load.image('land-night', `${landPath}bg-dark.png`);
+		this.load.image('water-day', `${waterPath}bg-light.png`);
+		this.load.image('water-night', `${waterPath}bg-dark.png`);
 
 		// Load sprite configuration JSON
-		this.load.json('sprite-config', 'sprites/sprite-config.json');
+		this.load.json('sprite-config', `${spritesPath}/sprite-config.json`);
 
 		// Note: Sprite sheets will be loaded dynamically in create() after JSON is parsed
 	}
