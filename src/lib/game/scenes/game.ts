@@ -115,11 +115,9 @@ export class Game extends Scene {
 		// Debug events
 		this.eventEmitter.on('debug-toggle', ({ enabled }) => this.debugManager.setEnabled(enabled));
 
-		// Theme change events (connect to mode-watcher if needed)
-		this.eventEmitter.on('theme-changed', (data) => {
-			// Cast to expected type since theme-changed is not in the main event types
-			const themeData = data as { isDark: boolean };
-			this.backgroundManager.updateTheme(themeData.isDark);
+		// Theme change events
+		this.eventEmitter.on('theme-changed', ({ isDark }) => {
+			this.backgroundManager.updateTheme(isDark);
 		});
 
 		// Collision events

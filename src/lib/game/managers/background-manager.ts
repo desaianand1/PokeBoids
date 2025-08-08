@@ -1,5 +1,6 @@
 import type { Scene } from 'phaser';
 import type { SimulationFlavor } from '$boid/animation/types';
+import { mode } from 'mode-watcher';
 
 /**
  * Manages game background setup and resizing with environment/theme support
@@ -10,7 +11,10 @@ export class BackgroundManager {
   private isDarkMode: boolean = false;
 
   constructor(private scene: Scene) {
-    // Create background with initial texture
+    // Initialize with current theme state
+    this.isDarkMode = mode.current === 'dark';
+    
+    // Create background with correct initial texture
     this.background = scene.add.image(0, 0, this.getBackgroundTexture()).setOrigin(0.5, 0.5);
     
     // Setup resize handling

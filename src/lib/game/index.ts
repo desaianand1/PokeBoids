@@ -28,6 +28,12 @@ export function createGame(containerId: string, options: GameOptions = {}): Boid
 		width: window.innerWidth,
 		height: window.innerHeight,
 		backgroundColor: '#000',
+		scale: {
+			mode: Phaser.Scale.RESIZE,
+			autoCenter: Phaser.Scale.CENTER_BOTH,
+			width: window.innerWidth,
+			height: window.innerHeight
+		},
 		physics: {
 			default: 'arcade',
 			arcade: {

@@ -147,6 +147,10 @@ export type ConfigEvents = {
 export type DebugEvents = {
 	'debug-toggle': { enabled: boolean };
 };
+/** Theme events for UI-game synchronization */
+export type ThemeEvents = {
+	'theme-changed': { isDark: boolean };
+};
 
 /**
  * Type-safe event definitions for Svelte-Phaser communication
@@ -156,7 +160,8 @@ export type GameEvents = SceneEvents &
 	SimulationEvents &
 	FlockingEvents &
 	ConfigEvents &
-	DebugEvents & { [key: string]: unknown };
+	DebugEvents &
+	ThemeEvents & { [key: string]: unknown };
 
 /**
  * Type for event bus that can emit GameEvents
