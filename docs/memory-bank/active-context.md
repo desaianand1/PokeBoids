@@ -1,137 +1,174 @@
-# Active Context: Boids Simulation
+# Active Context: PokéBoids Simulation
 
 ## Current Work Focus
 
-### 1. Simulation Core Development
+### 1. Critical Priority: Activate Biological Systems 🔥
 
-- [x] Completed separation of boid and flocking behavior from Phaser rendering
-- [x] Implemented adapter pattern for framework-agnostic core logic
-- [x] Centralized event system implementation
-- [x] Addressed configuration management TODOs
-- [x] Refactored update method redundancy
-- [] Improving performance metrics with focus on 60 FPS target
+The project has reached a unique state where all biological features are **implemented in code but not active in gameplay**. This represents the highest priority work:
 
-### 2. UI Improvements
+- [ ] **Implement predator-prey interactions**: Connect existing attack/damage systems to actual gameplay
+- [ ] **Trigger combat animations**: Link attack/hurt animation states to predator-prey encounters
+- [ ] **Add death mechanics**: Remove boids when health reaches zero (system exists but not connected)
+- [ ] **Visual health feedback**: Display health/stamina status in UI or on boids themselves
+- [ ] **Activate reproduction**: Create new boids when reproduction thresholds are met
 
-- Added Credits & References panel with proper attributions
-- Refactoring control panel components to use Svelte 5 runes
-- Adding simulation parameters for biological features
-- Implementing responsive design with shadcn-svelte components
-- Enhancing theme switching with day/night backgrounds
+### 2. Performance Optimization for Large Populations
 
-### 3. Testing Infrastructure
+- [ ] **Scale to 200+ boids**: Current performance drops with very large populations
+- [ ] **Memory management**: Optimize for long-running simulations
+- [ ] **GPU utilization**: Better leverage hardware acceleration
+- [ ] **WebGL optimization**: Improve rendering performance
 
-- Expanding unit test coverage for boid behaviors
-- Adding integration tests for predator-prey interactions
-- Implementing performance benchmarks for FPS and memory usage
-- Setting up CI/CD pipeline with Vitest
+### 3. Enhanced Educational Value
 
-## Recent Changes
+- [ ] **Biological parameter controls**: Connect existing UI controls to active biological systems
+- [ ] **Ecosystem balance**: Implement self-regulating predator-prey dynamics
+- [ ] **Visual feedback systems**: Health bars, stamina indicators, reproduction status
 
-### 1. Codebase Updates
+## Recent Changes (Last 3 Days)
 
-- Added comprehensive Credits & References panel
-  - Organized references by category (research, implementations, academic)
-  - Added proper attribution for UI assets
-  - Implemented with accessibility and security best practices
-- Fixed bug with simulation reset not using default configuration values
-- Fully migrated to Svelte 5 runes syntax (no stores)
-- Implemented strict TypeScript types throughout
-- Updated Phaser to latest version with modern syntax
-- Integrated shadcn-svelte components with TailwindCSS
-- Completed core behavior separation with adapter pattern
-- Implemented field of view (FoV) system:
-  - Predators: Narrower FoV (70%) with larger perception radius (130%)
-  - Prey: Wider FoV (130%) with shorter perception radius (80%)
-  - Added UI controls for base FoV angle
-  - Visual debugging with FoV cones
+### 1. Major Infrastructure Improvements ✅
 
-### 2. Architecture Changes
+- **CI/CD Pipeline**: Complete GitHub Actions workflow with semantic release
+- **Professional Presentation**: Custom splash screen with real-time loading progress
+- **Theme System**: Automatic theme-responsive backgrounds (day/night)
+- **Asset Migration**: Moved all assets to `static/` directory for production compatibility
+- **Version Management**: Automated versioning with UI display and environment indicators
 
-- Implemented component-scoped state with runes
-- Centralized event system with unified event bus
-- Optimized rendering with GPU acceleration
-- Enhanced component structure using atomic design
-- Separated core boid logic from rendering concerns
-- Simplified event handling with type-safe adapters
-- Added event debugging and monitoring capabilities
-- Enhanced boid perception system:
-  - Field of view cone-based perception
-  - Type-specific perception multipliers
-  - Biologically inspired vision patterns
+### 2. Animation System Completion ✅
 
-### 3. Dependency Updates
+- **8-Directional Sprites**: Complete Pokémon sprite integration with PMD Sprite Collab assets
+- **Environment Flavors**: Air (Zubat/Crobat), Land, Water environments with themed backgrounds
+- **Animation States**: Walk, Attack, Hurt animations with proper state machine
+- **Group-Based Flocking**: Auto-generated group IDs for species-specific behavior
+- **Performance Optimization**: Animation key caching and efficient sprite management
 
-- Updated all dependencies to latest versions
-- Removed deprecated packages
-- Added new development tools
-- Improved build process
+### 3. UI/UX Enhancements ✅
+
+- **Responsive Design**: Mobile-optimized layout with collapsible sidebar
+- **Flavor Controls**: Toggle group UI for environment switching
+- **Enhanced Statistics**: FPS monitoring with color-coded performance indicators
+- **Event Debug Panel**: Development tool for monitoring system events
+- **Credits Panel**: Proper attribution for sprites and research references
+
+### 4. Code Quality Improvements ✅
+
+- **Svelte 5 Migration**: Complete migration to runes syntax (no legacy stores)
+- **TypeScript Strict Mode**: 100% type safety throughout codebase
+- **Testing Framework**: Comprehensive unit and integration tests with Vitest
+- **Code Standards**: ESLint, Prettier, and commit message validation
+
+## Architecture Status
+
+### 1. Completed Systems ✅
+
+- **Framework-Agnostic Core**: Complete separation of simulation logic from Phaser
+- **Event-Driven Architecture**: Centralized EventBus with type-safe communication
+- **Spatial Partitioning**: QuadTree implementation for O(n log n) performance
+- **Field of View System**: Biologically-inspired vision with predator/prey differences
+- **Adapter Pattern**: Clean abstraction layer for framework independence
+
+### 2. Animation Integration ✅
+
+- **BoidAnimationController**: 8-directional sprite animation management
+- **BoidSpriteManager**: Centralized sprite database with JSON configuration
+- **State Machine**: Proper animation state transitions (walk, attack, hurt)
+- **Performance**: Cached animation keys and efficient frame updates
+
+### 3. Biological Systems - Code Complete but Inactive ⚠️
+
+**Critical Gap**: All biological features exist in code but are not connected to gameplay:
+
+- **Stats System**: Health, stamina, speed, reproduction, level, sex, attack (implemented)
+- **Damage System**: `takeDamage()` method exists but never called in gameplay
+- **Stamina System**: Speed-based depletion and recovery (active)
+- **Reproduction System**: Progress tracking exists but no actual reproduction
+- **Animation States**: Attack/hurt animations exist but not triggered by combat
 
 ## Next Steps
 
-### 1. Immediate Priorities
+### 1. Immediate Actions (This Week)
 
-- [x] Centralized event bus implementation
-- [x] Simplified event system architecture
-- [x] Refactored PhaserBoid update method
-- [x] Added event debugging capabilities
-- [x] Add spatial partioning to flocking logic to improve performance significantly
-  - Implemented quad tree spatial partitioning
-  - Added event-based world bounds handling
-  - Created comprehensive tests and benchmarks
-- [ ] Document separation architecture and patterns
-- [ ] Implement performance benchmarks
+- [ ] **Connect predator-prey interactions**: Implement collision detection between predators and prey
+- [ ] **Trigger combat animations**: Call `playAttack()` and `playHurt()` during encounters
+- [ ] **Implement death mechanics**: Remove boids when `takeDamage()` returns true
+- [ ] **Add visual health indicators**: Show health/stamina status in statistics panel or on boids
 
-### 2. Upcoming Features
+### 2. Short-term Goals (Next 2 Weeks)
 
-- Implement leveling system for both predator and prey
-- Add reproduction mechanics with stat inheritance
-- Create advanced parameter controls for biological features
-- Add debug visualization modes for development
-- Implement spatial partitioning to improve performance with a large number of boids
+- [ ] **Activate reproduction system**: Create new boids when reproduction thresholds met
+- [ ] **Enhanced predator behaviors**: Implement hunting mechanics with existing attack radius
+- [ ] **Prey evasion**: Enhanced escape behaviors when predators detected
+- [ ] **Performance optimization**: Scale to 200+ boids while maintaining 60 FPS
 
-### 3. Technical Debt
+### 3. Medium-term Objectives (Next Month)
 
-- Remove any remaining non-runes patterns
-- Document biological system implementations
-- Optimize collision detection algorithms
-- Enhance error handling for edge cases
-- Implement performance benchmarks for FPS and memory usage
+- [ ] **Advanced biological features**: Pack hunting, territorial behavior, genetic inheritance
+- [ ] **Educational enhancements**: Guided tutorials, scenario presets, data export
+- [ ] **Additional environments**: Complete land and water flavor implementations
+- [ ] **Accessibility improvements**: Screen reader support, keyboard navigation
 
 ## Active Decisions
 
-### 1. Technical Choices
+### 1. Technical Architecture ✅ ESTABLISHED
 
-- Using Svelte 5 runes exclusively
-- Maintaining strict TypeScript types
-- Following atomic design principles
-- Implementing performance-first approach
+- **Svelte 5 Runes**: Exclusive use of modern reactive patterns (no legacy stores)
+- **Framework Independence**: Core simulation logic remains framework-agnostic
+- **Event-Driven Design**: Centralized communication via type-safe EventBus
+- **Spatial Partitioning**: QuadTree for efficient neighbor detection at scale
 
-### 2. Architectural Decisions
+### 2. Animation and Visual Design ✅ ESTABLISHED
 
-- Complete separation of core logic from rendering
-- Framework-agnostic boid and flocking behavior
-- Adapter pattern for Phaser integration
-- Centralized event system with type-safe communication
-- Composition over inheritance in boid implementation
-- Single source of truth for event handling
-- Comprehensive event debugging and monitoring
+- **Pokémon Theme**: Licensed sprites from PMD Sprite Collab
+- **Environment Flavors**: Air, Land, Water with themed backgrounds and sprites
+- **Professional Presentation**: Custom splash screen, theme integration, responsive design
+- **Performance First**: Cached animations, efficient rendering, GPU acceleration
 
-### 3. Development Practices
+### 3. Development Practices ✅ ESTABLISHED
 
-- Strict code reviews
-- Comprehensive testing
-- Continuous integration
-- Performance monitoring
-- Interface-driven development
+- **Semantic Versioning**: Automated release management with GitHub Actions
+- **Code Quality**: TypeScript strict mode, comprehensive testing, automated formatting
+- **CI/CD Pipeline**: Automated testing, building, and deployment to GitHub Pages
+- **Documentation**: Comprehensive memory bank and Claude documentation
 
-### 4. Versioning System
+### 4. Biological System Activation 🔄 IN PROGRESS
 
-- Implemented semantic versioning system following SemVer 2.0.0
-- Version maintained in package.json as source of truth
-- Automatic sync to src/lib/utils/version.ts via postversion script
-- Enhanced version display in UI with development indicator
-- Version bumping commands:
-  - `pnpm version:patch` for bug fixes
-  - `pnpm version:minor` for new features
-  - `pnpm version:major` for breaking changes
+- **Priority Decision**: Activate existing biological code rather than adding new features
+- **Educational Focus**: Complete predator-prey dynamics for full educational value
+- **Performance Balance**: Ensure biological interactions don't compromise 60 FPS target
+- **Visual Feedback**: Provide clear indicators of biological system states
+
+## Development Context
+
+### 1. Current Version: v1.3.0
+
+- **Major Achievement**: Complete animation system and CI/CD pipeline
+- **Professional Quality**: Production-ready deployment with automated versioning
+- **Educational Foundation**: All core systems in place for biological activation
+
+### 2. Architecture Strengths
+
+- **Testability**: Framework-agnostic core enables comprehensive unit testing
+- **Maintainability**: Clean separation of concerns with adapter pattern
+- **Scalability**: Spatial partitioning and event-driven design support growth
+- **Extensibility**: Modular behavior system allows easy feature additions
+
+### 3. Key Technical Debt
+
+- **Biological Activation**: Highest priority - connect existing systems to gameplay
+- **Performance Scaling**: Optimize for larger populations (200+ boids)
+- **Memory Management**: Prevent leaks in long-running simulations
+- **Mobile Optimization**: Fine-tune responsive design and touch interactions
+
+### 4. Success Metrics Progress
+
+- ✅ **Technical Performance**: 60 FPS with 100+ boids, cross-browser compatibility
+- ✅ **Code Quality**: TypeScript strict mode, comprehensive testing, automated CI/CD
+- ✅ **Professional Presentation**: Custom branding, responsive design, theme integration
+- ⚠️ **Educational Value**: Core systems complete but biological interactions inactive
+
+## Critical Path Forward
+
+The project is at a pivotal moment where all foundational systems are complete and professional-quality, but the core educational value proposition (predator-prey dynamics) requires activation of existing biological systems. This represents a unique opportunity to deliver significant educational impact with relatively focused development effort.
+
+**Success Definition**: Activate biological systems to create a fully functional ecosystem simulation where predators hunt prey, boids reproduce, and populations self-regulate - all using the robust foundation already in place.
