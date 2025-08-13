@@ -233,7 +233,7 @@ BoidSpriteConfig - Animation configuration
 
 ```typescript
 // Simulation Control
-'simulation-paused' | 'simulation-resumed' | 'simulation-reset';
+'simulation-paused' | 'simulation-resumed' | 'simulation-restart';
 
 // Configuration Changes
 'boid-config-changed' | 'simulation-config-changed';

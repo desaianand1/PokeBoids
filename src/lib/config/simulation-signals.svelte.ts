@@ -3,7 +3,7 @@ import type { BoidConfig, BoundaryMode, SimulationConfig } from '$config/types';
 import { toast } from 'svelte-sonner';
 import { hasAngleChanged } from '$utils/angles';
 
-const simulationSpeeds = [0.2, 0.5, 1.0, 1.5, 2.0, 3.0] as const;
+const simulationSpeeds = [0.2, 0.5, 1.0, 1.5, 2.0, 3.0, 5.0, 10.0] as const;
 export type SimulationSpeed = (typeof simulationSpeeds)[number];
 
 const DEFAULT_BOID_CONFIG: BoidConfig = {
@@ -191,6 +191,13 @@ function resetToDefaults() {
 	});
 }
 
+function resetBoidConfigToDefaults() {
+	boidConfig = { ...DEFAULT_BOID_CONFIG };
+	toast.error('Boid Configuration Reset', {
+		description: 'All boid parameters (only) restored to their default values'
+	});
+}
+
 function togglePlayPause() {
 	isPlaying = !isPlaying;
 	if (isPlaying) {
@@ -209,16 +216,25 @@ function isSimulationPlaying(): boolean {
 	return isPlaying;
 }
 
-function advanceSimulationSpeed(): void {
+/**
+ * Speeds up simulation speed by one step
+ * @returns simulation speed after speed up
+ */
+function advanceSimulationSpeed(): SimulationSpeed {
 	if (simulationSpeedIndex < simulationSpeeds.length - 1) {
 		simulationSpeedIndex++;
 	}
+	return getCurrentSimulationSpeed();
 }
-
-function slowSimulationSpeed(): void {
+/**
+ * Slows down simulation speed by one step
+ * @returns simulation speed after slowdown
+ */
+function slowSimulationSpeed(): SimulationSpeed {
 	if (simulationSpeedIndex > 0) {
 		simulationSpeedIndex--;
 	}
+	return getCurrentSimulationSpeed();
 }
 
 function getCurrentSimulationSpeed(): SimulationSpeed {
@@ -237,9 +253,9 @@ function getDebugMode(): boolean {
 	return debugMode;
 }
 
-function resetSimulation() {
-	EventBus.emit('simulation-reset', undefined);
-	toast.error('Simulation Reset', {
+function restartSimulation() {
+	EventBus.emit('simulation-restart', undefined);
+	toast.error('Simulation Restart', {
 		description: `Restarting with ${simulationConfig.initialPreyCount.default} prey and ${simulationConfig.initialPredatorCount.default} predators`
 	});
 }
@@ -259,5 +275,6 @@ export {
 	slowSimulationSpeed,
 	getSimulationSpeedRange,
 	toggleDebugMode,
-	resetSimulation
+	resetBoidConfigToDefaults,
+	restartSimulation
 };

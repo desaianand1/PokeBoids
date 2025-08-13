@@ -1,14 +1,17 @@
 <script lang="ts">
 	import { Slider as SliderPrimitive, type WithoutChildrenOrChild } from 'bits-ui';
-	import { cn } from '$lib/utils.js';
+	import { cn } from '$lib/utils';
 
 	let {
 		ref = $bindable(null),
 		value = $bindable(),
 		orientation = 'horizontal',
 		class: className,
+		thumbClasses,
 		...restProps
-	}: WithoutChildrenOrChild<SliderPrimitive.RootProps> = $props();
+	}: WithoutChildrenOrChild<
+		SliderPrimitive.RootProps & { thumbClasses?: string | undefined }
+	> = $props();
 </script>
 
 <!--
@@ -37,7 +40,10 @@ get along, so we shut typescript up by casting `value` to `never`.
 		{#each thumbs as thumb, index (index)}
 			<SliderPrimitive.Thumb
 				index={thumb}
-				class="block size-4 rounded-full border border-primary/50 bg-background shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+				class={cn(
+					'block size-4 rounded-full border border-primary/50 bg-background shadow transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+					thumbClasses
+				)}
 			/>
 		{/each}
 	{/snippet}

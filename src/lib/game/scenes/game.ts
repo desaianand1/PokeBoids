@@ -97,7 +97,7 @@ export class Game extends Scene {
 			this.simulationActive = true;
 			this.scene.resume();
 		});
-		this.eventEmitter.on('simulation-reset', () => this.resetSimulation());
+		this.eventEmitter.on('simulation-restart', () => this.resetSimulation());
 		this.eventEmitter.on('simulation-speed-changed', ({ value }) => (this.simulationSpeed = value));
 
 		// Configuration events

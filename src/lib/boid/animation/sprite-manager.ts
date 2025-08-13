@@ -1,7 +1,9 @@
-import type { Loader } from 'phaser';
+import type { Loader, Scene } from 'phaser';
 import type { SimulationFlavor, SpriteDatabase, BoidSpriteConfig } from '$boid/animation/types';
 import { BoidVariant } from '$boid/types';
 import { EventBus } from '$events/event-bus';
+import { safeExtractSpriteFrame, type ExtractedSpriteFrame } from '$utils/sprite-frame-extractor';
+import { phaserGameRef } from '$game/phaser-signals.svelte';
 
 /**
  * Singleton manager for sprite configurations and flavor management
@@ -329,5 +331,60 @@ export class BoidSpriteManager {
 		});
 
 		return stats;
+	}
+
+	/**
+	 * Get display frames for the WelcomeDialog
+	 * Extracts down-facing walk frames from currently active sprites
+	 */
+	async getDisplayFrames(): Promise<{
+		predator: ExtractedSpriteFrame | null;
+		prey: ExtractedSpriteFrame | null;
+	}> {
+		// Check if we have access to the game scene
+		if (!phaserGameRef.game || !phaserGameRef.scene) {
+			console.warn('[SpriteManager] No Phaser game scene available for frame extraction');
+			return { predator: null, prey: null };
+		}
+
+		const scene: Scene = phaserGameRef.scene;
+		const results = {
+			predator: null as ExtractedSpriteFrame | null,
+			prey: null as ExtractedSpriteFrame | null
+		};
+
+		try {
+			// Get representative sprites for current flavor
+			const predatorSprite = this.getRandomSprite(BoidVariant.PREDATOR);
+			const preySprite = this.getRandomSprite(BoidVariant.PREY);
+
+			// Extract predator frame
+			if (predatorSprite) {
+				const predatorWalkKey = `${predatorSprite.id}-walk`;
+
+				results.predator = await safeExtractSpriteFrame(
+					scene,
+					predatorWalkKey,
+					0, // First frame of down direction
+					'predator' // Fallback to legacy sprite
+				);
+			}
+
+			// Extract prey frame
+			if (preySprite) {
+				const preyWalkKey = `${preySprite.id}-walk`;
+
+				results.prey = await safeExtractSpriteFrame(
+					scene,
+					preyWalkKey,
+					0, // First frame of down direction
+					'prey' // Fallback to legacy sprite
+				);
+			}
+		} catch (error) {
+			console.error('[SpriteManager] Error extracting display frames:', error);
+		}
+
+		return results;
 	}
 }

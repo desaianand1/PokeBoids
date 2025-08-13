@@ -78,7 +78,7 @@ export const EVENT_CATEGORIES: {
 	simulation: [
 		'simulation-resumed',
 		'simulation-paused',
-		'simulation-reset',
+		'simulation-restart',
 		'simulation-speed-changed'
 	] as const,
 	flocking: [

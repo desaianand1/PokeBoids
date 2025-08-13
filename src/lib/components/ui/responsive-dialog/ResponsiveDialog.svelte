@@ -72,7 +72,7 @@
 		</AlertDialogContent>
 	</AlertDialog>
 {:else}
-	<Drawer bind:open {shouldScaleBackground} {snapPoints} closeThreshold={0.3}>
+	<Drawer bind:open {shouldScaleBackground} {snapPoints}>
 		<DrawerContent>
 			<DrawerHeader class="text-center">
 				{#if title}<DrawerTitle>{@render title()}</DrawerTitle>{/if}

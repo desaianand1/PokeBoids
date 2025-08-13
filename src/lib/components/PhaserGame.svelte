@@ -3,15 +3,10 @@
 	import { initialize, destroy, phaserGameRef } from '$game/phaser-signals.svelte';
 	import { EventBus } from '$events/event-bus';
 	import type Phaser from 'phaser';
-	import {
-		AlertDialog,
-		AlertDialogContent,
-		AlertDialogHeader,
-		AlertDialogTitle,
-		AlertDialogDescription,
-		AlertDialogFooter
-	} from '$ui/alert-dialog';
-	import { Button } from '$ui/button';
+	import { ResponsiveDialog } from '$ui/responsive-dialog';
+	import { AlertDialogAction } from '$ui/alert-dialog';
+	import { Button, buttonVariants } from '$ui/button';
+	import { OctagonAlert } from 'lucide-svelte';
 	import type { Scene } from 'phaser';
 
 	interface PhaserGameProps {
@@ -36,6 +31,7 @@
 				}
 			: null
 	);
+	let errorDialogOpen = $derived(formattedError !== null);
 
 	// Event handlers
 	function handleSceneReady({ scene }: { scene: Phaser.Scene }) {
@@ -84,22 +80,36 @@
 </script>
 
 <div class="relative h-full w-full overflow-hidden">
+	<!-- Game Error Dialog -->
 	{#if formattedError}
-		<AlertDialog open={true}>
-			<AlertDialogContent>
-				<AlertDialogHeader>
-					<AlertDialogTitle class="text-rose-400">
-						{formattedError.title}
-					</AlertDialogTitle>
-					<AlertDialogDescription class="text-slate-500">
-						{formattedError.description}
-					</AlertDialogDescription>
-				</AlertDialogHeader>
-				<AlertDialogFooter>
-					<Button variant="outline" onclick={restartGame}>Reload Page</Button>
-				</AlertDialogFooter>
-			</AlertDialogContent>
-		</AlertDialog>
+		<ResponsiveDialog bind:open={errorDialogOpen}>
+			{#snippet title()}
+				<span
+					class="inline-flex items-center justify-center gap-2 text-lg font-bold text-destructive"
+				>
+					<OctagonAlert class="stroke-2 text-destructive" />
+					{formattedError.title}
+				</span>
+			{/snippet}
+			{#snippet description()}
+				<p class="text-muted-foreground">
+					{formattedError.description}
+				</p>
+			{/snippet}
+			{#snippet footer(isDesktop: boolean)}
+				{#if isDesktop}
+					<AlertDialogAction
+						class={buttonVariants({ variant: 'destructive' })}
+						onclick={restartGame}
+					>
+						Reload Page
+					</AlertDialogAction>
+				{:else}
+					<Button variant="destructive" onclick={restartGame}>Reload Page</Button>
+				{/if}
+			{/snippet}
+		</ResponsiveDialog>
 	{/if}
+
 	<div bind:this={gameContainer} id="game-container" class="h-full w-full"></div>
 </div>

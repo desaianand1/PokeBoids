@@ -69,7 +69,7 @@
 				class="flex items-center justify-center gap-1 text-center"
 				title={currentContent.title}
 			>
-				<Info class="h-4 w-4" />
+				<Info class="size-4" />
 				{currentContent.title}
 			</Button>
 		</PopoverTrigger>

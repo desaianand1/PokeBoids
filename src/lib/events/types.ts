@@ -66,7 +66,7 @@ export type BoidEvents = {
 export type SimulationEvents = {
 	'simulation-resumed': void;
 	'simulation-paused': void;
-	'simulation-reset': void;
+	'simulation-restart': void;
 	'simulation-speed-changed': { value: number };
 };
 /** Flocking & Flock behavior events */

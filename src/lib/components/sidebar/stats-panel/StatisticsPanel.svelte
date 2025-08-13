@@ -2,8 +2,8 @@
 	import { Card, CardContent, CardHeader, CardTitle } from '$ui/card';
 	import { ChartColumn } from '@lucide/svelte';
 	import { phaserGameRef, gameStats, getRuntimeDuration } from '$game/phaser-signals.svelte';
-	import StatItem from '$components/sidebar/stats-panel/StatItem.svelte';
-	import FpsIndicator from '$components/sidebar/stats-panel/FpsIndicator.svelte';
+	import StatItem from '$sidebar/stats-panel/StatItem.svelte';
+	import FpsIndicator from '$sidebar/stats-panel/FpsIndicator.svelte';
 
 	// State
 	let frameRate = $state(0);

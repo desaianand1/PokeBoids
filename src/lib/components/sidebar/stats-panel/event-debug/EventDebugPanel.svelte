@@ -13,10 +13,10 @@
 	import { toast } from 'svelte-sonner';
 
 	// Import subcomponents
-	import EventSearchBar from '$components/sidebar/stats-panel/event-debug/EventSearchBar.svelte';
-	import EventFilterControls from '$components/sidebar/stats-panel/event-debug/EventFilterControls.svelte';
-	import EventList from '$components/sidebar/stats-panel/event-debug/EventList.svelte';
-	import EventDetails from '$components/sidebar/stats-panel/event-debug/EventDetails.svelte';
+	import EventSearchBar from '$sidebar/stats-panel/event-debug/EventSearchBar.svelte';
+	import EventFilterControls from '$sidebar/stats-panel/event-debug/EventFilterControls.svelte';
+	import EventList from '$sidebar/stats-panel/event-debug/EventList.svelte';
+	import EventDetails from '$sidebar/stats-panel/event-debug/EventDetails.svelte';
 
 	// Import types and constants
 	import type {
