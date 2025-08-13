@@ -1,3 +1,16 @@
+# [2.0.0](https://github.com/desaianand1/PokeBoids/compare/v1.4.0...v2.0.0) (2025-08-13)
+
+
+### Features
+
+* add new component architecture (dock, onboarding, sidebar structure) ([ac98ccd](https://github.com/desaianand1/PokeBoids/commit/ac98ccde0d4f1bd057eecc7efeb4cea9aa2c82a4))
+* added lots of new functionality and UI polish ([f496c89](https://github.com/desaianand1/PokeBoids/commit/f496c894ad7d2af339b773e4da5b1e6948a030f8))
+
+
+### BREAKING CHANGES
+
+* WelcomeDialog and Dock will break prev UI
+
 # [1.4.0](https://github.com/desaianand1/PokeBoids/compare/v1.3.0...v1.4.0) (2025-08-13)
 
 
