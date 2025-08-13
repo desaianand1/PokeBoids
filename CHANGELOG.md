@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/desaianand1/PokeBoids/compare/v1.3.0...v1.4.0) (2025-08-13)
+
+
+### Features
+
+* add new UI components (drawer, checkbox, pagination, responsive-dialog) ([7574832](https://github.com/desaianand1/PokeBoids/commit/7574832c2987ac2a6e6b8d39a4de340a438eb66d))
+
 # [1.3.0](https://github.com/desaianand1/PokeBoids/compare/v1.2.2...v1.3.0) (2025-08-08)
 
 ### Bug Fixes
