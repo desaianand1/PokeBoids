@@ -21,7 +21,9 @@ const config = {
 		alias: {
 			$routes: '.svelte-kit/types/src/routes',
 			$components: 'src/lib/components',
+			$shared: 'src/lib/components/shared',
 			$ui: 'src/lib/components/ui',
+			$sidebar: 'src/lib/components/sidebar',
 			$utils: 'src/lib/utils',
 			$boid: 'src/lib/boid',
 			$config: 'src/lib/config',
