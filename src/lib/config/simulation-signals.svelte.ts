@@ -48,7 +48,7 @@ let boidConfig = $state<BoidConfig>({ ...DEFAULT_BOID_CONFIG });
 let simulationConfig = $state<SimulationConfig>({ ...DEFAULT_SIMULATION_CONFIG });
 
 // Strategy management
-let currentStrategy = $derived<ISimulationModeStrategy>(
+const currentStrategy = $derived<ISimulationModeStrategy>(
 	SimulationModeStrategyFactory.createSimulationStrategy(
 		simulationConfig.simulationMode.default as SimulationMode
 	)

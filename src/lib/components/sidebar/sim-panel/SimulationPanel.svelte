@@ -19,7 +19,9 @@
 		slowSimulationSpeed,
 		advanceSimulationSpeed,
 		getSimulationSpeedRange,
-		resetToDefaults
+		resetToDefaults,
+		getCurrentSimulationMode,
+		switchSimulationMode
 	} from '$config/simulation-signals.svelte';
 
 	// Import subcomponents
@@ -29,7 +31,9 @@
 	import BoundaryModeControls from '$sidebar/sim-panel/BoundaryModeControls.svelte';
 	import FlavorControls from '$sidebar/sim-panel/FlavorControls.svelte';
 	import type { SimulationFlavor } from '$boid/animation/types';
+	import type { SimulationMode } from '$config/types';
 	import { Button, buttonVariants } from '$ui/button';
+	import ModeConfirmationDialog from '$shared/ModeConfirmationDialog.svelte';
 	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$ui/tabs';
 	import { OctagonAlert, Cpu, History, Replace } from 'lucide-svelte';
 	import { DrawerClose } from '$ui/drawer';
@@ -42,6 +46,7 @@
 	const isPlaying = $derived(isSimulationPlaying());
 	const debugMode = $derived(getDebugMode());
 	const simulationSpeed = $derived(getCurrentSimulationSpeed());
+	const currentMode = $derived(getCurrentSimulationMode());
 
 	function handleUpdateConfig<K extends keyof typeof simulationConfig>(
 		key: K,
@@ -54,8 +59,10 @@
 	let flavorDialogOpen = $state(false);
 	let restartDialogOpen = $state(false);
 	let defaultsDialogOpen = $state(false);
+	let modeConfirmationOpen = $state(false);
 	let pendingFlavor: SimulationFlavor | null = $state(null);
 	let pendingFlavorCancelCallback: (() => void) | undefined = $state(undefined);
+	let pendingMode: SimulationMode | null = $state(null);
 
 	function handleFlavorChange(flavor: SimulationFlavor, onCancel?: () => void): void {
 		if (flavor !== simulationConfig.simulationFlavor.default) {
@@ -85,6 +92,27 @@
 
 	function handleDefaultsClick(): void {
 		defaultsDialogOpen = true;
+	}
+
+	function handleModeSwitch(newMode: SimulationMode): void {
+		if (newMode !== currentMode) {
+			pendingMode = newMode;
+			modeConfirmationOpen = true;
+		}
+	}
+
+	function confirmModeSwitch(): void {
+		if (pendingMode) {
+			switchSimulationMode(pendingMode);
+			restartSimulation();
+			pendingMode = null;
+		}
+		modeConfirmationOpen = false;
+	}
+
+	function cancelModeSwitch(): void {
+		pendingMode = null;
+		modeConfirmationOpen = false;
 	}
 
 	async function confirmDefaultsAndRestartAsync(): Promise<void> {
@@ -170,6 +198,35 @@
 			</TabsList>
 
 			<TabsContent value="general" class="mt-4 space-y-4">
+				<!-- Simulation Mode Settings -->
+				<div class="space-y-2">
+					<h3 class="mb-2 text-sm font-medium text-muted-foreground">Simulation Mode</h3>
+					<div class="p-2">
+						<div class="flex items-center justify-between">
+							<div class="space-y-1">
+								<Label for="mode-switch" class="text-sm font-medium">
+									{currentMode === 'simple' ? 'Simple Boids' : 'Predator-Prey'}
+								</Label>
+								<p class="text-xs text-muted-foreground">
+									{currentMode === 'simple'
+										? 'Unified flocking behavior with basic rules'
+										: 'Biological interactions with hunting and reproduction'}
+								</p>
+							</div>
+							<Switch
+								id="mode-switch"
+								checked={currentMode === 'predator-prey'}
+								onCheckedChange={(checked) =>
+									handleModeSwitch(
+										checked ? ('predator-prey' as SimulationMode) : ('simple' as SimulationMode)
+									)}
+							/>
+						</div>
+					</div>
+				</div>
+
+				<Separator class="my-2" />
+
 				<!-- Population Settings -->
 				<div class="space-y-2">
 					<h3 class="mb-2 text-sm font-medium text-muted-foreground">Population Settings</h3>
@@ -342,3 +399,11 @@
 		{/if}
 	{/snippet}
 </ResponsiveDialog>
+
+<!-- Mode Confirmation Dialog -->
+<ModeConfirmationDialog
+	open={modeConfirmationOpen}
+	newMode={pendingMode || ('simple' as SimulationMode)}
+	onConfirm={confirmModeSwitch}
+	onCancel={cancelModeSwitch}
+/>

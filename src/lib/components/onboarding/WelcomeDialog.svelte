@@ -3,6 +3,7 @@
 	import { Button } from '$ui/button';
 	import { Checkbox } from '$ui/checkbox';
 	import { Label } from '$ui/label';
+	import { Switch } from '$ui/switch';
 	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$ui/tabs';
 	import { ScrollArea } from '$ui/scroll-area';
 	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$ui/card';
@@ -17,19 +18,50 @@
 		Boxes,
 		Milestone,
 		Split,
-		LoaderCircle
+		LoaderCircle,
+		Zap
 	} from 'lucide-svelte';
 	import { onboardingStore } from './onboarding-store.svelte';
 	import { BoidSpriteManager } from '$boid/animation/sprite-manager';
 	import type { ExtractedSpriteFrame } from '$utils/sprite-frame-extractor';
+	import { switchSimulationMode, isPredatorPreyMode } from '$config/simulation-signals.svelte';
+	import { EventBus } from '$events/event-bus';
+	import type { SimulationMode } from '$config/types';
 
 	let activeTab = $state('welcome');
+
+	// Derived state from simulation signals - the Svelte 5 idiomatic way
+	let predatorPreyModeActive = $derived(isPredatorPreyMode());
 
 	// Get display frames reactively using $derived and async
 	let spriteFrames = $state<{
 		predator: ExtractedSpriteFrame | null;
 		prey: ExtractedSpriteFrame | null;
 	}>({ predator: null, prey: null });
+
+	// Handle predator-prey mode toggle - directly call the signal function
+	function handlePredatorPreyToggle(checked: boolean) {
+		const newMode = checked ? ('predator-prey' as SimulationMode) : ('simple' as SimulationMode);
+		switchSimulationMode(newMode);
+	}
+
+	// Enhanced close drawer with proper session-based behavior
+	function handleStartExploring() {
+		const isFirstTime = !onboardingStore.hasSeenWelcome;
+		onboardingStore.closeDrawer();
+
+		// Only spawn boids on first-time users (after splash screen)
+		// Do nothing if user has seen welcome before or opened via Help button
+		if (isFirstTime) {
+			EventBus.emit('spawn-boids-requested', undefined);
+			// Mark as seen so it won't auto-show again
+			onboardingStore.markAsSeen();
+		}
+
+		// Clear restart flag to allow future restarts to potentially show dialog
+		// (only if it becomes first-time again via reset)
+		onboardingStore.clearRestartFlag();
+	}
 
 	// Load sprite frames when dialog opens
 	$effect(() => {
@@ -122,6 +154,46 @@
 								<p class="text-sm font-medium text-primary">
 									From these simple rules emerges organic, lifelike movement!
 								</p>
+							</CardContent>
+						</Card>
+
+						<!-- Predator-Prey Mode Card -->
+						<Card>
+							<CardHeader>
+								<CardTitle class="flex items-center gap-2">
+									<Zap class="size-5" />
+									Simulation Mode
+								</CardTitle>
+							</CardHeader>
+							<CardContent class="space-y-4">
+								<div class="flex items-center justify-between">
+									<div class="space-y-1">
+										<Label for="predator-prey-toggle" class="text-sm font-medium">
+											Predator-Prey Interactions
+										</Label>
+										<p class="text-xs text-muted-foreground">
+											{predatorPreyModeActive
+												? 'Predators hunt prey with biological behaviors'
+												: 'All creatures follow basic flocking rules independently'}
+										</p>
+									</div>
+									<Switch
+										id="predator-prey-toggle"
+										checked={predatorPreyModeActive}
+										onCheckedChange={handlePredatorPreyToggle}
+									/>
+								</div>
+
+								<div class="rounded-lg bg-muted/30 p-3 text-xs text-muted-foreground">
+									<p>
+										<strong>Independent Mode:</strong> All boids flock together peacefully using alignment,
+										cohesion, and separation.
+									</p>
+									<p class="mt-2">
+										<strong>Predator-Prey Mode:</strong> Adds hunting behaviors, health systems, and
+										ecosystem dynamics.
+									</p>
+								</div>
 							</CardContent>
 						</Card>
 					</div>
@@ -329,7 +401,7 @@
 				/>
 				<Label for="dont-show" class="text-sm font-normal">Don't show on startup</Label>
 			</span>
-			<Button onclick={() => onboardingStore.closeDrawer()}>Start Exploring</Button>
+			<Button onclick={handleStartExploring}>Start Exploring</Button>
 		</div>
 	{/snippet}
 </ResponsiveDialog>

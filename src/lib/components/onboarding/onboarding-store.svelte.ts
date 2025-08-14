@@ -9,6 +9,7 @@ class OnboardingStore {
 	private _hasSeenWelcome = $state(false);
 	private _dontShowAgain = $state(false);
 	private _gameReady = $state(false);
+	private _isRestartTriggered = $state(false);
 
 	constructor() {
 		// Check localStorage on initialization
@@ -47,12 +48,22 @@ class OnboardingStore {
 	}
 
 	showWelcomeIfNeeded() {
-		if (!this._hasSeenWelcome && !this._drawerOpen && this._gameReady) {
+		if (
+			!this._hasSeenWelcome &&
+			!this._drawerOpen &&
+			this._gameReady &&
+			!this._isRestartTriggered
+		) {
 			this.openDrawer();
 		}
 	}
 
 	openDrawer() {
+		this._drawerOpen = true;
+	}
+
+	openFromHelp() {
+		// Always allow opening from help button, regardless of other flags
 		this._drawerOpen = true;
 	}
 
@@ -65,6 +76,14 @@ class OnboardingStore {
 		}
 	}
 
+	setRestartTriggered() {
+		this._isRestartTriggered = true;
+	}
+
+	clearRestartFlag() {
+		this._isRestartTriggered = false;
+	}
+
 	markAsSeen() {
 		this._hasSeenWelcome = true;
 		if (typeof window !== 'undefined') {
@@ -75,6 +94,7 @@ class OnboardingStore {
 	resetOnboarding() {
 		this._hasSeenWelcome = false;
 		this._dontShowAgain = false;
+		this._isRestartTriggered = false;
 		if (typeof window !== 'undefined') {
 			localStorage.removeItem(STORAGE_KEY);
 		}
