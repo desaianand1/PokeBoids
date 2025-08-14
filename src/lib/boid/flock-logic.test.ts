@@ -2,6 +2,7 @@ import { describe, test, expect, beforeEach, vi } from 'vitest';
 import { FlockLogic } from '$boid/flock-logic';
 import { TestVectorFactory } from '$tests/implementations/vector';
 import { TestEventBus } from '$tests/implementations/events';
+import { testStrategy } from '$tests/implementations/strategy';
 import { BoidVariant } from '$boid/types';
 import { createMockBoid } from '$tests/utils/mock-boid';
 import { TEST_BOID_CONFIG, TEST_DEFAULTS } from '$tests/utils/constants';
@@ -15,7 +16,7 @@ describe('FlockLogic', () => {
 		vectorFactory = new TestVectorFactory();
 		eventBus = new TestEventBus();
 
-		flockLogic = new FlockLogic(vectorFactory, eventBus, {
+		flockLogic = new FlockLogic(vectorFactory, eventBus, testStrategy, {
 			alignmentWeight: TEST_BOID_CONFIG.alignmentWeight.default,
 			cohesionWeight: TEST_BOID_CONFIG.cohesionWeight.default,
 			separationWeight: TEST_BOID_CONFIG.separationWeight.default,

@@ -1,5 +1,7 @@
 import { EventBus } from '$events/event-bus';
-import type { BoidConfig, BoundaryMode, SimulationConfig } from '$config/types';
+import type { BoidConfig, BoundaryMode, SimulationConfig, SimulationMode } from '$config/types';
+import type { ISimulationModeStrategy } from '$interfaces/strategy';
+import { SimulationModeStrategyFactory, UIDisplayStrategyFactory } from '$strategies';
 import { toast } from 'svelte-sonner';
 import { hasAngleChanged } from '$utils/angles';
 
@@ -36,6 +38,7 @@ const DEFAULT_SIMULATION_CONFIG: SimulationConfig = {
 	initialPredatorCount: { default: 20, min: 0, max: 500, step: 1 },
 	obstacleCount: { default: 0, min: 0, max: 20, step: 1 },
 	simulationFlavor: { default: 'air' },
+	simulationMode: { default: 'simple' },
 	trackStats: { default: true },
 	boundaryMode: { default: 'collidable' },
 	boundaryStuckThreshold: { default: 3000, min: 1000, max: 10000, step: 500 }
@@ -43,6 +46,13 @@ const DEFAULT_SIMULATION_CONFIG: SimulationConfig = {
 
 let boidConfig = $state<BoidConfig>({ ...DEFAULT_BOID_CONFIG });
 let simulationConfig = $state<SimulationConfig>({ ...DEFAULT_SIMULATION_CONFIG });
+
+// Strategy management
+let currentStrategy = $derived<ISimulationModeStrategy>(
+	SimulationModeStrategyFactory.createSimulationStrategy(
+		simulationConfig.simulationMode.default as SimulationMode
+	)
+);
 
 // Simulation state
 let isPlaying = $state(true);
@@ -77,6 +87,7 @@ const simConfigValues = $derived({
 	initialPredatorCount: simulationConfig.initialPredatorCount.default,
 	obstacleCount: simulationConfig.obstacleCount.default,
 	simulationFlavor: simulationConfig.simulationFlavor.default,
+	simulationMode: simulationConfig.simulationMode.default,
 	trackStats: simulationConfig.trackStats.default,
 	boundaryMode: simulationConfig.boundaryMode.default,
 	boundaryStuckThreshold: simulationConfig.boundaryStuckThreshold.default
@@ -120,6 +131,7 @@ $effect.root(() => {
 		EventBus.emit('initial-predator-count-changed', { value: values.initialPredatorCount });
 		EventBus.emit('obstacle-count-changed', { value: values.obstacleCount });
 		EventBus.emit('simulation-flavor-changed', { flavor: values.simulationFlavor });
+		EventBus.emit('simulation-mode-changed', { mode: values.simulationMode as SimulationMode });
 		EventBus.emit('track-stats-changed', { value: values.trackStats });
 		EventBus.emit('boundary-mode-changed', { value: values.boundaryMode as BoundaryMode });
 		EventBus.emit('boundary-stuck-threshold-changed', { value: values.boundaryStuckThreshold });
@@ -255,9 +267,49 @@ function getDebugMode(): boolean {
 
 function restartSimulation() {
 	EventBus.emit('simulation-restart', undefined);
-	toast.error('Simulation Restart', {
-		description: `Restarting with ${simulationConfig.initialPreyCount.default} prey and ${simulationConfig.initialPredatorCount.default} predators`
-	});
+
+	// Get current mode and strategy for appropriate messaging
+	const currentMode = simulationConfig.simulationMode.default as SimulationMode;
+	const uiStrategy = UIDisplayStrategyFactory.createUIStrategy(currentMode);
+	const labels = uiStrategy.getLabels();
+	const visibilityConfig = uiStrategy.getVisibilityConfig();
+
+	// Create appropriate restart message based on simulation mode
+	let description: string;
+	if (currentMode === 'simple') {
+		description = `Restarting with ${simulationConfig.initialPreyCount.default} ${labels.preyLabel.toLowerCase()}`;
+	} else {
+		// Predator-prey mode - show both counts
+		description = `Restarting with ${simulationConfig.initialPreyCount.default} ${labels.preyLabel.toLowerCase()} and ${simulationConfig.initialPredatorCount.default} ${labels.predatorLabel.toLowerCase()}`;
+	}
+
+	toast.error('Simulation Restart', { description });
+}
+
+function switchSimulationMode(newMode: SimulationMode) {
+	updateSimulationConfig('simulationMode', { default: newMode });
+
+	if (newMode === 'predator-prey') {
+		toast.success('Predator-Prey Mode Enabled', {
+			description: 'Predators will now hunt prey with biological behaviors'
+		});
+	} else {
+		toast.info('Simple Boids Mode', {
+			description: 'All boids follow basic flocking rules independently'
+		});
+	}
+}
+
+function getCurrentSimulationMode(): SimulationMode {
+	return simulationConfig.simulationMode.default as SimulationMode;
+}
+
+function getCurrentStrategy(): ISimulationModeStrategy {
+	return currentStrategy;
+}
+
+function isPredatorPreyMode(): boolean {
+	return simulationConfig.simulationMode.default === 'predator-prey';
 }
 
 // Export everything
@@ -276,5 +328,9 @@ export {
 	getSimulationSpeedRange,
 	toggleDebugMode,
 	resetBoidConfigToDefaults,
-	restartSimulation
+	restartSimulation,
+	switchSimulationMode,
+	getCurrentSimulationMode,
+	getCurrentStrategy,
+	isPredatorPreyMode
 };

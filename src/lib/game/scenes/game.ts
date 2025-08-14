@@ -6,12 +6,17 @@ import { BackgroundManager } from '$game/managers/background-manager';
 import { ObstacleManager } from '$game/managers/obstacle-manager';
 import { DebugManager } from '$game/managers/debug-manager';
 import { EffectsManager } from '$game/managers/effects-manager';
-import { getBoidConfig, getSimulationConfig } from '$config/simulation-signals.svelte';
+import {
+	getBoidConfig,
+	getSimulationConfig,
+	getCurrentStrategy
+} from '$config/simulation-signals.svelte';
 import { createCompleteDependencies } from '$adapters';
 import type { SimulationFlavor } from '$boid/animation/types';
 import { EventBus } from '$events/event-bus';
 import type { BoidConfig, BoundaryMode, SimulationConfig } from '$config/types';
 import type { IFlockingConfig } from '$interfaces/flocking';
+import type { ISimulationModeStrategy } from '$interfaces/strategy';
 
 /**
  * Main game scene that coordinates all game components
@@ -31,6 +36,7 @@ export class Game extends Scene {
 	// Configuration and state
 	private boidConfig: Partial<BoidConfig> = getBoidConfig();
 	private simulationConfig: Partial<SimulationConfig> = getSimulationConfig();
+	private strategy: ISimulationModeStrategy = getCurrentStrategy();
 	private simulationActive = true;
 	private simulationSpeed = 1;
 
@@ -83,8 +89,8 @@ export class Game extends Scene {
 			physics: dependencies.physics
 		});
 
-		// Create flock
-		this.flock = new PhaserFlock(this, this.eventEmitter, flockingConfig);
+		// Create flock with strategy
+		this.flock = new PhaserFlock(this, this.eventEmitter, this.strategy, flockingConfig);
 	}
 
 	private setupEventListeners(): void {
@@ -124,6 +130,17 @@ export class Game extends Scene {
 		this.eventEmitter.on('boundary-collision', ({ boid, boundary }) => {
 			this.effectsManager.createCollisionEffect(boid, boundary);
 		});
+
+		// Spawn control event
+		this.eventEmitter.on('spawn-boids-requested', () => {
+			this.spawnInitialBoids();
+		});
+
+		// Simulation mode change event
+		this.eventEmitter.on('simulation-mode-changed', () => {
+			// Update strategy when mode changes
+			this.strategy = getCurrentStrategy();
+		});
 	}
 
 	private emitWorldBounds(): void {
@@ -144,6 +161,15 @@ export class Game extends Scene {
 	}
 
 	private startSimulation(): void {
+		// Create obstacles
+		this.obstacleManager.updateObstacles(this.simulationConfig.obstacleCount?.default ?? 0);
+
+		// Notify scene is ready (but don't spawn boids yet - wait for spawn event)
+		this.eventEmitter.emit('scene-ready', { scene: this });
+		this.eventEmitter.emit('game-started', undefined);
+	}
+
+	private spawnInitialBoids(): void {
 		const margin = 50;
 		const bounds = {
 			minX: margin,
@@ -152,40 +178,33 @@ export class Game extends Scene {
 			maxY: this.scale.height - margin
 		};
 
-		// Create initial boids with current config
-		const prey = this.boidFactory.createPreys(
-			this.simulationConfig.initialPreyCount?.default ?? 0,
-			{
-				...bounds,
-				...this.boidConfig
-			}
+		// Use strategy to calculate spawn counts
+		const spawnConfig = this.strategy.calculateSpawnCounts(
+			this.simulationConfig as SimulationConfig
 		);
-		const predators = this.boidFactory.createPredators(
-			this.simulationConfig.initialPredatorCount?.default ?? 0,
-			{
-				...bounds,
-				...this.boidConfig
-			}
-		);
+
+		// Create boids based on strategy
+		const prey = this.boidFactory.createPreys(spawnConfig.prey, {
+			...bounds,
+			...this.boidConfig
+		});
+		const predators = this.boidFactory.createPredators(spawnConfig.predators, {
+			...bounds,
+			...this.boidConfig
+		});
 
 		// Add boids to flock
 		[...prey, ...predators].forEach((boid) => this.flock.addBoid(boid));
-
-		// Create obstacles
-		this.obstacleManager.updateObstacles(this.simulationConfig.obstacleCount?.default ?? 0);
-
-		// Notify scene is ready
-		this.eventEmitter.emit('scene-ready', { scene: this });
-		this.eventEmitter.emit('game-started', undefined);
 	}
 
 	private resetSimulation(): void {
 		// Clean up existing simulation
 		this.flock.destroy();
 
-		// Refresh configuration values
+		// Refresh configuration values and strategy
 		this.boidConfig = getBoidConfig();
 		this.simulationConfig = getSimulationConfig();
+		this.strategy = getCurrentStrategy();
 
 		const flockingConfig: IFlockingConfig = {
 			alignmentWeight: this.boidConfig.alignmentWeight?.default ?? 1.0,
@@ -200,11 +219,12 @@ export class Game extends Scene {
 			boundaryStuckThreshold: this.simulationConfig.boundaryStuckThreshold?.default ?? 3000
 		};
 
-		// Create new flock
-		this.flock = new PhaserFlock(this, this.eventEmitter, flockingConfig);
+		// Create new flock with updated strategy
+		this.flock = new PhaserFlock(this, this.eventEmitter, this.strategy, flockingConfig);
 
-		// Start new simulation
+		// Start new simulation and immediately spawn boids (restart should restore full simulation)
 		this.startSimulation();
+		this.spawnInitialBoids();
 		this.eventEmitter.emit('game-reset', undefined);
 	}
 

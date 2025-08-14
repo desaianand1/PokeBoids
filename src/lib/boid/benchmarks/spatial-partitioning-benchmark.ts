@@ -1,6 +1,7 @@
 import { FlockLogic } from '$boid/flock-logic';
 import { TestVectorFactory } from '$tests/implementations/vector';
 import { TestEventBus } from '$tests/implementations/events';
+import { TestSimulationModeStrategy } from '$tests/implementations/strategy';
 import { createMockBoid } from '$tests/utils/mock-boid';
 import { BoidVariant } from '$boid/types';
 
@@ -25,8 +26,9 @@ export function runBenchmark(): void {
 		boundaryStuckThreshold: 3000
 	};
 
-	// Create flock logic
-	const flockLogic = new FlockLogic(vectorFactory, eventBus, config);
+	// Create flock logic with test strategy
+	const testStrategy = new TestSimulationModeStrategy();
+	const flockLogic = new FlockLogic(vectorFactory, eventBus, testStrategy, config);
 
 	// Emit world bounds
 	eventBus.emit('world-bounds-initialized', { width: 2000, height: 2000 });
@@ -85,7 +87,8 @@ export function getBenchmarkResults(): {
 		boundaryStuckThreshold: 3000
 	};
 
-	const flockLogic = new FlockLogic(vectorFactory, eventBus, config);
+	const testStrategy2 = new TestSimulationModeStrategy();
+	const flockLogic = new FlockLogic(vectorFactory, eventBus, testStrategy2, config);
 	eventBus.emit('world-bounds-initialized', { width: 2000, height: 2000 });
 
 	const boids = [];

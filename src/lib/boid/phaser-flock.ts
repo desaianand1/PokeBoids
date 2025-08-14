@@ -1,5 +1,6 @@
 import type { Scene } from 'phaser';
 import type { IFlockingConfig } from '$interfaces/flocking';
+import type { ISimulationModeStrategy } from '$interfaces/strategy';
 import { FlockLogic } from '$boid/flock-logic';
 import { PhaserVectorFactory } from '$adapters/phaser-vector';
 import { PhaserBoid } from '$boid/phaser-boid';
@@ -18,13 +19,14 @@ export class PhaserFlock {
 	constructor(
 		private scene: Scene,
 		private eventBus: IGameEventBus,
+		private strategy: ISimulationModeStrategy,
 		config: IFlockingConfig
 	) {
 		// Create vector factory for Phaser
 		const vectorFactory = new PhaserVectorFactory();
 
-		// Create core flock logic
-		this.logic = new FlockLogic(vectorFactory, eventBus, config);
+		// Create core flock logic with strategy
+		this.logic = new FlockLogic(vectorFactory, eventBus, strategy, config);
 	}
 
 	addBoid(boid: PhaserBoid): void {
@@ -99,21 +101,20 @@ export class PhaserFlock {
 	 */
 	private checkPredatorPreyInteractions(): void {
 		// Get predators and prey
-		const predators = this.boids.filter(b => b.getVariant() === BoidVariant.PREDATOR);
-		const prey = this.boids.filter(b => b.getVariant() === BoidVariant.PREY);
+		const predators = this.boids.filter((b) => b.getVariant() === BoidVariant.PREDATOR);
+		const prey = this.boids.filter((b) => b.getVariant() === BoidVariant.PREY);
 
 		for (const predator of predators) {
 			const predatorPos = predator.getBoidPosition();
 			const attackRadius = predator.getAttackRadius();
-			
+
 			// Check if predator can attack (not already attacking and has cooldown)
 			if (!predator.canAttack()) continue;
 
 			for (const preyBoid of prey) {
 				const preyPos = preyBoid.getBoidPosition();
 				const distance = Math.sqrt(
-					Math.pow(predatorPos.x - preyPos.x, 2) + 
-					Math.pow(predatorPos.y - preyPos.y, 2)
+					Math.pow(predatorPos.x - preyPos.x, 2) + Math.pow(predatorPos.y - preyPos.y, 2)
 				);
 
 				// If prey is within attack range, trigger attack
@@ -136,17 +137,16 @@ export class PhaserFlock {
 				const predatorPos = predator.getBoidPosition();
 				const preyPos = prey.getBoidPosition();
 				const distance = Math.sqrt(
-					Math.pow(predatorPos.x - preyPos.x, 2) + 
-					Math.pow(predatorPos.y - preyPos.y, 2)
+					Math.pow(predatorPos.x - preyPos.x, 2) + Math.pow(predatorPos.y - preyPos.y, 2)
 				);
 
 				// If still in range, deal damage and trigger hurt animation
 				if (distance <= predator.getAttackRadius()) {
 					const wasKilled = prey.takeDamage(1); // Deal 1 damage
-					
+
 					// Trigger prey hurt animation
 					prey.playHurt();
-					
+
 					// If prey was killed, remove it (will be handled by existing death system)
 					if (wasKilled) {
 						console.log('Prey killed by predator attack!');
