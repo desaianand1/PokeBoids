@@ -67,7 +67,7 @@ PhaserEventAdapter → IEventSystem + Phaser.Events
 
 #### Strategy Pattern
 
-Modular flocking behaviors with configurable weights:
+**Flocking Behaviors** - Modular behaviors with configurable weights:
 
 ```typescript
 // Individual Behaviors
@@ -78,6 +78,40 @@ BoundaryAvoidanceBehavior implements IFlockingBehavior
 
 // Composition
 CompositeBehavior combines all strategies with weights
+```
+
+**Simulation Mode Strategies** - Clean separation between Simple Boids and Predator-Prey modes:
+
+```typescript
+// Core Strategy Interfaces
+ISimulationModeStrategy - behavioral logic for different modes
+IUIDisplayStrategy - conditional UI rendering based on mode
+
+// Simulation Mode Strategies
+SimpleBoidsStrategy implements ISimulationModeStrategy
+├── Unified flocking behavior (all boids as single group)
+├── Simple spawn configuration
+└── No predator-prey interactions
+
+PredatorPreyStrategy implements ISimulationModeStrategy
+├── Group-based flocking (species-specific behavior)
+├── Biological interaction systems
+└── Complex spawn configuration with predator/prey ratios
+
+// UI Display Strategies
+SimpleBoidsUIStrategy implements IUIDisplayStrategy
+├── Shows unified controls ("Boids" count)
+├── Hides predator-specific UI elements
+└── Disables biological statistics
+
+PredatorPreyUIStrategy implements IUIDisplayStrategy
+├── Shows separate controls ("Prey" and "Predators")
+├── Enables predator-specific UI elements
+└── Displays biological statistics (births, deaths)
+
+// Strategy Factories
+SimulationModeStrategyFactory.createSimulationStrategy(mode)
+UIDisplayStrategyFactory.createUIStrategy(mode)
 ```
 
 #### State Machine Pattern
@@ -108,8 +142,9 @@ Hierarchical component organization with improved separation of concerns:
 ├── SidebarLayout (Responsive Sidebar System)
 │   ├── SidebarContent
 │   │   ├── Simulation Panel
+│   │   │   ├── Mode Switcher (Simple Boids ↔ Predator-Prey)
 │   │   │   ├── PlaybackControls
-│   │   │   ├── PopulationControls
+│   │   │   ├── PopulationControls (strategy-based visibility)
 │   │   │   ├── SpeedControls
 │   │   │   ├── FlavorControls
 │   │   │   └── BoundaryModeControls
@@ -140,6 +175,7 @@ src/lib/components/
 │   ├── onboarding-store.svelte.ts
 │   └── WelcomeDialog.svelte
 ├── shared/
+│   ├── ModeConfirmationDialog.svelte
 │   ├── ParameterSlider.svelte
 │   ├── TabInfoPopover.svelte
 │   └── ThemeSwitcher.svelte
@@ -220,6 +256,8 @@ BoidAnimationController (Per Boid)
 ```
 FloatingDock → Controls Click → SidebarLayout.visible = true
 FloatingDock → Help Click → WelcomeDialog.open = true
+Mode Switcher → Strategy Factory → UI Strategy → Component Visibility
+Mode Switcher → Confirmation Dialog → Simulation Restart
 Sidebar Components → Event Bus → Game Scene → Core Logic
 Core Logic → Event Bus → UI Components → Visual Updates
 Animation System → Sprite Updates → GPU Rendering
@@ -243,9 +281,11 @@ ISpatialPartitioning - Neighbor detection abstraction
 
 ```typescript
 BoidConfig - Simulation parameter definitions
-SimulationConfig - Runtime configuration
+SimulationConfig - Runtime configuration with SimulationMode
 FlockingConfig - Behavior weight configuration
 BoidSpriteConfig - Animation configuration
+IUIVisibilityConfig - Strategy-based UI component visibility
+ISpawnConfig - Mode-specific spawn configuration
 ```
 
 ### Event-Driven Data Flow
@@ -354,6 +394,7 @@ scene.shutdown() → cleans up all resources
 '$config': './src/lib/config',
 '$events': './src/lib/events',
 '$interfaces': './src/lib/interfaces',
+'$strategies': './src/lib/strategies',
 '$adapters': './src/lib/adapters',
 '$utils': './src/lib/utils',
 '$ui': './src/lib/components/ui',

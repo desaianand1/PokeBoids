@@ -71,18 +71,36 @@ The codebase follows a **separation of concerns** principle with framework-agnos
      - `EffectsManager` - Visual effects (collision flashes, etc.)
      - `ObstacleManager` - World boundary management
 
-5. **Event System** (`src/lib/events/`)
+5. **Strategy System** (`src/lib/strategies/`)
+   - `SimulationModeStrategyFactory` - Creates behavior strategies for different simulation modes
+   - `UIDisplayStrategyFactory` - Creates UI display strategies for conditional rendering
+   - Concrete strategies: `SimpleBoidsStrategy`, `PredatorPreyStrategy`, `SimpleBoidsUIStrategy`, `PredatorPreyUIStrategy`
+   - Clean separation between Simple Boids and Predator-Prey modes without if/else chains
+
+6. **Event System** (`src/lib/events/`)
    - `EventBus` - Central event bus for decoupled communication
    - Type-safe events for simulation control, boid updates, flavor changes, and UI interactions
    - Enables loose coupling between UI and game logic
 
-6. **UI Components** (`src/lib/components/`)
-   - `PhaserGame.svelte` - Phaser canvas wrapper
-   - `SidebarLayout.svelte` - Collapsible sidebar system
-   - Config panels for real-time parameter adjustment
-   - `FlavorControls.svelte` - Environment flavor switching using shadcn ToggleGroup
-   - Event debug panel for monitoring system events
-   - Credits panel with proper attributions
+7. **UI Components** (`src/lib/components/`)
+
+   **New Architecture (Post-Major Refactoring)**:
+   - `dock/FloatingDock.svelte` - Central control hub with theme switcher, controls, help, and audio buttons
+   - `onboarding/WelcomeDialog.svelte` - Comprehensive onboarding system with tabbed tutorial
+   - `shared/` - Reusable components (ParameterSlider, TabInfoPopover, ThemeSwitcher)
+   - `sidebar/` - Organized sidebar panels in dedicated subdirectories
+     - `SidebarLayout.svelte` - Responsive sidebar system with mobile drawer support
+     - `sim-panel/` - Simulation controls (playback, population, speed, flavor, boundary modes)
+     - `boid-config-panel/` - Real-time parameter adjustment panels
+     - `stats-panel/` - FPS monitoring, population counts, and event debug panel
+     - `credits-panel/` - Proper attributions for sprites and research references
+   - `ui/` - shadcn-svelte components for consistent design system
+
+   **Technical Improvements**:
+   - **ResponsiveDialog**: Enhanced responsive dialog component for better mobile experience
+   - **Sprite Frame Extraction** (`sprite-frame-extractor.ts`): New utility for dynamic sprite display in onboarding
+   - **Enhanced Theme Integration**: Seamless theme switching with improved visual feedback
+   - **Mobile Optimization**: Better responsive design with touch-friendly controls
 
 ### Adapter Pattern
 
@@ -123,9 +141,12 @@ The project uses path aliases for clean imports:
 - `$config` → `src/lib/config`
 - `$events` → `src/lib/events`
 - `$interfaces` → `src/lib/interfaces`
+- `$strategies` → `src/lib/strategies`
 - `$adapters` → `src/lib/adapters`
 - `$utils` → `src/lib/utils`
 - `$ui` → `src/lib/components/ui`
+- `$sidebar` → `src/lib/components/sidebar`
+- `$shared` → `src/lib/components/shared`
 - `$tests` → `tests`
 
 ## Key Implementation Details
@@ -174,37 +195,98 @@ The boids support 8-directional sprite animations with multiple states:
 - Configurable perception/separation radii to limit calculations
 - GPU-accelerated rendering via Phaser 3
 
-## Current Development Status
+## Current Development Status (v1.3.0+)
 
-### Completed Features
+### Completed Features ✅
 
-- Core flocking behaviors (alignment, cohesion, separation)
-- Framework-agnostic architecture with adapter pattern
-- Spatial partitioning for performance
-- Field of view perception system
-- **Animation system with 8-directional sprite support**
-- **Group-based flocking with auto-generated group IDs**
-- **Environment flavor system (air/land/water) with UI controls**
-- **JSON-based sprite configuration system**
-- Event-driven state management
-- UI with real-time parameter controls
-- Theme switching with day/night backgrounds
-- Credits panel with proper attributions
-- Semantic versioning system
+- **Core flocking behaviors** (alignment, cohesion, separation) with real-time parameter adjustment
+- **Framework-agnostic architecture** with adapter pattern for maintainable, testable code
+- **Spatial partitioning** using QuadTree for O(n log n) performance with large populations
+- **Field of view perception system** with biologically-inspired predator/prey vision patterns
+- **Animation system** with 8-directional sprite support and state machine (walk, attack, hurt)
+- **Group-based flocking** with auto-generated group IDs for species-specific behavior
+- **Environment flavor system** (air/land/water) with UI controls and themed backgrounds
+- **JSON-based sprite configuration** system for dynamic sprite management
+- **FloatingDock control system** - new central control hub replacing static sidebar approach
+- **WelcomeDialog onboarding** - comprehensive tutorial system with tabbed interface (Intro, Creatures, Controls, Tips)
+- **Responsive UI architecture** with new component organization (dock/, onboarding/, shared/, sidebar/)
+- **Event-driven state management** with centralized EventBus and type-safe communication
+- **Professional CI/CD pipeline** with automated testing, semantic versioning, and GitHub Pages deployment
+- **Theme integration** with automatic day/night backgrounds and seamless theme switching
+- **Semantic versioning system** with automated version management
 
-### In Progress
+### Biological Features - Scaffolding Present but Non-Functional ⚠️
 
-- Performance optimization for 60 FPS target
-- Attack/hurt animation triggers in predator-prey interactions
-- Advanced predator-prey dynamics with animation integration
-- Biological features (health, stamina, reproduction)
-- Leveling system implementation
+**Current Status**: Code scaffolding exists but features don't work properly in actual gameplay:
+
+- **Predator-prey combat**: Code framework present but collision detection and damage dealing not functioning
+- **Attack/hurt animations**: Animation states and controllers exist but not properly triggering during encounters
+- **Health/stamina system**: Basic stats implemented but damage system not working in practice
+- **Death mechanics**: No system to remove boids when health reaches zero
+- **Reproduction system**: Progress tracking exists but no actual boid creation occurs
+- **Visual feedback**: No health/stamina indicators or damage effects visible to user
+
+### Critical Priority - Biological System Activation 🔥
+
+The highest priority is **activating the biological systems** that have scaffolding in place but aren't functioning:
+
+- **Implement functional predator-prey interactions** with working collision detection
+- **Fix attack/hurt animation triggers** to work during actual encounters
+- **Complete damage system** to properly reduce health and provide feedback
+- **Add death mechanics** to remove boids when health reaches zero
+- **Activate reproduction system** to create new boids when thresholds are met
+- **Add visual health indicators** in UI or on boids themselves
 
 ### Known Issues
 
 - Frame rate drops with very large boid populations
 - Memory usage spikes during reproduction events
 - Some boundary collision edge cases
+
+## Current Development Priorities
+
+### Immediate Tasks (From TODO.md)
+
+**✅ COMPLETED: Welcome Dialog & Startup Flow (Task #1)**
+
+- Strategy pattern implementation for clean mode separation
+- UI display strategies for conditional component rendering
+- Mode switching with confirmation dialogs and restart behavior
+- Session-based welcome dialog management
+
+**1. Simulation Runtime & Stats**
+
+- Fix runtime timer to pause when simulation pauses (track active runtime only)
+- Add granular runtime formatting (days:hours:seconds)
+
+**2. Boid Collisions & Hit Effects**
+
+- Fix collision effects to work with PMD sprites and animations
+- Implement white flashing hit effects when boids are hurt
+- Fix boundary/obstacle collision detection (prevent pass-through)
+
+**3. UI: Drawer, Layout & Nested Drawers**
+
+- Fix responsive drawer full-screen issues and snap points
+- Configure nested drawer support for mobile (Reset, Restart, Change Environment dialogs)
+
+**4. Panels & Settings**
+
+- Rename "Fun" tab to "Advanced Settings"
+
+**5. Slider Labels & User Guidance**
+
+- Add concise explanatory labels under sliders for user comprehension
+
+### Critical Priority - Biological System Activation 🔥
+
+Transform existing scaffolding into functional gameplay:
+
+- **Fix predator-prey collision detection** and make attacks actually work
+- **Activate combat animations** to trigger properly during encounters
+- **Implement working damage system** with visual feedback
+- **Add death mechanics** to remove boids when health reaches zero
+- **Complete reproduction system** to spawn new boids
 
 ## Important Constraints
 
@@ -225,7 +307,13 @@ The boids support 8-directional sprite animations with multiple states:
    - Clean separation of concerns
    - Type-safe event system
 
-4. **Commit Guidelines**
+4. **Development Infrastructure**
+   - **CI/CD Pipeline**: Automated testing, building, and deployment with GitHub Actions
+   - **Semantic Release**: Automated version management following SemVer 2.0.0
+   - **GitHub Pages**: Static site deployment with custom domain support
+   - **Quality Gates**: ESLint, Prettier, TypeScript checks, and comprehensive testing
+
+5. **Commit Guidelines**
    - NEVER add Claude as a contributor to commits
    - NO mentions of Claude in commit messages or footers
    - Use clean, conventional commit format only
