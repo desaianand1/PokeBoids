@@ -4,10 +4,19 @@
 	import { phaserGameRef, gameStats, getRuntimeDuration } from '$game/phaser-signals.svelte';
 	import StatItem from '$sidebar/stats-panel/StatItem.svelte';
 	import FpsIndicator from '$sidebar/stats-panel/FpsIndicator.svelte';
+	import { getCurrentStrategy } from '$config/simulation-signals.svelte';
+	import { UIDisplayStrategyFactory } from '$strategies/ui-display';
+	import { cn } from '$lib/utils';
 
 	// State
 	let frameRate = $state(0);
 	const runtimeDuration = $derived(getRuntimeDuration());
+
+	// Reactive UI strategy based on current simulation mode
+	const currentSimStrategy = $derived(getCurrentStrategy());
+	const uiStrategy = $derived(UIDisplayStrategyFactory.createUIStrategy(currentSimStrategy.mode));
+	const visibilityConfig = $derived(uiStrategy.getVisibilityConfig());
+	const labels = $derived(uiStrategy.getLabels());
 
 	// Format time as MM:SS
 	function formatTime(seconds: number): string {
@@ -36,19 +45,39 @@
 		</CardTitle>
 	</CardHeader>
 	<CardContent>
-		<div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+		<div
+			class={cn(
+				'grid gap-4',
+				visibilityConfig.showBiologicalStats
+					? 'grid-cols-2 md:grid-cols-4'
+					: 'grid-cols-2 md:grid-cols-3'
+			)}
+		>
 			<!-- Population Stats -->
 			<StatItem label="Total Boids" value={gameStats.totalBoids} />
-			<StatItem label="Prey" value={gameStats.preyCount} textClass="text-green-500" />
-			<StatItem label="Predators" value={gameStats.predatorCount} textClass="text-red-500" />
+
+			{#if visibilityConfig.showPreyStats}
+				<StatItem label={labels.preyLabel} value={gameStats.preyCount} textClass="text-green-500" />
+			{/if}
+
+			{#if visibilityConfig.showPredatorStats}
+				<StatItem
+					label={labels.predatorLabel}
+					value={gameStats.predatorCount}
+					textClass="text-red-500"
+				/>
+			{/if}
+
 			<StatItem label="Runtime" value={formatTime(runtimeDuration)} />
 
 			<!-- Performance Stats -->
 			<FpsIndicator fps={frameRate} />
 
-			<!-- Event Stats -->
-			<StatItem label="Births" value={gameStats.reproductionEvents} textClass="text-blue-500" />
-			<StatItem label="Deaths" value={gameStats.deathEvents} textClass="text-gray-500" />
+			<!-- Biological Event Stats - Only show in predator-prey mode -->
+			{#if visibilityConfig.showBiologicalStats}
+				<StatItem label="Births" value={gameStats.reproductionEvents} textClass="text-blue-500" />
+				<StatItem label="Deaths" value={gameStats.deathEvents} textClass="text-gray-500" />
+			{/if}
 		</div>
 	</CardContent>
 </Card>
