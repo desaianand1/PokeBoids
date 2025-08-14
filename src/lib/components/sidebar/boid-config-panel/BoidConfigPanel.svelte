@@ -21,19 +21,11 @@
 	import { Label } from '$ui/label';
 	import { Switch } from '$ui/switch';
 	import { Separator } from '$ui/separator';
-	import { getCurrentStrategy } from '$config/simulation-signals.svelte';
-	import { UIDisplayStrategyFactory } from '$strategies/ui-display';
-
 	// State
 	let activeTab = $state('flocking');
 	let defaultsDialogOpen = $state(false);
 	const boidConfig = $derived(getBoidConfig());
 	const debugMode = $derived(getDebugMode());
-
-	// Reactive UI strategy based on current simulation mode
-	const currentSimStrategy = $derived(getCurrentStrategy());
-	const uiStrategy = $derived(UIDisplayStrategyFactory.createUIStrategy(currentSimStrategy.mode));
-	const visibilityConfig = $derived(uiStrategy.getVisibilityConfig());
 
 	// Helper function to create parameter update handler
 	function handleUpdate<K extends keyof BoidConfig>(key: K, value: BoidConfig[K]): void {
@@ -101,7 +93,6 @@
 					perceptionRadius={boidConfig.perceptionRadius}
 					separationRadius={boidConfig.separationRadius}
 					fieldOfViewAngle={boidConfig.fieldOfViewAngle}
-					{visibilityConfig}
 					onUpdate={handleUpdate}
 				/>
 			</TabsContent>
