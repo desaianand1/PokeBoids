@@ -33,9 +33,10 @@ export class SimpleBoidsUIStrategy implements IUIDisplayStrategy {
 
 	getConfirmationConfig() {
 		return {
-			requiresConfirmation: false,
-			confirmationTitle: '',
-			confirmationMessage: ''
+			requiresConfirmation: true,
+			confirmationTitle: 'Switch to Simple Boids Mode?',
+			confirmationMessage:
+				'This will restart the simulation with basic flocking behavior enabled. Continue?'
 		};
 	}
 }

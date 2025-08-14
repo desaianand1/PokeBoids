@@ -37,6 +37,9 @@ const phaserGameRef = $state<PhaserGameRef>(initialGameRef);
 const gameStats = $state<GameStatistics>(initialGameStats);
 let runtimeInterval = $state<NodeJS.Timeout>();
 let gameRuntimeDuration = $state<number>(0);
+let runtimeStartTime = $state<number>(0);
+let runtimePausedTime = $state<number>(0);
+let isRuntimePaused = $state<boolean>(false);
 
 // Initialize the game
 function initialize(containerId: string) {
@@ -77,6 +80,15 @@ function initialize(containerId: string) {
 			gameStats.reproductionEvents = 0;
 			gameStats.deathEvents = 0;
 		});
+
+		// Listen for simulation pause/resume events to control runtime timer
+		EventBus.subscribe('simulation-paused', () => {
+			pauseRuntimeTimer();
+		});
+
+		EventBus.subscribe('simulation-resumed', () => {
+			resumeRuntimeTimer();
+		});
 	} catch (err) {
 		phaserGameRef.error = err instanceof Error ? err : new Error('Unknown error');
 		console.error('Failed to initialize Phaser game:', phaserGameRef.error);
@@ -103,6 +115,8 @@ function destroy() {
 	EventBus.unsubscribe('boid-reproduced');
 	EventBus.unsubscribe('boid-removed');
 	EventBus.unsubscribe('game-reset');
+	EventBus.unsubscribe('simulation-paused');
+	EventBus.unsubscribe('simulation-resumed');
 }
 
 function resetStats() {
@@ -113,15 +127,40 @@ function resetStats() {
 function startGameRuntimeTimer() {
 	if (runtimeInterval) clearInterval(runtimeInterval);
 	// Start tracking runtime
-	const startTime = Date.now();
+	runtimeStartTime = Date.now();
+	runtimePausedTime = 0;
+	isRuntimePaused = false;
 	runtimeInterval = setInterval(() => {
-		gameRuntimeDuration = Math.floor((Date.now() - startTime) / 1000);
+		if (!isRuntimePaused) {
+			const currentTime = Date.now();
+			gameRuntimeDuration = Math.floor((currentTime - runtimeStartTime - runtimePausedTime) / 1000);
+		}
 	}, 1000);
+}
+
+function pauseRuntimeTimer() {
+	if (!isRuntimePaused) {
+		isRuntimePaused = true;
+		// Remember when we paused to subtract this time later
+		runtimePausedTime += Date.now() - (runtimeStartTime + runtimePausedTime);
+	}
+}
+
+function resumeRuntimeTimer() {
+	if (isRuntimePaused) {
+		isRuntimePaused = false;
+		// Adjust the start time to account for paused duration
+		runtimeStartTime = Date.now() - gameRuntimeDuration * 1000;
+		runtimePausedTime = 0;
+	}
 }
 
 function resetGameRuntimeTimer() {
 	clearInterval(runtimeInterval);
 	gameRuntimeDuration = 0;
+	runtimeStartTime = 0;
+	runtimePausedTime = 0;
+	isRuntimePaused = false;
 }
 
 function getRuntimeDuration(): number {

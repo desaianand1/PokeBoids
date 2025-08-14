@@ -58,6 +58,14 @@ class OnboardingStore {
 		}
 	}
 
+	shouldAutoSpawnBoids() {
+		// Auto-spawn boids if user has seen welcome before (return visit)
+		// but don't spawn if it's a restart event or dialog is open
+		return (
+			this._hasSeenWelcome && this._gameReady && !this._isRestartTriggered && !this._drawerOpen
+		);
+	}
+
 	openDrawer() {
 		this._drawerOpen = true;
 	}

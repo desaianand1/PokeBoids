@@ -18,11 +18,25 @@
 	const visibilityConfig = $derived(uiStrategy.getVisibilityConfig());
 	const labels = $derived(uiStrategy.getLabels());
 
-	// Format time as MM:SS
+	// Format time with hybrid approach: MM:SS under 1hr, adaptive above
 	function formatTime(seconds: number): string {
-		const mins = Math.floor(seconds / 60);
-		const secs = seconds % 60;
-		return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+		if (seconds < 3600) {
+			// Under 1 hour: use MM:SS format
+			const mins = Math.floor(seconds / 60);
+			const secs = seconds % 60;
+			return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+		}
+
+		// 1 hour and above: use adaptive format
+		const days = Math.floor(seconds / 86400);
+		const hours = Math.floor((seconds % 86400) / 3600);
+		const mins = Math.floor((seconds % 3600) / 60);
+
+		if (days > 0) {
+			return `${days}d ${hours}h ${mins}m`;
+		} else {
+			return `${hours}h ${mins}m`;
+		}
 	}
 
 	// Performance tracking using runes

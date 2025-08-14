@@ -130,12 +130,12 @@
 	{/snippet}
 	{#snippet description()}
 		<p>
-			This will ONLY
-			<span class="text-destructive">reset</span>
-			all boid behavior parameters to their
-			<span class="text-destructive">default values!</span>
+			This will ONLY reset all
+			<span class="font-semibold">boid behavior parameters</span>
+			to their
+			<span class="font-semibold underline">default values!</span>
 		</p>
-		<p>Changes will apply immediately to all existing boids.</p>
+		<p class="mt-1">Changes will apply immediately to all existing boids.</p>
 	{/snippet}
 	{#snippet footer(isDesktop: boolean)}
 		{#if isDesktop}

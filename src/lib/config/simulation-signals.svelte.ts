@@ -272,7 +272,6 @@ function restartSimulation() {
 	const currentMode = simulationConfig.simulationMode.default as SimulationMode;
 	const uiStrategy = UIDisplayStrategyFactory.createUIStrategy(currentMode);
 	const labels = uiStrategy.getLabels();
-	const visibilityConfig = uiStrategy.getVisibilityConfig();
 
 	// Create appropriate restart message based on simulation mode
 	let description: string;

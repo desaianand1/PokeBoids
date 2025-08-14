@@ -4,6 +4,7 @@
 	import SidebarLayout from '$sidebar/SidebarLayout.svelte';
 	import WelcomeDialog from '$components/onboarding/WelcomeDialog.svelte';
 	import { onboardingStore } from '$components/onboarding/onboarding-store.svelte';
+	import { EventBus } from '$events/event-bus';
 	import type Phaser from 'phaser';
 
 	// Sidebar state
@@ -20,6 +21,11 @@
 			dockVisible = true;
 			onboardingStore.setGameReady();
 			onboardingStore.showWelcomeIfNeeded();
+
+			// Auto-spawn boids for return users who have seen welcome dialog before
+			if (onboardingStore.shouldAutoSpawnBoids()) {
+				EventBus.emit('spawn-boids-requested', undefined);
+			}
 		},
 		onGameError: (error: Error) => {
 			console.error('Game error:', error);

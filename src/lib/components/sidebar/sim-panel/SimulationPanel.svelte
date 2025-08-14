@@ -21,7 +21,8 @@
 		getSimulationSpeedRange,
 		resetToDefaults,
 		getCurrentSimulationMode,
-		switchSimulationMode
+		switchSimulationMode,
+		isPredatorPreyMode
 	} from '$config/simulation-signals.svelte';
 
 	// Import subcomponents
@@ -35,7 +36,7 @@
 	import { Button, buttonVariants } from '$ui/button';
 	import ModeConfirmationDialog from '$shared/ModeConfirmationDialog.svelte';
 	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$ui/tabs';
-	import { OctagonAlert, Cpu, History, Replace } from 'lucide-svelte';
+	import { OctagonAlert, Cpu, History, ArrowLeftRight, TriangleAlert } from 'lucide-svelte';
 	import { DrawerClose } from '$ui/drawer';
 
 	// State
@@ -63,7 +64,18 @@
 	let pendingFlavor: SimulationFlavor | null = $state(null);
 	let pendingFlavorCancelCallback: (() => void) | undefined = $state(undefined);
 	let pendingMode: SimulationMode | null = $state(null);
+	let pendingModeCancelCallback: (() => void) | undefined = $state(undefined);
 
+	// Local toggle state for mode switch (tracks UI state independently of actual mode)
+	let modeToggleChecked = $state(isPredatorPreyMode());
+
+	// Keep local toggle in sync with actual mode when not in pending state
+	const shouldSyncToggle = $derived(!pendingMode);
+	$effect(() => {
+		if (shouldSyncToggle) {
+			modeToggleChecked = isPredatorPreyMode();
+		}
+	});
 	function handleFlavorChange(flavor: SimulationFlavor, onCancel?: () => void): void {
 		if (flavor !== simulationConfig.simulationFlavor.default) {
 			pendingFlavor = flavor;
@@ -94,9 +106,10 @@
 		defaultsDialogOpen = true;
 	}
 
-	function handleModeSwitch(newMode: SimulationMode): void {
+	function handleModeSwitch(newMode: SimulationMode, onCancel?: () => void): void {
 		if (newMode !== currentMode) {
 			pendingMode = newMode;
+			pendingModeCancelCallback = onCancel;
 			modeConfirmationOpen = true;
 		}
 	}
@@ -107,11 +120,16 @@
 			restartSimulation();
 			pendingMode = null;
 		}
+		pendingModeCancelCallback = undefined;
 		modeConfirmationOpen = false;
 	}
 
 	function cancelModeSwitch(): void {
+		if (pendingModeCancelCallback) {
+			pendingModeCancelCallback();
+		}
 		pendingMode = null;
+		pendingModeCancelCallback = undefined;
 		modeConfirmationOpen = false;
 	}
 
@@ -215,11 +233,17 @@
 							</div>
 							<Switch
 								id="mode-switch"
-								checked={currentMode === 'predator-prey'}
-								onCheckedChange={(checked) =>
-									handleModeSwitch(
-										checked ? ('predator-prey' as SimulationMode) : ('simple' as SimulationMode)
-									)}
+								checked={modeToggleChecked}
+								onCheckedChange={(checked) => {
+									modeToggleChecked = checked === true;
+									const newMode = checked
+										? ('predator-prey' as SimulationMode)
+										: ('simple' as SimulationMode);
+									const revertToggle = () => {
+										modeToggleChecked = !checked;
+									};
+									handleModeSwitch(newMode, revertToggle);
+								}}
 							/>
 						</div>
 					</div>
@@ -282,18 +306,21 @@
 <ResponsiveDialog bind:open={flavorDialogOpen}>
 	{#snippet title()}
 		<span class="inline-flex items-center justify-center gap-2 text-lg font-bold text-primary"
-			><Replace class="stroke-2 text-primary" />Change Environment Flavor?</span
+			><ArrowLeftRight class="stroke-2 text-primary" />Change Environment Flavor?</span
 		>
 	{/snippet}
 	{#snippet description()}
-		<p>
-			This will
-			<span class="text-destructive">restart the simulation</span>
-			and switch to
-			<span class="capitalize text-primary">{pendingFlavor}</span>
-			themed background and sprites.
-		</p>
-		<p>All current boids will be recreated. Continue?</p>
+		<div class="space-y-3">
+			<div class="flex items-center gap-2 text-amber-600">
+				<TriangleAlert class="size-4" />
+				<span class="font-medium">This action will restart the simulation</span>
+			</div>
+			<p class="text-muted-foreground">
+				This will switch to
+				<span class="capitalize text-primary">{pendingFlavor}</span>
+				themed background and sprites. All current boids will be recreated.
+			</p>
+		</div>
 	{/snippet}
 	{#snippet footer(isDesktop: boolean)}
 		{#if isDesktop}
@@ -340,12 +367,16 @@
 		>
 	{/snippet}
 	{#snippet description()}
-		<p>
-			This will
-			<span class="text-destructive">restart the simulation</span>
-			with current settings.
-		</p>
-		<p>All boids will be recreated and positioned randomly.</p>
+		<div class="space-y-3">
+			<div class="flex items-center gap-2 text-amber-600">
+				<TriangleAlert class="size-4" />
+				<span class="font-medium">This action will restart the simulation</span>
+			</div>
+			<p class="text-muted-foreground">
+				This will restart the simulation with current settings. All boids will be recreated and
+				positioned randomly.
+			</p>
+		</div>
 	{/snippet}
 	{#snippet footer(isDesktop: boolean)}
 		{#if isDesktop}
@@ -371,15 +402,16 @@
 		>
 	{/snippet}
 	{#snippet description()}
-		<p>
-			This will
-			<span class="text-destructive">reset</span>
-			ALL simulation & boid settings to their
-			<span class="text-destructive">default values</span>
-			AND
-			<span class="text-destructive">restart</span>
-			the simulation.
-		</p>
+		<div class="space-y-3">
+			<div class="flex items-center gap-2 text-amber-600">
+				<TriangleAlert class="size-4" />
+				<span class="font-medium">This action will restart the simulation</span>
+			</div>
+			<p class="text-muted-foreground">
+				This will reset ALL simulation & boid settings to their default values and restart the
+				simulation.
+			</p>
+		</div>
 	{/snippet}
 	{#snippet footer(isDesktop: boolean)}
 		{#if isDesktop}
