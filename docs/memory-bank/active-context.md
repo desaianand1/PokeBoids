@@ -25,38 +25,39 @@ The project has reached a unique state where all biological features are **imple
 - [ ] **Ecosystem balance**: Implement self-regulating predator-prey dynamics
 - [ ] **Visual feedback systems**: Health bars, stamina indicators, reproduction status
 
-## Recent Changes (Last 3 Days)
+## Recent Changes (Major UI Refactoring)
 
-### 1. Major Infrastructure Improvements ✅
+### 1. Complete UI Architecture Overhaul ✅
+
+- **FloatingDock System**: New central control hub replacing static sidebar approach
+- **WelcomeDialog**: Comprehensive onboarding system with tabbed tutorial (Intro, Creatures, Controls, Tips)
+- **Component Reorganization**: New directory structure with `dock/`, `onboarding/`, `shared/`, and `sidebar/` subdirectories
+- **Responsive Dialog System**: Enhanced `ResponsiveDialog` component for better mobile experience
+- **Sprite Frame Extraction**: New utility (`sprite-frame-extractor.ts`) for dynamic sprite display in onboarding
+
+### 2. Enhanced User Experience ✅
+
+- **Improved Onboarding**: Interactive tutorial explaining boids algorithm, creatures, and controls
+- **Better Navigation**: FloatingDock provides intuitive access to all features
+- **Theme Integration**: Seamless theme switching with improved visual feedback
+- **Mobile Optimization**: Better responsive design with touch-friendly controls
+- **Professional Polish**: Refined animations, transitions, and visual hierarchy
+
+### 3. Component Architecture Improvements ✅
+
+- **Shared Components**: Centralized reusable components in `shared/` directory
+- **Modular Sidebar**: Organized sidebar panels in dedicated subdirectories
+- **Type Safety**: Enhanced TypeScript integration with Svelte 5 runes
+- **Event Handling**: Improved event flow between FloatingDock, Sidebar, and WelcomeDialog
+- **Performance**: Optimized component rendering and state management
+
+### 4. Technical Infrastructure Maintained ✅
 
 - **CI/CD Pipeline**: Complete GitHub Actions workflow with semantic release
 - **Professional Presentation**: Custom splash screen with real-time loading progress
 - **Theme System**: Automatic theme-responsive backgrounds (day/night)
-- **Asset Migration**: Moved all assets to `static/` directory for production compatibility
+- **Asset Management**: Proper asset processing for production builds
 - **Version Management**: Automated versioning with UI display and environment indicators
-
-### 2. Animation System Completion ✅
-
-- **8-Directional Sprites**: Complete Pokémon sprite integration with PMD Sprite Collab assets
-- **Environment Flavors**: Air (Zubat/Crobat), Land, Water environments with themed backgrounds
-- **Animation States**: Walk, Attack, Hurt animations with proper state machine
-- **Group-Based Flocking**: Auto-generated group IDs for species-specific behavior
-- **Performance Optimization**: Animation key caching and efficient sprite management
-
-### 3. UI/UX Enhancements ✅
-
-- **Responsive Design**: Mobile-optimized layout with collapsible sidebar
-- **Flavor Controls**: Toggle group UI for environment switching
-- **Enhanced Statistics**: FPS monitoring with color-coded performance indicators
-- **Event Debug Panel**: Development tool for monitoring system events
-- **Credits Panel**: Proper attribution for sprites and research references
-
-### 4. Code Quality Improvements ✅
-
-- **Svelte 5 Migration**: Complete migration to runes syntax (no legacy stores)
-- **TypeScript Strict Mode**: 100% type safety throughout codebase
-- **Testing Framework**: Comprehensive unit and integration tests with Vitest
-- **Code Standards**: ESLint, Prettier, and commit message validation
 
 ## Architecture Status
 

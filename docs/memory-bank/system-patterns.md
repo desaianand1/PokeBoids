@@ -1,8 +1,8 @@
-# System Patterns: PokéBoids Simulation
+# System Architecture: PokéBoids Simulation
 
-## 1. Architecture Overview
+## Architecture Overview
 
-### 1.1 System Components
+### System Components
 
 - **Core Domain Logic**: Framework-agnostic boid behaviors and flocking algorithms
 - **Adapter Layer**: Phaser-specific implementations with clean abstraction
@@ -12,52 +12,44 @@
 - **Spatial Partitioning**: QuadTree for efficient neighbor detection
 - **CI/CD Pipeline**: Automated testing, building, and deployment
 
-### 1.2 Data Flow Architecture
+### Data Flow Architecture
 
 ```
-User Input → UI Layer → Event Bus → Core Logic → Visual Feedback
-Core Logic → Event Bus → UI Layer → Statistics Display
+User Input → FloatingDock/Sidebar → Event Bus → Core Logic → Visual Feedback
+Core Logic → Event Bus → UI Components → Statistics Display
 Core Logic → Adapter Layer → Phaser Rendering → Animation System
 Animation System → Sprite Manager → GPU Rendering
 ```
 
-### 1.3 Deployment Flow
+### Technology Stack
 
-```
-Code Changes → GitHub → CI Pipeline → Tests → Build → GitHub Pages
-Semantic Release → Version Bump → Changelog → Asset Optimization
-```
+#### Core Frameworks
 
-## 2. Key Technical Decisions
+- **SvelteKit**: Application framework (v2.27+) with static site generation
+- **Svelte 5**: Component framework (v5.38+) using runes syntax exclusively
+- **Phaser 3**: Game engine (v3.90+) for simulation rendering
+- **TypeScript**: Primary development language (v5.9+) with strict mode
 
-### 2.1 Framework Choices
+#### UI and Styling
 
-- **SvelteKit**: Application structure with static site generation
-- **Svelte 5**: Component framework using runes syntax exclusively
-- **Phaser 3**: Game engine for simulation rendering (v3.90+)
-- **shadcn-svelte**: UI component library with bits-ui integration
-- **TypeScript**: Strict mode for complete type safety
-- **TailwindCSS**: Utility-first styling with responsive design
+- **shadcn-svelte**: UI component library with Svelte 5 compatibility
+- **bits-ui**: Base UI primitives (v1.8+) for component foundation
+- **lucide-svelte**: Icon library (v0.539+) for consistent iconography
+- **TailwindCSS**: Utility-first CSS framework (v3.4+) with responsive design
+- **tailwindcss-animate**: Animation utilities for smooth transitions
+- **mode-watcher**: Theme detection and management
 
-### 2.2 State Management Philosophy
+#### Development Tools
 
-- **Svelte 5 Runes**: `$state`, `$derived`, `$effect` for reactive programming
-- **No Legacy Patterns**: Complete elimination of Svelte stores
-- **Component-Scoped State**: Localized state management where appropriate
-- **Event-Driven Updates**: Cross-component communication via EventBus
-- **Interface-Driven Design**: Type-safe state definitions and contracts
+- **Vite**: Build tool (v7.1+) with hot module replacement
+- **pnpm**: Package manager (v9.0+) with workspace support
+- **ESLint**: JavaScript/TypeScript linting (v9.32+) with TypeScript ESLint
+- **Prettier**: Code formatting (v3.6+) with Svelte plugin
+- **Vitest**: Testing framework (v3.2+) with coverage reporting
 
-### 2.3 Performance Architecture
+## Design Patterns
 
-- **Spatial Partitioning**: QuadTree for O(n log n) neighbor detection
-- **GPU Acceleration**: Hardware-accelerated rendering via Phaser 3
-- **Animation Caching**: Cached animation keys to avoid string concatenation
-- **Memory Pooling**: Efficient object reuse for boid instances
-- **Event Debouncing**: Optimized event handling for UI responsiveness
-
-## 3. Design Patterns
-
-### 3.1 Core Architectural Patterns
+### Core Architectural Patterns
 
 #### Adapter Pattern
 
@@ -99,18 +91,67 @@ WalkState → HurtState → WalkState
 // No direct AttackState ↔ HurtState transitions
 ```
 
-### 3.2 UI Patterns
+### UI Patterns
 
-#### Atomic Design
+#### New Architecture (Post-Refactoring)
 
-Hierarchical component organization:
+Hierarchical component organization with improved separation of concerns:
 
 ```
-Atoms: Button, Slider, Badge, Toggle
-Molecules: ParameterSlider, StatItem, TabInfoPopover
-Organisms: BoidConfigPanel, SimulationPanel, EventDebugPanel
-Templates: SidebarLayout, PhaserGame
-Pages: Main application layout
++page.svelte (Main Layout)
+├── PhaserGame (Fullscreen Canvas)
+├── FloatingDock (Central Control Hub)
+│   ├── ThemeSwitcher
+│   ├── Controls Button → Opens Sidebar
+│   ├── Help Button → Opens WelcomeDialog
+│   └── Audio Button (Future)
+├── SidebarLayout (Responsive Sidebar System)
+│   ├── SidebarContent
+│   │   ├── Simulation Panel
+│   │   │   ├── PlaybackControls
+│   │   │   ├── PopulationControls
+│   │   │   ├── SpeedControls
+│   │   │   ├── FlavorControls
+│   │   │   └── BoundaryModeControls
+│   │   ├── Configuration Panel
+│   │   │   ├── FlockingTab
+│   │   │   ├── MovementTab
+│   │   │   └── AvoidanceTab
+│   │   ├── Statistics Panel
+│   │   │   ├── FpsIndicator
+│   │   │   ├── StatItem components
+│   │   │   └── EventDebugPanel
+│   │   └── Credits Panel
+│   └── SidebarFooter
+└── WelcomeDialog (Onboarding System)
+    ├── Intro Tab (Boids explanation)
+    ├── Creatures Tab (Sprite display)
+    ├── Controls Tab (UI guide)
+    └── Tips Tab (Experiments)
+```
+
+#### Component Directory Structure
+
+```
+src/lib/components/
+├── dock/
+│   └── FloatingDock.svelte
+├── onboarding/
+│   ├── onboarding-store.svelte.ts
+│   └── WelcomeDialog.svelte
+├── shared/
+│   ├── ParameterSlider.svelte
+│   ├── TabInfoPopover.svelte
+│   └── ThemeSwitcher.svelte
+├── sidebar/
+│   ├── SidebarContent.svelte
+│   ├── SidebarFooter.svelte
+│   ├── SidebarLayout.svelte
+│   ├── boid-config-panel/
+│   ├── credits-panel/
+│   ├── sim-panel/
+│   └── stats-panel/
+└── ui/ (shadcn-svelte components)
 ```
 
 #### Container-Presenter Pattern
@@ -120,15 +161,16 @@ Separation of logic and presentation:
 ```typescript
 // Container (Logic)
 SimulationPanel.svelte → manages state and events
+BoidConfigPanel.svelte → parameter management
 
 // Presenter (UI)
 PlaybackControls.svelte → pure UI components
-PopulationControls.svelte → parameter display
+ParameterSlider.svelte → reusable parameter display
 ```
 
-## 4. Component Relationships
+## Component Relationships
 
-### 4.1 Core Simulation Architecture
+### Core Simulation Architecture
 
 #### Behavior Layer (Framework Agnostic)
 
@@ -173,40 +215,19 @@ BoidAnimationController (Per Boid)
 └── Frame timing control
 ```
 
-### 4.2 UI Layer Architecture
-
-#### Layout Structure
+### UI Event Flow
 
 ```
-MainLayout
-├── SidebarLayout (responsive)
-│   ├── SimulationPanel
-│   │   ├── PlaybackControls
-│   │   ├── PopulationControls
-│   │   ├── SpeedControls
-│   │   ├── FlavorControls
-│   │   └── BoundaryModeControls
-│   ├── BoidConfigPanel
-│   │   ├── FlockingTab
-│   │   ├── MovementTab
-│   │   └── AvoidanceTab
-│   ├── StatisticsPanel
-│   ├── EventDebugPanel
-│   └── CreditsPanel
-└── PhaserGame (canvas container)
-```
-
-#### Event Flow
-
-```
-UI Components → Event Bus → Game Scene → Core Logic
+FloatingDock → Controls Click → SidebarLayout.visible = true
+FloatingDock → Help Click → WelcomeDialog.open = true
+Sidebar Components → Event Bus → Game Scene → Core Logic
 Core Logic → Event Bus → UI Components → Visual Updates
 Animation System → Sprite Updates → GPU Rendering
 ```
 
-## 5. Data Patterns
+## Data Patterns
 
-### 5.1 Interface-Driven Architecture
+### Interface-Driven Architecture
 
 #### Core Interfaces
 
@@ -227,7 +248,7 @@ FlockingConfig - Behavior weight configuration
 BoidSpriteConfig - Animation configuration
 ```
 
-### 5.2 Event-Driven Data Flow
+### Event-Driven Data Flow
 
 #### Event Categories
 
@@ -249,9 +270,17 @@ BoidSpriteConfig - Animation configuration
 
 All events use strongly-typed payloads with compile-time validation.
 
-## 6. Performance Patterns
+### State Management Philosophy
 
-### 6.1 Spatial Optimization
+- **Svelte 5 Runes**: `$state`, `$derived`, `$effect` for reactive programming
+- **No Legacy Patterns**: Complete elimination of Svelte stores
+- **Component-Scoped State**: Localized state management where appropriate
+- **Event-Driven Updates**: Cross-component communication via EventBus
+- **Interface-Driven Design**: Type-safe state definitions and contracts
+
+## Performance Patterns
+
+### Spatial Optimization
 
 #### QuadTree Implementation
 
@@ -272,7 +301,7 @@ Field of view filtering → Cone-based perception
 Distance culling → Early rejection optimization
 ```
 
-### 6.2 Rendering Optimization
+### Rendering Optimization
 
 #### Animation Performance
 
@@ -293,7 +322,7 @@ Sprite batching → Reduced draw calls
 Texture atlasing → Memory efficiency
 ```
 
-### 6.3 Memory Management
+### Memory Management
 
 #### Object Pooling
 
@@ -311,61 +340,115 @@ boid.destroy() → removes all event listeners
 scene.shutdown() → cleans up all resources
 ```
 
-## 7. CI/CD and Deployment Patterns
+## Build and Deployment
 
-### 7.1 Automated Pipeline
+### Build Configuration
+
+#### Vite Configuration
+
+```typescript
+// Path aliases for clean imports
+'$components': './src/lib/components',
+'$boid': './src/lib/boid',
+'$game': './src/lib/game',
+'$config': './src/lib/config',
+'$events': './src/lib/events',
+'$interfaces': './src/lib/interfaces',
+'$adapters': './src/lib/adapters',
+'$utils': './src/lib/utils',
+'$ui': './src/lib/components/ui',
+'$sidebar': './src/lib/components/sidebar'
+```
+
+#### SvelteKit Configuration
+
+```javascript
+// Static site generation for GitHub Pages
+adapter: adapter_static({
+	pages: 'build',
+	assets: 'build',
+	fallback: undefined,
+	precompress: false,
+	strict: true
+});
+```
+
+### CI/CD Pipeline
 
 #### GitHub Actions Workflow
 
 ```yaml
-# Trigger: Push to main branch
-Code Push → Tests → Build → Deploy
-├── ESLint + Prettier validation
-├── TypeScript compilation
-├── Vitest unit tests
-├── Production build
-└── GitHub Pages deployment
+# .github/workflows/ci-cd.yml
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    - ESLint validation
+    - Prettier check
+    - TypeScript compilation
+    - Vitest unit tests
+    - Coverage reporting
+
+  build:
+    - Production build
+    - Asset optimization
+    - Static site generation
+
+  release:
+    - Semantic release
+    - Version bumping
+    - Changelog generation
+    - GitHub Pages deployment
 ```
 
-#### Semantic Release
+#### Semantic Release Configuration
 
+```json
+{
+	"branches": ["main"],
+	"plugins": [
+		"@semantic-release/commit-analyzer",
+		"@semantic-release/release-notes-generator",
+		"@semantic-release/changelog",
+		"@semantic-release/npm",
+		"@semantic-release/git",
+		"@semantic-release/github"
+	]
+}
 ```
-Conventional Commits → Semantic Versioning → Automated Changelog
-feat: → Minor version bump
-fix: → Patch version bump
-BREAKING CHANGE: → Major version bump
+
+### Version Management
+
+#### Automated Versioning
+
+```bash
+# Version bump commands
+pnpm version:patch  # Bug fixes (1.3.0 → 1.3.1)
+pnpm version:minor  # New features (1.3.0 → 1.4.0)
+pnpm version:major  # Breaking changes (1.3.0 → 2.0.0)
+
+# Automatic synchronization
+postversion hook → scripts/update-version.js → src/lib/utils/version.ts
 ```
 
-### 7.2 Version Management Pattern
-
-#### Automated Synchronization
+#### Version Display
 
 ```typescript
-// package.json (source of truth)
-"version": "1.3.0"
-
-// Automatic sync via postversion hook
-scripts/update-version.js → src/lib/utils/version.ts
-
-// UI display with environment detection
-formatVersion() → "v1.3.0" | "v1.3.0-dev"
+// Environment-aware version display
+export const gameVersion = '1.4.0';
+export function formatVersion(prefix = 'v') {
+	return `${prefix}${gameVersion}${isDev ? '-dev' : ''}`;
+}
 ```
 
-### 7.3 Asset Processing
+## Testing Patterns
 
-#### Static Asset Pipeline
-
-```
-src/assets/ → static/assets/ (migration completed)
-├── Sprite sheets with JSON configuration
-├── Background images (theme-responsive)
-├── Favicon and branding assets
-└── Optimized for production builds
-```
-
-## 8. Testing Patterns
-
-### 8.1 Framework-Agnostic Testing
+### Framework-Agnostic Testing
 
 #### Core Logic Tests
 
@@ -389,7 +472,7 @@ Event system communication testing
 Spatial partitioning performance benchmarks
 ```
 
-### 8.2 UI Testing Strategy
+### UI Testing Strategy
 
 #### Component Testing
 
@@ -408,51 +491,39 @@ EventBus.emit() → component reaction testing
 State synchronization → UI update validation
 ```
 
-## 9. Security and Quality Patterns
+## Coding Standards
 
-### 9.1 Type Safety
+### TypeScript Standards
 
-#### Strict TypeScript
+- **Strict Mode**: All strict TypeScript checks enabled
+- **No Implicit Any**: Explicit type annotations required
+- **Interface-Driven**: Type-safe contracts for all major systems
+- **Consistent Naming**: PascalCase for types, camelCase for variables
 
-```typescript
-// No implicit any, strict null checks
-"strict": true in tsconfig.json
-Interface-driven development
-Compile-time error prevention
-```
+### Svelte Standards
 
-#### Runtime Validation
+- **Runes Only**: Exclusive use of `$state`, `$derived`, `$effect`
+- **Component Scoping**: Localized state management where appropriate
+- **Type-Safe Props**: Explicit prop type definitions
+- **Reactive Patterns**: Proper use of reactive declarations
 
-```typescript
-// Input sanitization
-clamp(value, min, max) → bounded parameters
-isFinite(position.x) → NaN prevention
-hasSignificantLength() → zero-vector handling
-```
+### Code Organization
 
-### 9.2 Code Quality
+- **Path Aliases**: Clean import statements using configured aliases
+- **Atomic Design**: Hierarchical component organization
+- **Separation of Concerns**: Framework-agnostic core with adapters
+- **Single Responsibility**: Focused, testable modules
 
-#### Automated Formatting
+### Styling Standards
 
-```
-Prettier → consistent code style
-ESLint → error prevention and best practices
-lint-staged → pre-commit validation
-Husky → git hook automation
-```
+- **Tailwind Utilities**: Utility-first CSS approach
+- **Consistent Spacing**: Tailwind spacing scale (4px base)
+- **Responsive Design**: Mobile-first responsive patterns
+- **Theme Integration**: Consistent light/dark theme support
 
-#### Documentation Standards
+## Extensibility Patterns
 
-```
-TSDoc comments → API documentation
-Memory bank → architectural decisions
-Claude documentation → AI assistant context
-README → user and developer guidance
-```
-
-## 10. Extensibility Patterns
-
-### 10.1 Plugin Architecture
+### Plugin Architecture
 
 #### Modular Behaviors
 
@@ -476,7 +547,7 @@ EffectsManager → visual feedback systems
 ObstacleManager → environmental elements
 ```
 
-### 10.2 Configuration Extensibility
+### Configuration Extensibility
 
 #### Dynamic Configuration
 
@@ -497,4 +568,46 @@ BoidSpriteManager.addFlavor(config);
 BackgroundManager.addTheme(flavor, backgrounds);
 ```
 
-This architecture provides a solid foundation for continued development while maintaining clean separation of concerns, type safety, and performance optimization.
+## Security and Quality
+
+### Type Safety
+
+#### Strict TypeScript
+
+```typescript
+// No implicit any, strict null checks
+"strict": true in tsconfig.json
+Interface-driven development
+Compile-time error prevention
+```
+
+#### Runtime Validation
+
+```typescript
+// Input sanitization
+clamp(value, min, max) → bounded parameters
+isFinite(position.x) → NaN prevention
+hasSignificantLength() → zero-vector handling
+```
+
+### Code Quality
+
+#### Automated Formatting
+
+```
+Prettier → consistent code style
+ESLint → error prevention and best practices
+lint-staged → pre-commit validation
+Husky → git hook automation
+```
+
+#### Documentation Standards
+
+```
+TSDoc comments → API documentation
+Memory bank → architectural decisions
+Claude documentation → AI assistant context
+README → user and developer guidance
+```
+
+This architecture provides a solid foundation for continued development while maintaining clean separation of concerns, type safety, and performance optimization. The recent UI refactoring has significantly improved the user experience while preserving the robust technical foundation.
