@@ -45,6 +45,9 @@ interface SimulationConfigValues {
 	obstacleCount: number;
 	simulationFlavor: string; // 'air' | 'land' | 'water'
 
+	// Gameplay modes
+	simulationMode: SimulationMode;
+
 	// Statistics tracking
 	trackStats: boolean;
 	boundaryMode: BoundaryMode;
@@ -53,6 +56,14 @@ interface SimulationConfigValues {
 }
 
 export type BoundaryMode = 'collidable' | 'wrappable';
+
+/**
+ * Available simulation modes
+ */
+export enum SimulationMode {
+	SIMPLE = 'simple',
+	PREDATOR_PREY = 'predator-prey'
+}
 
 export type BoidConfig = {
 	[K in keyof BoidConfigValues]: Parameter<BoidConfigValues[K]>;

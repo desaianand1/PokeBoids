@@ -8,6 +8,11 @@ import type {
 } from '$interfaces/events';
 import type { IRandomGenerator, ITimeProvider, IPhysics, IDebugRenderer } from '$interfaces/system';
 import type { IGameEventBus } from '$events/types';
+import type {
+	ISimulationModeStrategy,
+	IUIDisplayStrategy,
+	ISpawnConfig
+} from '$interfaces/strategy';
 
 // Re-export all interfaces
 export type {
@@ -26,7 +31,12 @@ export type {
 	IRandomGenerator,
 	ITimeProvider,
 	IPhysics,
-	IDebugRenderer
+	IDebugRenderer,
+
+	// Strategy interfaces
+	ISimulationModeStrategy,
+	IUIDisplayStrategy,
+	ISpawnConfig
 };
 
 // Core dependencies interface
