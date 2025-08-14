@@ -72,7 +72,7 @@
 			{onControlsClick}
 			{onHelpClick}
 			{onSettingsClick}
-			class={sidebarVisible ? '-translate-x-2/3' : '-translate-x-1/2'}
+			class={sidebarVisible ? '-translate-x-1/2 md:-translate-x-2/3' : '-translate-x-1/2'}
 		/>
 	{/if}
 

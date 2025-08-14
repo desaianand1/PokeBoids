@@ -34,7 +34,7 @@
 
 <div class={cn('space-y-1', className)}>
 	<p class="text-xs uppercase tracking-wider text-muted-foreground">FPS</p>
-	<p class="flex items-center text-2xl font-semibold">
+	<p class="flex items-center justify-center text-2xl font-semibold md:justify-start">
 		{fps}
 		{#if fps > 0}
 			{@const indicator = getFpsIndicator(fps)}

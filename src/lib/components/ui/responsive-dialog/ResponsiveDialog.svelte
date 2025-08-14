@@ -9,6 +9,7 @@
 	} from '$ui/alert-dialog';
 	import {
 		Drawer,
+		DrawerNestedRoot,
 		DrawerContent,
 		DrawerHeader,
 		DrawerTitle,
@@ -27,10 +28,10 @@
 		content?: Snippet;
 		footer?: Snippet<[boolean]>;
 		children?: Snippet;
-		snapPoints?: (number | string)[];
 		shouldScaleBackground?: boolean;
 		scrollAreaClassNames?: string | undefined;
 		containerClassNames?: string | undefined;
+		nested?: boolean;
 	}
 
 	let {
@@ -40,10 +41,10 @@
 		content,
 		footer,
 		children,
-		snapPoints = [0.7, 0.95],
 		shouldScaleBackground = true,
 		scrollAreaClassNames,
-		containerClassNames
+		containerClassNames,
+		nested = false
 	}: Props = $props();
 
 	const isDesktop = new MediaQuery('(min-width: 768px)');
@@ -72,24 +73,36 @@
 		</AlertDialogContent>
 	</AlertDialog>
 {:else}
-	<Drawer bind:open {shouldScaleBackground} {snapPoints}>
+	{#snippet drawerContent()}
 		<DrawerContent>
 			<DrawerHeader class="text-center">
 				{#if title}<DrawerTitle>{@render title()}</DrawerTitle>{/if}
 				{#if description}<DrawerDescription>{@render description()}</DrawerDescription>{/if}
 			</DrawerHeader>
 
-			<ScrollArea class="h-2/3 bg-orange-200">
+			<div
+				class={cn('h-[50vh] max-h-[70vh] min-h-[30vh] overflow-y-auto', nested && 'h-fit min-h-16')}
+			>
 				{#if content}
 					{@render content()}
 				{/if}
-			</ScrollArea>
+			</div>
 
 			{#if footer}
-				<DrawerFooter class="bg-red-100">
+				<DrawerFooter>
 					{@render footer(isDesktop.current)}
 				</DrawerFooter>
 			{/if}
 		</DrawerContent>
-	</Drawer>
+	{/snippet}
+
+	{#if nested}
+		<DrawerNestedRoot bind:open {shouldScaleBackground}>
+			{@render drawerContent()}
+		</DrawerNestedRoot>
+	{:else}
+		<Drawer bind:open {shouldScaleBackground}>
+			{@render drawerContent()}
+		</Drawer>
+	{/if}
 {/if}

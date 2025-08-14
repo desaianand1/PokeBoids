@@ -12,9 +12,16 @@
 		newMode: SimulationMode;
 		onConfirm: () => void;
 		onCancel: () => void;
+		nested?: boolean;
 	}
 
-	const { open, newMode, onConfirm, onCancel }: ModeConfirmationDialogProps = $props();
+	const {
+		open,
+		newMode,
+		onConfirm,
+		onCancel,
+		nested = false
+	}: ModeConfirmationDialogProps = $props();
 
 	// Get confirmation configuration from UI strategy
 	const uiStrategy = $derived(UIDisplayStrategyFactory.createUIStrategy(newMode));
@@ -30,7 +37,7 @@
 	}
 </script>
 
-<ResponsiveDialog {open}>
+<ResponsiveDialog {open} {nested}>
 	{#snippet title()}
 		<span class="inline-flex items-center justify-center gap-2 text-lg font-bold text-primary">
 			<ArrowLeftRight class="size-5 stroke-2 text-primary" />
@@ -39,8 +46,8 @@
 	{/snippet}
 
 	{#snippet description()}
-		<div class="space-y-3">
-			<div class="flex items-center gap-2 text-amber-600">
+		<div class="flex flex-col items-center justify-center gap-4 space-y-3 md:block md:items-start">
+			<div class="mt-2 flex items-center gap-2 text-amber-600 md:mt-0">
 				<TriangleAlert class="size-4" />
 				<span class="font-medium">This action will restart the simulation</span>
 			</div>

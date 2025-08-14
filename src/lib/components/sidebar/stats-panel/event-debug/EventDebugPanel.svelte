@@ -298,7 +298,7 @@
 
 <Card class="w-full shadow-md">
 	<CardHeader class="pb-2">
-		<div class="flex items-center justify-between">
+		<div class="flex items-center justify-between gap-3">
 			<div>
 				<CardTitle class="flex items-center text-lg">
 					<Bug class="mr-2 size-5" />

@@ -20,11 +20,11 @@
 
 <Card class="w-full shadow-md">
 	<CardHeader class="pb-4">
-		<CardTitle class="flex items-center text-lg">
+		<CardTitle class="flex items-center justify-center text-lg md:justify-start">
 			<BookText class="mr-2 size-5" />
 			Credits & References
 		</CardTitle>
-		<CardDescription>
+		<CardDescription class="space-y-3 pt-4">
 			<p>
 				This is an original work developed by <a
 					target="_blank"
@@ -49,7 +49,9 @@
 			<div class="space-y-6 pr-4">
 				<!-- References Section -->
 				<div>
-					<h3 class="flex items-center py-2 text-base font-semibold">
+					<h3
+						class="flex items-center justify-center py-2 text-base font-semibold md:justify-start"
+					>
 						<FileText class="mr-2 size-4" />
 						<span>References</span>
 					</h3>
@@ -201,7 +203,9 @@
 
 				<!-- Assets Section -->
 				<div>
-					<h3 class="flex items-center py-2 text-base font-semibold">
+					<h3
+						class="flex items-center justify-center py-2 text-base font-semibold md:justify-start"
+					>
 						<Palette class="mr-2 size-4" />
 						<span>Asset Credits</span>
 					</h3>

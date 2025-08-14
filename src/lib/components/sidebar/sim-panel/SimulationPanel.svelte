@@ -42,6 +42,7 @@
 	// State
 	const { min: minSimSpeed, max: maxSimSpeed } = getSimulationSpeedRange();
 	const isLargeScreen = new MediaQuery('min-width: 1024px');
+	const isDesktop = new MediaQuery('(min-width: 768px)');
 
 	const simulationConfig = $derived(getSimulationConfig());
 	const isPlaying = $derived(isSimulationPlaying());
@@ -149,7 +150,7 @@
 
 <Card class="w-full shadow-md">
 	<CardHeader class="pb-4">
-		<CardTitle class="flex items-center text-lg">
+		<CardTitle class="flex items-center justify-center text-lg md:justify-start">
 			<Cpu class="mr-2 size-5" />
 			Simulation Controls
 		</CardTitle>
@@ -212,7 +213,7 @@
 		<Tabs value="general" class="w-full">
 			<TabsList class="grid w-full grid-cols-2">
 				<TabsTrigger value="general">General</TabsTrigger>
-				<TabsTrigger value="fun">Fun</TabsTrigger>
+				<TabsTrigger value="fun">Advanced Settings</TabsTrigger>
 			</TabsList>
 
 			<TabsContent value="general" class="mt-4 space-y-4">
@@ -263,20 +264,6 @@
 						/>
 					</div>
 				</div>
-
-				<Separator class="my-2" />
-
-				<!-- Boundary Controls Section -->
-				<div class="space-y-2">
-					<h3 class="mb-2 text-sm font-medium text-muted-foreground">Boundary Settings</h3>
-					<div class="p-2">
-						<BoundaryModeControls
-							boundaryMode={simulationConfig.boundaryMode}
-							boundaryStuckThreshold={simulationConfig.boundaryStuckThreshold}
-							onUpdate={handleUpdateConfig}
-						/>
-					</div>
-				</div>
 			</TabsContent>
 
 			<TabsContent value="fun" class="mt-4 space-y-4">
@@ -287,6 +274,20 @@
 						<FlavorControls
 							currentFlavor={simulationConfig.simulationFlavor.default as SimulationFlavor}
 							onFlavorChange={handleFlavorChange}
+						/>
+					</div>
+				</div>
+
+				<Separator class="my-2" />
+
+				<!-- Boundary Settings Section -->
+				<div class="space-y-2">
+					<h3 class="mb-2 text-sm font-medium text-muted-foreground">Boundary Settings</h3>
+					<div class="p-2">
+						<BoundaryModeControls
+							boundaryMode={simulationConfig.boundaryMode}
+							boundaryStuckThreshold={simulationConfig.boundaryStuckThreshold}
+							onUpdate={handleUpdateConfig}
 						/>
 					</div>
 				</div>
@@ -303,15 +304,15 @@
 </Card>
 
 <!-- Confirmation Dialogs -->
-<ResponsiveDialog bind:open={flavorDialogOpen}>
+<ResponsiveDialog bind:open={flavorDialogOpen} nested={!isDesktop.current}>
 	{#snippet title()}
 		<span class="inline-flex items-center justify-center gap-2 text-lg font-bold text-primary"
 			><ArrowLeftRight class="stroke-2 text-primary" />Change Environment Flavor?</span
 		>
 	{/snippet}
 	{#snippet description()}
-		<div class="space-y-3">
-			<div class="flex items-center gap-2 text-amber-600">
+		<div class="flex flex-col items-center justify-center gap-4 space-y-3 md:block md:items-start">
+			<div class="mt-2 flex items-center gap-2 text-amber-600 md:mt-0">
 				<TriangleAlert class="size-4" />
 				<span class="font-medium">This action will restart the simulation</span>
 			</div>
@@ -360,15 +361,15 @@
 	{/snippet}
 </ResponsiveDialog>
 
-<ResponsiveDialog bind:open={restartDialogOpen}>
+<ResponsiveDialog bind:open={restartDialogOpen} nested={!isDesktop.current}>
 	{#snippet title()}
 		<span class="inline-flex items-center justify-center gap-2 text-lg font-bold text-destructive"
 			><OctagonAlert class="stroke-2 text-destructive" />Restart Simulation?</span
 		>
 	{/snippet}
 	{#snippet description()}
-		<div class="space-y-3">
-			<div class="flex items-center gap-2 text-amber-600">
+		<div class="flex flex-col items-center justify-center gap-4 space-y-3 md:block md:items-start">
+			<div class="mt-2 flex items-center gap-2 text-amber-600 md:mt-0">
 				<TriangleAlert class="size-4" />
 				<span class="font-medium">This action will restart the simulation</span>
 			</div>
@@ -395,15 +396,15 @@
 	{/snippet}
 </ResponsiveDialog>
 
-<ResponsiveDialog bind:open={defaultsDialogOpen}>
+<ResponsiveDialog bind:open={defaultsDialogOpen} nested={!isDesktop.current}>
 	{#snippet title()}
 		<span class="inline-flex items-center justify-center gap-2 text-lg font-bold text-destructive"
 			><OctagonAlert class="stroke-2 text-destructive" />Reset to Defaults?</span
 		>
 	{/snippet}
 	{#snippet description()}
-		<div class="space-y-3">
-			<div class="flex items-center gap-2 text-amber-600">
+		<div class="flex flex-col items-center justify-center gap-4 space-y-3 md:block md:items-start">
+			<div class="mt-2 flex items-center gap-2 text-amber-600 md:mt-0">
 				<TriangleAlert class="size-4" />
 				<span class="font-medium">This action will restart the simulation</span>
 			</div>
@@ -438,4 +439,5 @@
 	newMode={pendingMode || ('simple' as SimulationMode)}
 	onConfirm={confirmModeSwitch}
 	onCancel={cancelModeSwitch}
+	nested={!isDesktop.current}
 />

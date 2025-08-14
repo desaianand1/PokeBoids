@@ -53,7 +53,7 @@
 
 <Card class="w-full shadow-md">
 	<CardHeader class="pb-4">
-		<CardTitle class="flex items-center text-lg">
+		<CardTitle class="flex items-center justify-center text-lg md:justify-start">
 			<ChartColumn class="mr-2 size-5" />
 			Simulation Statistics
 		</CardTitle>
@@ -61,9 +61,9 @@
 	<CardContent>
 		<div
 			class={cn(
-				'grid gap-4',
+				'grid items-center justify-center gap-4 text-center md:justify-start md:text-start',
 				visibilityConfig.showBiologicalStats
-					? 'grid-cols-2 md:grid-cols-4'
+					? 'grid-cols-3 md:grid-cols-4'
 					: 'grid-cols-2 md:grid-cols-3'
 			)}
 		>

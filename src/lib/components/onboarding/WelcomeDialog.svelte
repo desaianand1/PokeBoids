@@ -92,7 +92,7 @@
 		<p class="text-center">An Interactive Boids Simulation</p>
 	{/snippet}
 	{#snippet content()}
-		<Tabs bind:value={activeTab} class="w-full px-4">
+		<Tabs bind:value={activeTab} class="w-full px-4 py-2">
 			<TabsList class="grid grid-cols-4">
 				<TabsTrigger value="welcome">Intro</TabsTrigger>
 				<TabsTrigger value="creatures">Creatures</TabsTrigger>

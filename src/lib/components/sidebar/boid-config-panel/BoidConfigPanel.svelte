@@ -21,11 +21,13 @@
 	import { Label } from '$ui/label';
 	import { Switch } from '$ui/switch';
 	import { Separator } from '$ui/separator';
+	import { MediaQuery } from 'svelte/reactivity';
 	// State
 	let activeTab = $state('flocking');
 	let defaultsDialogOpen = $state(false);
 	const boidConfig = $derived(getBoidConfig());
 	const debugMode = $derived(getDebugMode());
+	const isDesktop = new MediaQuery('(min-width: 768px)');
 
 	// Helper function to create parameter update handler
 	function handleUpdate<K extends keyof BoidConfig>(key: K, value: BoidConfig[K]): void {
@@ -51,7 +53,7 @@
 		<div
 			class="flex flex-col items-center justify-center gap-6 lg:flex-row lg:justify-between lg:gap-0"
 		>
-			<CardTitle class="flex items-center text-lg">
+			<CardTitle class="flex items-center justify-center text-lg md:justify-start">
 				<SlidersVertical class="mr-2 size-5" />
 				Boid Parameters
 			</CardTitle>
@@ -122,14 +124,14 @@
 </Card>
 
 <!-- Confirmation Dialog -->
-<ResponsiveDialog bind:open={defaultsDialogOpen}>
+<ResponsiveDialog bind:open={defaultsDialogOpen} nested={!isDesktop.current}>
 	{#snippet title()}
 		<span class="inline-flex items-center justify-center gap-2 text-lg font-bold text-destructive"
 			><OctagonAlert class="stroke-2 text-destructive" />Reset Boid Parameters?</span
 		>
 	{/snippet}
 	{#snippet description()}
-		<p>
+		<p class="mt-2 md:mt-0">
 			This will ONLY reset all
 			<span class="font-semibold">boid behavior parameters</span>
 			to their
