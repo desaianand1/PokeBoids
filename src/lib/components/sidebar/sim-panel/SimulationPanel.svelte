@@ -329,7 +329,7 @@
 			<AlertDialogCancel onclick={() => (defaultsDialogOpen = false)}>Cancel</AlertDialogCancel>
 			<AlertDialogAction
 				class={buttonVariants({ variant: 'destructive' })}
-				onclick={confirmDefaultsAndRestartAsync}>Reset to Defaults</AlertDialogAction
+				onclick={confirmDefaultsAndRestartAsync}>Reset & Restart</AlertDialogAction
 			>
 		{:else}
 			<DrawerClose
@@ -337,8 +337,7 @@
 				class={buttonVariants({ variant: 'outline' })}
 				>Cancel
 			</DrawerClose>
-			<Button variant="destructive" onclick={confirmDefaultsAndRestartAsync}
-				>Reset to Defaults</Button
+			<Button variant="destructive" onclick={confirmDefaultsAndRestartAsync}>Reset & Restart</Button
 			>
 		{/if}
 	{/snippet}
