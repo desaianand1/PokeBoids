@@ -77,7 +77,7 @@ export class Game extends Scene {
 		this.backgroundManager = new BackgroundManager(this);
 		this.obstacleManager = new ObstacleManager(this);
 		this.debugManager = new DebugManager(this, this.eventEmitter, flockingConfig);
-		this.effectsManager = new EffectsManager(this);
+		this.effectsManager = new EffectsManager(this, this.eventEmitter);
 
 		// Create boid factory with dependencies (config will be passed during creation)
 		const vectorFactory = dependencies.vectorFactory;

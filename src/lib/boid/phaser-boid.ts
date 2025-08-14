@@ -37,10 +37,10 @@ export class PhaserBoid extends Physics.Arcade.Sprite implements IBoid {
 			this.spriteConfig = spriteConfig;
 			this.groupId = spriteConfig.groupId;
 			this.attackRadius = spriteConfig.attackRadius;
-			
+
 			// Create animation controller
 			this.animationController = new BoidAnimationController(scene, this, spriteConfig);
-			
+
 			// Set scale and origin to center for proper positioning
 			this.setScale(spriteConfig.scale);
 			this.setOrigin(0.5, 0.5);
@@ -50,20 +50,22 @@ export class PhaserBoid extends Physics.Arcade.Sprite implements IBoid {
 			super(scene, x, y, texture);
 			this.groupId = `legacy-${variant}-${this.scene.time.now}`;
 			this.attackRadius = variant === BoidVariant.PREDATOR ? 40 : 30;
-			
+
 			// Set legacy display properties
 			this.setupLegacyDisplay();
 		}
 
 		// Add to physics system
 		scene.physics.add.existing(this);
-		
+
 		// Store dependencies for later use
 		this.dependencies = deps;
-		
+
 		// Create behavior instance
 		this.behavior = new BoidBehavior(deps, x, y, variant);
-		
+
+		// Note: Event translation is handled by EffectsManager through type checking
+
 		// Store original tint for flash effects
 		this.originalSpriteTint = this.tint;
 	}
@@ -147,7 +149,12 @@ export class PhaserBoid extends Physics.Arcade.Sprite implements IBoid {
 	}
 
 	takeDamage(amount: number): boolean {
-		return this.behavior.takeDamage(amount);
+		const wasKilled = this.behavior.takeDamage(amount);
+
+		// Trigger hurt animation and visual effects
+		this.playHurtAnimation();
+
+		return wasKilled;
 	}
 
 	increaseReproduction(amount: number): boolean {
@@ -173,9 +180,15 @@ export class PhaserBoid extends Physics.Arcade.Sprite implements IBoid {
 		const velocity = this.behavior.getBoidVelocity();
 
 		// Validate position before setting
-		if (typeof position.x !== 'number' || typeof position.y !== 'number' || 
-			!isFinite(position.x) || !isFinite(position.y)) {
-			console.error(`[PhaserBoid] Invalid position for sprite '${this.getId()}': ${position.x}, ${position.y}`);
+		if (
+			typeof position.x !== 'number' ||
+			typeof position.y !== 'number' ||
+			!isFinite(position.x) ||
+			!isFinite(position.y)
+		) {
+			console.error(
+				`[PhaserBoid] Invalid position for sprite '${this.getId()}': ${position.x}, ${position.y}`
+			);
 			return;
 		}
 
@@ -186,9 +199,15 @@ export class PhaserBoid extends Physics.Arcade.Sprite implements IBoid {
 		if (this.animationController) {
 			try {
 				// Validate velocity before updating direction
-				if (typeof velocity.x !== 'number' || typeof velocity.y !== 'number' ||
-					!isFinite(velocity.x) || !isFinite(velocity.y)) {
-					console.error(`[PhaserBoid] Invalid velocity for sprite '${this.getId()}': ${velocity.x}, ${velocity.y}`);
+				if (
+					typeof velocity.x !== 'number' ||
+					typeof velocity.y !== 'number' ||
+					!isFinite(velocity.x) ||
+					!isFinite(velocity.y)
+				) {
+					console.error(
+						`[PhaserBoid] Invalid velocity for sprite '${this.getId()}': ${velocity.x}, ${velocity.y}`
+					);
 					return;
 				}
 
@@ -196,19 +215,27 @@ export class PhaserBoid extends Physics.Arcade.Sprite implements IBoid {
 
 				// Ensure sprite origin and scale are maintained after animation updates
 				if (this.originX !== 0.5 || this.originY !== 0.5) {
-					console.warn(`[PhaserBoid] Correcting sprite origin for '${this.getId()}' from (${this.originX}, ${this.originY}) to (0.5, 0.5)`);
+					console.warn(
+						`[PhaserBoid] Correcting sprite origin for '${this.getId()}' from (${this.originX}, ${this.originY}) to (0.5, 0.5)`
+					);
 					this.setOrigin(0.5, 0.5);
 				}
 
 				// Validate sprite scale
 				const expectedScale = this.spriteConfig?.scale || 1.0;
-				if (Math.abs(this.scaleX - expectedScale) > 0.01 || Math.abs(this.scaleY - expectedScale) > 0.01) {
-					console.warn(`[PhaserBoid] Correcting sprite scale for '${this.getId()}' from (${this.scaleX}, ${this.scaleY}) to (${expectedScale}, ${expectedScale})`);
+				if (
+					Math.abs(this.scaleX - expectedScale) > 0.01 ||
+					Math.abs(this.scaleY - expectedScale) > 0.01
+				) {
+					console.warn(
+						`[PhaserBoid] Correcting sprite scale for '${this.getId()}' from (${this.scaleX}, ${this.scaleY}) to (${expectedScale}, ${expectedScale})`
+					);
 					this.setScale(expectedScale);
 				}
 
 				// Periodic validation (every ~5 seconds) to catch any issues early
-				if (this.scene.time.now % 5000 < 16) { // Approximately every 5 seconds
+				if (this.scene.time.now % 5000 < 16) {
+					// Approximately every 5 seconds
 					this.validateAndFixSpriteProperties();
 				}
 			} catch (error) {
@@ -227,7 +254,7 @@ export class PhaserBoid extends Physics.Arcade.Sprite implements IBoid {
 	// Combat Methods
 	canAttack(): boolean {
 		const currentTime = this.scene.time.now;
-		return (currentTime - this.lastAttackTime) >= this.attackCooldown;
+		return currentTime - this.lastAttackTime >= this.attackCooldown;
 	}
 
 	playAttack(onComplete?: () => void): void {
@@ -252,6 +279,13 @@ export class PhaserBoid extends Physics.Arcade.Sprite implements IBoid {
 			return this.animationController.isAtHitFrame();
 		}
 		return false;
+	}
+
+	/**
+	 * Get the behavior instance for event matching
+	 */
+	getBehavior() {
+		return this.behavior;
 	}
 
 	destroy(fromScene?: boolean): void {
@@ -291,20 +325,20 @@ export class PhaserBoid extends Physics.Arcade.Sprite implements IBoid {
 		if (this.animationController) {
 			this.animationController.playHurt();
 		}
-		
+
 		// Apply flash effect
 		this.showCollisionFlash();
 	}
 
 	/**
-	 * Show collision flash effect
+	 * Show collision flash effect (standardized to white)
 	 */
 	private showCollisionFlash(): void {
-		// Flash red for hurt
-		this.setTint(0xff4444);
-		
+		// Flash white for all hit effects (standardized)
+		this.setTint(0xffffff);
+
 		// Return to original tint after short delay
-		this.scene.time.delayedCall(200, () => {
+		this.scene.time.delayedCall(150, () => {
 			this.setTint(this.originalSpriteTint);
 		});
 	}
@@ -359,51 +393,70 @@ export class PhaserBoid extends Physics.Arcade.Sprite implements IBoid {
 			// Check current frame dimensions
 			const frameDims = this.animationController.getCurrentFrameDimensions();
 			if (frameDims.width <= 0 || frameDims.height <= 0) {
-				console.error(`[PhaserBoid] Invalid frame dimensions detected for sprite '${this.getId()}': ${frameDims.width}x${frameDims.height}`);
+				console.error(
+					`[PhaserBoid] Invalid frame dimensions detected for sprite '${this.getId()}': ${frameDims.width}x${frameDims.height}`
+				);
 				return;
 			}
 
 			// Ensure origin is centered
 			if (this.originX !== 0.5 || this.originY !== 0.5) {
-				console.warn(`[PhaserBoid] Fixing origin for sprite '${this.getId()}' from (${this.originX}, ${this.originY}) to (0.5, 0.5)`);
+				console.warn(
+					`[PhaserBoid] Fixing origin for sprite '${this.getId()}' from (${this.originX}, ${this.originY}) to (0.5, 0.5)`
+				);
 				this.setOrigin(0.5, 0.5);
 			}
 
 			// Ensure scale is correct
 			const expectedScale = this.spriteConfig.scale;
-			if (Math.abs(this.scaleX - expectedScale) > 0.01 || Math.abs(this.scaleY - expectedScale) > 0.01) {
-				console.warn(`[PhaserBoid] Fixing scale for sprite '${this.getId()}' from (${this.scaleX}, ${this.scaleY}) to (${expectedScale}, ${expectedScale})`);
+			if (
+				Math.abs(this.scaleX - expectedScale) > 0.01 ||
+				Math.abs(this.scaleY - expectedScale) > 0.01
+			) {
+				console.warn(
+					`[PhaserBoid] Fixing scale for sprite '${this.getId()}' from (${this.scaleX}, ${this.scaleY}) to (${expectedScale}, ${expectedScale})`
+				);
 				this.setScale(expectedScale);
 			}
 
 			// Validate position is reasonable
 			const pos = this.getBoidPosition();
 			if (!isFinite(pos.x) || !isFinite(pos.y)) {
-				console.error(`[PhaserBoid] Invalid position detected for sprite '${this.getId()}': (${pos.x}, ${pos.y})`);
+				console.error(
+					`[PhaserBoid] Invalid position detected for sprite '${this.getId()}': (${pos.x}, ${pos.y})`
+				);
 				// Reset to scene center as emergency fallback
 				const centerX = this.scene.scale.width / 2;
 				const centerY = this.scene.scale.height / 2;
 				const centerPosition = this.dependencies.vectorFactory.create(centerX, centerY);
 				this.setBoidPosition(centerPosition);
-				console.warn(`[PhaserBoid] Reset sprite '${this.getId()}' position to scene center: (${centerX}, ${centerY})`);
+				console.warn(
+					`[PhaserBoid] Reset sprite '${this.getId()}' position to scene center: (${centerX}, ${centerY})`
+				);
 			}
 
 			// Validate texture and animation state
 			if (!this.texture || this.texture.key === '__MISSING') {
-				console.error(`[PhaserBoid] Missing or invalid texture for sprite '${this.getId()}': ${this.texture?.key}`);
+				console.error(
+					`[PhaserBoid] Missing or invalid texture for sprite '${this.getId()}': ${this.texture?.key}`
+				);
 			}
 
 			// Check if current animation exists
 			if (this.anims.currentAnim) {
 				const currentAnimKey = this.anims.currentAnim.key;
 				if (!this.scene.anims.exists(currentAnimKey)) {
-					console.error(`[PhaserBoid] Current animation '${currentAnimKey}' does not exist for sprite '${this.getId()}'`);
+					console.error(
+						`[PhaserBoid] Current animation '${currentAnimKey}' does not exist for sprite '${this.getId()}'`
+					);
 					// Try to restart with walk animation
 					this.animationController.playWalk();
 				}
 			}
 
-			console.debug(`[PhaserBoid] Sprite validation passed for '${this.getId()}': pos(${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}), scale(${this.scaleX}, ${this.scaleY}), origin(${this.originX}, ${this.originY})`);
+			console.debug(
+				`[PhaserBoid] Sprite validation passed for '${this.getId()}': pos(${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}), scale(${this.scaleX}, ${this.scaleY}), origin(${this.originX}, ${this.originY})`
+			);
 		} catch (error) {
 			console.error(`[PhaserBoid] Error during sprite validation for '${this.getId()}':`, error);
 		}

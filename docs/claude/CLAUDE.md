@@ -217,31 +217,29 @@ The boids support 8-directional sprite animations with multiple states:
 
 ### Biological Features - Scaffolding Present but Non-Functional ⚠️
 
-**Current Status**: Code scaffolding exists but features don't work properly in actual gameplay:
+**Current Status**: Progress made on biological systems with collision work completed:
 
-- **Predator-prey combat**: Code framework present but collision detection and damage dealing not functioning
-- **Attack/hurt animations**: Animation states and controllers exist but not properly triggering during encounters
-- **Health/stamina system**: Basic stats implemented but damage system not working in practice
-- **Death mechanics**: No system to remove boids when health reaches zero
-- **Reproduction system**: Progress tracking exists but no actual boid creation occurs
-- **Visual feedback**: No health/stamina indicators or damage effects visible to user
+- **✅ Predator-prey combat**: Collision detection and damage dealing now functional with proper event system
+- **✅ Attack/hurt animations**: Animation states properly trigger during encounters with visual feedback
+- **✅ Health/stamina system**: Damage system working with proper event emission and visual effects
+- **❌ Death mechanics**: No system to remove boids when health reaches zero
+- **❌ Reproduction system**: Progress tracking exists but no actual boid creation occurs
+- **❌ Visual feedback**: No health/stamina indicators or damage effects visible to user (beyond hit flashes)
 
 ### Critical Priority - Biological System Activation 🔥
 
-The highest priority is **activating the biological systems** that have scaffolding in place but aren't functioning:
+Remaining high priority biological system tasks:
 
-- **Implement functional predator-prey interactions** with working collision detection
-- **Fix attack/hurt animation triggers** to work during actual encounters
-- **Complete damage system** to properly reduce health and provide feedback
 - **Add death mechanics** to remove boids when health reaches zero
 - **Activate reproduction system** to create new boids when thresholds are met
-- **Add visual health indicators** in UI or on boids themselves
+- **Add visual health indicators** in UI or on boids themselves (health bars, status indicators)
+- **Enhance visual feedback** beyond collision flashes (health/stamina UI elements)
 
 ### Known Issues
 
 - Frame rate drops with very large boid populations
 - Memory usage spikes during reproduction events
-- Some boundary collision edge cases
+- ~~Some boundary collision edge cases~~ ✅ **FIXED**: Boundary collision prevention now robust with position clamping
 
 ## Current Development Priorities
 
@@ -254,27 +252,30 @@ The highest priority is **activating the biological systems** that have scaffold
 - Mode switching with confirmation dialogs and restart behavior
 - Session-based welcome dialog management
 
-**1. Simulation Runtime & Stats**
+**✅ COMPLETED: Simulation Runtime & Stats (Task #2)**
 
-- Fix runtime timer to pause when simulation pauses (track active runtime only)
-- Add granular runtime formatting (days:hours:seconds)
+- Runtime timer now pauses when simulation pauses (tracks active runtime only)
+- Granular runtime formatting with hybrid approach (MM:SS under 1hr, adaptive format above)
 
-**2. Boid Collisions & Hit Effects**
+**✅ COMPLETED: Boid Collisions & Hit Effects (Task #3)**
 
-- Fix collision effects to work with PMD sprites and animations
-- Implement white flashing hit effects when boids are hurt
-- Fix boundary/obstacle collision detection (prevent pass-through)
+- Enhanced EffectsManager with priority-based effect queue system
+- Standardized white flash colors for all collision types (boundary and hurt effects)
+- Fixed event architecture with clean BoidBehavior → PhaserBoid event translation
+- Improved hurt animation integration with automatic triggering via takeDamage()
+- Strengthened boundary collision prevention with position clamping and velocity reflection
+- Maintained comprehensive type safety with proper TypeScript interfaces
 
-**3. UI: Drawer, Layout & Nested Drawers**
+**1. UI: Drawer, Layout & Nested Drawers**
 
 - Fix responsive drawer full-screen issues and snap points
 - Configure nested drawer support for mobile (Reset, Restart, Change Environment dialogs)
 
-**4. Panels & Settings**
+**2. Panels & Settings**
 
 - Rename "Fun" tab to "Advanced Settings"
 
-**5. Slider Labels & User Guidance**
+**3. Slider Labels & User Guidance**
 
 - Add concise explanatory labels under sliders for user comprehension
 

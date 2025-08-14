@@ -160,6 +160,11 @@ export class BoundaryAvoidanceBehavior implements IFlockingBehavior {
 			}
 		}
 
+		// Enforce hard boundaries to prevent pass-through
+		if (collisionDetected && collisionBoundary) {
+			this.enforceHardBoundaries(boid, collisionBoundary);
+		}
+
 		// Handle stuck boid detection
 		if (collisionDetected) {
 			this.checkForStuckBoid(boid, collisionBoundary, steering);
@@ -314,6 +319,68 @@ export class BoundaryAvoidanceBehavior implements IFlockingBehavior {
 					steering.x += Math.sign(velocity.x) * boid.getMaxSpeed() * 2;
 				}
 				break;
+		}
+	}
+
+	/**
+	 * Enforce hard boundaries by clamping position and reflecting velocity
+	 * This prevents boids from passing through boundaries when steering forces fail
+	 */
+	private enforceHardBoundaries(boid: IBoid, boundary: CollisionBoundary): void {
+		const position = boid.getBoidPosition();
+		const velocity = boid.getBoidVelocity();
+		let positionChanged = false;
+
+		switch (boundary) {
+			case 'left':
+				if (position.x < 0) {
+					position.x = 0;
+					positionChanged = true;
+					// Reflect velocity component
+					if (velocity.x < 0) {
+						velocity.x = Math.abs(velocity.x) * 0.8; // Dampen the reflection
+					}
+				}
+				break;
+
+			case 'right':
+				if (position.x > this.worldWidth) {
+					position.x = this.worldWidth;
+					positionChanged = true;
+					// Reflect velocity component
+					if (velocity.x > 0) {
+						velocity.x = -Math.abs(velocity.x) * 0.8; // Dampen the reflection
+					}
+				}
+				break;
+
+			case 'top':
+				if (position.y < 0) {
+					position.y = 0;
+					positionChanged = true;
+					// Reflect velocity component
+					if (velocity.y < 0) {
+						velocity.y = Math.abs(velocity.y) * 0.8; // Dampen the reflection
+					}
+				}
+				break;
+
+			case 'bottom':
+				if (position.y > this.worldHeight) {
+					position.y = this.worldHeight;
+					positionChanged = true;
+					// Reflect velocity component
+					if (velocity.y > 0) {
+						velocity.y = -Math.abs(velocity.y) * 0.8; // Dampen the reflection
+					}
+				}
+				break;
+		}
+
+		// Update boid position and velocity if changes were made
+		if (positionChanged) {
+			boid.setBoidPosition(position);
+			boid.setBoidVelocity(velocity);
 		}
 	}
 
