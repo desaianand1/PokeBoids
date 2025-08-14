@@ -1,6 +1,6 @@
 import type { Scene } from 'phaser';
 import type { IBoid } from '$interfaces/boid';
-import type { BoidConfig, BoundaryMode, SimulationConfig } from '$config/types';
+import type { BoidConfig, BoundaryMode, SimulationConfig, SimulationMode } from '$config/types';
 import type { BoidStats, BoidVariant } from '$boid/types';
 import type { IEventSystem } from '$interfaces/events';
 
@@ -12,6 +12,7 @@ export type SceneEvents = {
 	'scene-ready': { scene: Scene };
 	'game-started': void;
 	'game-reset': void;
+	'spawn-boids-requested': void;
 	'world-bounds-initialized': { width: number; height: number };
 	'world-bounds-changed': { width: number; height: number };
 };
@@ -139,6 +140,7 @@ export type ConfigEvents = {
 	'initial-predator-count-changed': { value: number };
 	'obstacle-count-changed': { value: number };
 	'track-stats-changed': { value: boolean };
+	'simulation-mode-changed': { mode: SimulationMode };
 	'simulation-config-changed': { config: SimulationConfig };
 	'boundary-mode-changed': { value: BoundaryMode };
 	'boundary-stuck-threshold-changed': { value: number };

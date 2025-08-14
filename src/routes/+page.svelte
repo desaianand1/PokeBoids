@@ -9,11 +9,15 @@
 	// Sidebar state
 	let sidebarVisible = $state(false);
 
+	// Dock visibility state - only show after game scene is ready
+	let dockVisible = $state(false);
+
 	// Game event handlers
 	const gameHandlers = {
 		onSceneReady: (scene: Phaser.Scene) => {
 			console.debug('Scene ready:', scene.scene.key);
-			// Mark game as ready for onboarding
+			// Mark game as ready for onboarding and show dock
+			dockVisible = true;
 			onboardingStore.setGameReady();
 			onboardingStore.showWelcomeIfNeeded();
 		},
@@ -25,6 +29,8 @@
 		},
 		onGameReset: () => {
 			console.debug('Game reset');
+			// Set restart flag to prevent welcome dialog on restart
+			onboardingStore.setRestartTriggered();
 		}
 	};
 
@@ -34,7 +40,7 @@
 	}
 
 	function onHelpClick() {
-		onboardingStore.openDrawer();
+		onboardingStore.openFromHelp();
 	}
 
 	function onSettingsClick() {
@@ -55,12 +61,14 @@
 	</div>
 
 	<!-- Floating Dock -->
-	<FloatingDock
-		{onControlsClick}
-		{onHelpClick}
-		{onSettingsClick}
-		class={sidebarVisible ? '-translate-x-2/3' : '-translate-x-1/2'}
-	/>
+	{#if dockVisible}
+		<FloatingDock
+			{onControlsClick}
+			{onHelpClick}
+			{onSettingsClick}
+			class={sidebarVisible ? '-translate-x-2/3' : '-translate-x-1/2'}
+		/>
+	{/if}
 
 	<!-- Sidebar System -->
 	<SidebarLayout bind:visible={sidebarVisible} onClose={onSidebarClose} />
