@@ -1,3 +1,27 @@
+# [3.0.0](https://github.com/desaianand1/PokeBoids/compare/v2.0.0...v3.0.0) (2025-08-15)
+
+
+### Bug Fixes
+
+* **collision:** improve collision handling and hit effect visual flashes ([b19a9d5](https://github.com/desaianand1/PokeBoids/commit/b19a9d5094b081a66e1b6d684a4a120e60e11a85))
+* drawer, nested drawer now work and size as intended. sm text centered ([196f661](https://github.com/desaianand1/PokeBoids/commit/196f6617a2728ee3fecd2bd00b861cba7a2e34e3))
+
+
+### Features
+
+* add pred/prey vs simple boids split, better runtime timer ([9a046ea](https://github.com/desaianand1/PokeBoids/commit/9a046ea7bb36a2f4e38b65602fde9666cfc8735a))
+* **core:** implement strategy pattern for simulation modes ([c35de71](https://github.com/desaianand1/PokeBoids/commit/c35de713e5548b2a2bf01aa99bb90022c02ab6fb))
+* **events:** add simulation mode change event and integrate mode confirmation ([9b6de8b](https://github.com/desaianand1/PokeBoids/commit/9b6de8bab1b4f06721594f05b016fea25b4bda56))
+* **simulation:** integrate strategy pattern into core systems ([7593d2e](https://github.com/desaianand1/PokeBoids/commit/7593d2eb3bfa6e44497781f0d06ad9e79b01a038))
+* **system:** integrate strategy pattern across core components ([39f8f55](https://github.com/desaianand1/PokeBoids/commit/39f8f557651ff75dce28eae469b6ab43148e095f))
+* **ui:** add mode confirmation dialog and clean boid config panel ([b7b1e4f](https://github.com/desaianand1/PokeBoids/commit/b7b1e4f7e08a8606e178e8fdc673e19e89425066))
+* **ui:** implement strategy-based conditional rendering in UI components ([efcf331](https://github.com/desaianand1/PokeBoids/commit/efcf33163dc5535ab4f624be8d0b2321e6bec142))
+
+
+### BREAKING CHANGES
+
+* new boids split breaks prev architecture & UI
+
 # [2.0.0](https://github.com/desaianand1/PokeBoids/compare/v1.4.0...v2.0.0) (2025-08-13)
 
 
