@@ -14,6 +14,7 @@
 		formatValue?: (val: number) => string;
 		onChange: (value: number) => void;
 		class?: string;
+		description?: string;
 	}
 
 	const {
@@ -26,7 +27,8 @@
 		unit = '',
 		formatValue = (val: number) => val.toFixed(1),
 		onChange,
-		class: className = ''
+		class: className = '',
+		description
 	}: ParameterSliderProps = $props();
 </script>
 
@@ -48,4 +50,7 @@
 		thumbClasses="group-hover:scale-125 transition-transform duration-200 ease-in-out"
 		onValueChange={onChange}
 	/>
+	{#if description}
+		<p class="text-xs leading-relaxed text-muted-foreground">{description}</p>
+	{/if}
 </div>

@@ -62,6 +62,7 @@
 		step={alignmentWeight.step}
 		formatValue={formatDecimal}
 		onChange={createUpdateHandler('alignmentWeight')}
+		description="How strongly boids align their direction with nearby neighbors"
 	/>
 
 	<ParameterSlider
@@ -73,6 +74,7 @@
 		step={cohesionWeight.step}
 		formatValue={formatDecimal}
 		onChange={createUpdateHandler('cohesionWeight')}
+		description="How strongly boids move toward the center of nearby neighbors"
 	/>
 
 	<ParameterSlider
@@ -84,6 +86,7 @@
 		step={separationWeight.step}
 		formatValue={formatDecimal}
 		onChange={createUpdateHandler('separationWeight')}
+		description="How strongly boids avoid crowding and maintain personal space"
 	/>
 
 	<ParameterSlider
@@ -106,6 +109,7 @@
 		step={separationRadius.step}
 		formatValue={formatPixels}
 		onChange={createUpdateHandler('separationRadius')}
+		description="Distance at which boids begin avoiding each other to prevent crowding"
 	/>
 
 	<ParameterSlider

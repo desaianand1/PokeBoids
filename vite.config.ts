@@ -20,7 +20,11 @@ export default defineConfig({
 			]
 		},
 		deps: {
-			inline: [/phaser/]
+			optimizer: {
+				web: {
+					include: ['phaser']
+				}
+			}
 		},
 		pool: 'forks',
 		poolOptions: {

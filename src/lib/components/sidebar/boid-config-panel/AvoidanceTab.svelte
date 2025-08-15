@@ -50,6 +50,7 @@
 		step={boundaryMargin.step}
 		formatValue={(val) => `${val.toFixed(0)}px`}
 		onChange={createUpdateHandler('boundaryMargin')}
+		description="Distance from world edge where boundary avoidance forces start"
 	/>
 
 	<ParameterSlider
@@ -61,6 +62,7 @@
 		step={boundaryForceMultiplier.step}
 		formatValue={(val) => `${val.toFixed(1)}x`}
 		onChange={createUpdateHandler('boundaryForceMultiplier')}
+		description="Strength multiplier for forces pushing boids away from boundaries"
 	/>
 
 	<ParameterSlider
@@ -72,6 +74,7 @@
 		step={boundaryForceRamp.step}
 		formatValue={(val) => val.toFixed(1)}
 		onChange={createUpdateHandler('boundaryForceRamp')}
+		description="How gradually boundary forces increase as boids approach edges"
 	/>
 
 	<ParameterSlider

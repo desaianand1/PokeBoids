@@ -97,10 +97,11 @@ The codebase follows a **separation of concerns** principle with framework-agnos
    - `ui/` - shadcn-svelte components for consistent design system
 
    **Technical Improvements**:
-   - **ResponsiveDialog**: Enhanced responsive dialog component for better mobile experience
+   - **ResponsiveDialog**: Enhanced responsive dialog component with nested drawer support, optimized snap points, and proper full-screen sizing
+   - **Nested Drawer System**: Clean implementation using Svelte 5 snippets and `nested` prop for mobile dialogs within sidebar drawers
    - **Sprite Frame Extraction** (`sprite-frame-extractor.ts`): New utility for dynamic sprite display in onboarding
    - **Enhanced Theme Integration**: Seamless theme switching with improved visual feedback
-   - **Mobile Optimization**: Better responsive design with touch-friendly controls
+   - **Mobile Optimization**: Better responsive design with touch-friendly controls and improved drawer UX
 
 ### Adapter Pattern
 
@@ -266,14 +267,19 @@ Remaining high priority biological system tasks:
 - Strengthened boundary collision prevention with position clamping and velocity reflection
 - Maintained comprehensive type safety with proper TypeScript interfaces
 
-**1. UI: Drawer, Layout & Nested Drawers**
+**1. UI: Drawer, Layout & Nested Drawers ✅ COMPLETED**
 
-- Fix responsive drawer full-screen issues and snap points
-- Configure nested drawer support for mobile (Reset, Restart, Change Environment dialogs)
+- Fixed responsive drawer full-screen issues and snap points
+- Configured nested drawer support for mobile (Reset, Restart, Change Environment dialogs)
+- Implemented clean nested drawer pattern using Svelte 5 snippets and `nested` prop
+- Optimized drawer sizing with proper height constraints and improved snap points
 
-**2. Panels & Settings**
+**2. Panels & Settings ✅ COMPLETED**
 
-- Rename "Fun" tab to "Advanced Settings"
+- ✅ Renamed "Fun" tab to "Advanced Settings"
+- ✅ Moved Boundary Settings to Advanced Settings tab
+- ✅ Added Predator-Prey Mechanics toggle with proper mode switching
+- ✅ Integrated with existing event system and UI patterns
 
 **3. Slider Labels & User Guidance**
 
