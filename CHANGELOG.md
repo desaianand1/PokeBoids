@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/desaianand1/PokeBoids/compare/v3.0.0...v3.0.1) (2026-10-23)
+
+
+### Bug Fixes
+
+* **security:** pin Node.js 24 → 24.22.1 (Brotli RCE, TLS bypass) ([7001489](https://github.com/desaianand1/PokeBoids/commit/7001489d8a15681e386a279e5842662722a2d16b))
+
 # [3.0.0](https://github.com/desaianand1/PokeBoids/compare/v2.0.0...v3.0.0) (2025-08-15)
 
 
