@@ -81,7 +81,7 @@
 		"typescript-eslint": "^8.39.0",
 		"vaul-svelte": "1.0.0-next.7",
 		"vite": "^7.1.1",
-		"vitest": "^3.2.4"
+		"vitest": "^4.0.0"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
